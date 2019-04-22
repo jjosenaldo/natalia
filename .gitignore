@@ -1,0 +1,5 @@
+# alex-generated files
+*.hi
+*.o
+lexical/tokens
+lexical/tokens.hs
