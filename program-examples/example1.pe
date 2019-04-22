@@ -1,0 +1,26 @@
+imports
+{
+    lib1.nat;
+    lib2.nat;
+}
+
+globals
+{
+
+}
+
+subprograms
+{
+
+}
+
+main
+{
+    # i'm a single line comment
+
+    #! i'm a
+    multiline
+    comment
+    very wow !#
+
+}
