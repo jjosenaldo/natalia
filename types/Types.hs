@@ -1,3 +1,5 @@
+module Types where
+
 data TypeValue = TypeValue {tvType :: String, tvValue :: Int }deriving Show 
 data Scope = Scope {scopeScope :: [String]} deriving Show 
 data MemoryCell = MemoryCell {cellName :: String, cellTv :: TypeValue, cellScope :: Scope} deriving Show 
