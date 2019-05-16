@@ -24,8 +24,6 @@ tokens :-
   =                                { \s -> Assign}
   int                              { \s -> Type s}
   $alpha [$alpha $digit \_ \']*    { \s -> Id s }
-
-
 {
 -- The token type:
 data Token =
@@ -42,7 +40,6 @@ data Token =
   Int Int |
   Main
   deriving (Eq,Show)
-
 main = do
   s <- getContents
   print (alexScanTokens s)
