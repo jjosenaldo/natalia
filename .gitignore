@@ -1,5 +1,9 @@
-# alex-generated files
-*.hi
+# haskell files
 *.o
-lexical/tokens
-lexical/tokens.hs
+*.hi
+
+# executable files
+*.out
+
+# buildable alex file 
+Tokens/*.hs

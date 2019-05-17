@@ -1,5 +1,8 @@
 {
-module Main (main) where
+module Lexical.Tokens (getTokens, Token(..)) where
+
+import System.IO
+import System.IO.Unsafe
 }
 
 %wrapper "basic"
@@ -62,13 +65,14 @@ tokens :-
   "else if"                        { \s -> ElseIf } 
 
   -- types
-  int                              { \s -> Type s }
-  float                            { \s -> Type s }
-  set                              { \s -> Type s }
-  double                           { \s -> Type s } 
-  bool                             { \s -> Type s }
-  tuple                            { \s -> Type s }
-  byte                             { \s -> Type s }
+  int                              { \s -> TypeInt }
+  -- float                            { \s -> Type s }
+  -- set                              { \s -> Type s }
+  -- double                           { \s -> Type s } 
+  -- bool                             { \s -> Type s }
+  -- tuple                            { \s -> Type s }
+  -- byte                             { \s -> Type s }
+  string                           { \s -> TypeString } 
 
   -- loops
   while                            { \s -> Loop s }
@@ -88,11 +92,11 @@ data Token =
   RParen           |
   LBracket         |
   RBracket         |
-  
   -- sections
   Imports          |
   Globals          |
   Subprograms      |
+  Main             |
   
   Filename String  |
   
@@ -126,18 +130,20 @@ data Token =
   ElseIf           |
 
   -- types
-  Type String      |
+  TypeString      |
+  TypeInt         |
   
   -- loops
   Loop String      |
   
   -- identifier
   Id String        |
-  Int Int          |
-  Main
+  Int Int          
   deriving (Eq,Show)
 
-main = do
-  s <- getContents
-  print (alexScanTokens s)
+getTokens fn = unsafePerformIO (getTokensAux fn)
+
+getTokensAux fn = do {fh <- openFile fn ReadMode;
+                      s <- hGetContents fh;
+                      return (alexScanTokens s)}
 }
