@@ -6,4 +6,4 @@
 *.out
 
 # buildable alex file 
-Tokens/*.hs
+Lexical/*.hs
