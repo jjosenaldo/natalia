@@ -12,11 +12,14 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
 
+  -- THINGS THAT ARE IGNORED ------------------------------
+
   $white+                          ; -- white spaces
   "#".*                            ; -- single-line comment
   "#"!   [.\n]*  !"#"              ; -- multi-line comment
 
-  -- blocks
+  -- BLOCKS -----------------------------------------------
+
   \{                               { \s -> LBrace }
   \}                               { \s -> RBrace }
   \(                               { \s -> LParen }
@@ -24,20 +27,24 @@ tokens :-
   \[                               { \s -> LBracket }
   \]                               { \s -> RBracket }
  
-  -- sections
+  -- SECTIONS ---------------------------------------------
+
   \@imports                        { \s -> Imports } 
   \@globals                        { \s -> Globals }
   \@subprograms                    { \s -> Subprograms }
   \@main                           { \s -> Main }
   
-  -- filename
-  [$alpha\_$digit]+   \.  [a-z]+   { \s -> Filename s }
-  
-  -- control
+  -- SEPARATORS -------------------------------------------
+
+  -- statement separator
   ";"                              { \s -> SemiColon }
+
+  -- LITERALS  ---------------------------------------------
+
   $digit+                          { \s -> Int (read s) }
  
-  -- operatos
+  -- OPERATORS  --------------------------------------------
+
   =                                { \s -> Assign }
   \+                               { \s -> Plus }
   \-                               { \s -> Minus }
@@ -59,12 +66,14 @@ tokens :-
   "||"                             { \s -> OrShortCircuit }
   "or"                             { \s -> Or }
 
-  -- conditionals
+  -- CONDITIONALS  -----------------------------------------
+
   if                               { \s -> If }
   else                             { \s -> Else }
   "else if"                        { \s -> ElseIf } 
 
-  -- types
+  -- TYPES  ------------------------------------------------
+
   int                              { \s -> TypeInt }
   -- float                            { \s -> Type s }
   -- set                              { \s -> Type s }
@@ -74,35 +83,46 @@ tokens :-
   -- byte                             { \s -> Type s }
   string                           { \s -> TypeString } 
 
-  -- loops
+  -- LOOPS  ------------------------------------------------
+
   while                            { \s -> Loop s }
   for                              { \s -> Loop s }
 
-  -- names 
+  -- NAMES ------------------------------------------------
+
+  -- filename
+  [$alpha\_$digit]+   \.  [a-z]+   { \s -> Filename s }
+
+  -- identifier
   $alpha [$alpha $digit \_ \']*    { \s -> Id s }
 
 {
 -- The token type:
 data Token =
 
-  -- blocks
+  -- BLOCKS -----------------------------------------------
+
   LBrace           |
   RBrace           |
   LParen           |
   RParen           |
   LBracket         |
   RBracket         |
-  -- sections
+
+  -- SECTIONS ---------------------------------------------
+  
   Imports          |
   Globals          |
   Subprograms      |
   Main             |
-  
-  Filename String  |
-  
+
+  -- SEPARATORS -------------------------------------------
+
+  -- statement separator
   SemiColon        |
   
-  -- operators
+  -- OPERATORS  --------------------------------------------
+
   Assign           |
   Plus             |
   Minus            |
@@ -124,21 +144,35 @@ data Token =
   OrShortCircuit   |
   Or               |
   
-  -- consitionals
+  -- CONDITIONALS  -----------------------------------------
+
   If               |
   Else             |
   ElseIf           |
 
-  -- types
+  -- TYPES  ------------------------------------------------
+
   TypeString      |
   TypeInt         |
   
-  -- loops
+  -- LOOPS  ------------------------------------------------
+
   Loop String      |
-  
+
+  -- NAMES ------------------------------------------------
+
   -- identifier
   Id String        |
+
+  -- file name
+  Filename String  |
+
+  -- LITERALS  ---------------------------------------------
+
   Int Int          
+
+  ----------------------------------------------------------
+
   deriving (Eq,Show)
 
 getTokens fn = unsafePerformIO (getTokensAux fn)
