@@ -1,5 +1,5 @@
 {
-module Lexical.Tokens (getTokens, Token(..)) where
+module Lexical.Tokens (getTokens, Token(..), typeName) where
 
 import System.IO
 import System.IO.Unsafe
@@ -9,8 +9,21 @@ import System.IO.Unsafe
 
 $digit = [0-9]
 $alpha = [a-zA-Z]   -- alphabetic characters
+$primitiveType = [ int string bool long float double ]
 
 tokens :-
+
+  -- TYPES  ------------------------------------------------
+
+  int                                 { \s -> Type s }
+  \{ int\}                             { \s -> Type s}
+  -- float                            { \s -> Type s }
+  -- set                              { \s -> Type s }
+  -- double                           { \s -> Type s } 
+  -- bool                             { \s -> Type s }
+  -- tuple                            { \s -> Type s }
+  -- byte                             { \s -> Type s }
+  -- string                           { \s -> TypeString } 
 
   -- THINGS THAT ARE IGNORED ------------------------------
 
@@ -71,17 +84,6 @@ tokens :-
   if                               { \s -> If }
   else                             { \s -> Else }
   "else if"                        { \s -> ElseIf } 
-
-  -- TYPES  ------------------------------------------------
-
-  int                              { \s -> TypeInt }
-  -- float                            { \s -> Type s }
-  -- set                              { \s -> Type s }
-  -- double                           { \s -> Type s } 
-  -- bool                             { \s -> Type s }
-  -- tuple                            { \s -> Type s }
-  -- byte                             { \s -> Type s }
-  string                           { \s -> TypeString } 
 
   -- LOOPS  ------------------------------------------------
 
@@ -152,8 +154,7 @@ data Token =
 
   -- TYPES  ------------------------------------------------
 
-  TypeString      |
-  TypeInt         |
+  Type String      |  
   
   -- LOOPS  ------------------------------------------------
 
@@ -174,6 +175,10 @@ data Token =
   ----------------------------------------------------------
 
   deriving (Eq,Show)
+
+typeName :: Token -> String
+typeName (Type x) = x
+typeName _ = error "typeName error"
 
 getTokens fn = unsafePerformIO (getTokensAux fn)
 

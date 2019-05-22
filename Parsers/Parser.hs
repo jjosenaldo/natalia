@@ -21,9 +21,9 @@ rightBraceToken = tokenPrim show update_pos get_token where
     get_token RBrace = Just RBrace
     get_token _       = Nothing
 
--- terminal: name of the *int* type
-typeIntToken = tokenPrim show update_pos get_token where
-    get_token TypeInt = Just TypeInt
+-- terminal: name of the *int* type %TODO: update comment
+typeToken = tokenPrim show update_pos get_token where
+    get_token (Type x) = Just (Type x)
     get_token _        = Nothing 
 
 -- terminal: identifier name
@@ -52,14 +52,24 @@ update_pos :: SourcePos -> Token -> [Token] -> SourcePos
 update_pos pos _ (tok:_) = pos -- necessita melhoria
 update_pos pos _ []      = pos  
 
+-- | intializes a variable, inserting in the memory and returns the memory
+behaveInitialization :: Token -- the name of the type 
+                     -> Token -- the name of the variable (it's a value of the form (Id x))
+                     -> Token -- the value of the variable (it's a value of the form (Int Int))
+                     -> [(Token, Token)] -> [(Token, Token)] -- sei la
+behaveInitialization a b d
+    | typeName a =="int" = symtable_insert (b,d)
+    | typeName a =="{int}" = symtable_insert (b,d)
+    | otherwise = error "unsupported type (se vc viu esse erro, a gente ta lascado)"
+
 -- nonterminal: initialization of an *int* variable
 varInitialization :: ParsecT [Token] [(Token,Token)] IO([Token])
 varInitialization = do
-    a <- typeIntToken
+    a <- typeToken
     b <- idToken
     c <- assignToken
     d <- intToken
-    updateState(symtable_insert(b, d))
+    updateState(behaveInitialization a b d)
 
     -- optional: print symbols_table content
     s <- getState
@@ -116,8 +126,8 @@ program = do
 
 -- functions for the table of symbols
 
-get_default_value :: Token -> Token
-get_default_value (TypeInt) = Int 0          
+-- get_default_value :: Token -> Token
+-- get_default_value (TypeInt) = Int 0          
 
 symtable_insert :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
 symtable_insert symbol []  = [symbol]
@@ -146,3 +156,8 @@ main = case unsafePerformIO (parser (getTokens "./Programs/init-int.nat")) of
             { Left err -> print err; 
                 Right ans -> print ans
             }
+
+
+-- Dúvida: vai ter um varInialization pra cada tipo, ou só 1? Se a segunda: quando a checagem é feita?
+-- Qual a diferença exata da symtable pra memória?
+-- Precisa de float e double?
