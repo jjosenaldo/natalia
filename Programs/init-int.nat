@@ -1,5 +1,4 @@
 @main{
-    {int} b = 1;
     int x = 10;
     x = 20;
     int y = 10;

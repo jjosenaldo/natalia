@@ -9,21 +9,17 @@ import System.IO.Unsafe
 
 $digit = [0-9]
 $alpha = [a-zA-Z]   -- alphabetic characters
-$primitiveType = [ int string bool long float double ]
 
 tokens :-
 
   -- TYPES  ------------------------------------------------
 
-  int                                 { \s -> Type s }
-  \{ int\}                             { \s -> Type s}
-  -- float                            { \s -> Type s }
-  -- set                              { \s -> Type s }
-  -- double                           { \s -> Type s } 
-  -- bool                             { \s -> Type s }
-  -- tuple                            { \s -> Type s }
-  -- byte                             { \s -> Type s }
-  -- string                           { \s -> TypeString } 
+  int                              { \s -> Type s }
+  long                             { \s -> Type s }
+  float                            { \s -> Type s }
+  double                           { \s -> Type s } 
+  string                           { \s -> Type s }
+  bool                             { \s -> Type s } 
 
   -- THINGS THAT ARE IGNORED ------------------------------
 
