@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Lexical.Lexems
+import Lexical.Lexemes
 import Text.Parsec
 import Control.Monad.IO.Class
 

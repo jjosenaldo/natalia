@@ -1,5 +1,5 @@
 {
-module Lexical.Lexems (getTokens, Token(..), typeName) where
+module Lexical.Lexemes (getTokens, Token(..), typeName) where
 
 import System.IO
 import System.IO.Unsafe
