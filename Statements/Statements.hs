@@ -3,7 +3,7 @@ module Statements.Statements where
 import Expressions.Abstractions
 import Memory.Memory
 import Lexical.Lexemes
-import Parsers.Tokens
+import Lexical.Tokens
 import Types.Types
 
 import Text.Parsec

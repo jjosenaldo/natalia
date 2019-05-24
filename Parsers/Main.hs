@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Lexical.Lexemes
-import Parsers.Tokens
+import Lexical.Tokens
 import Statements.Statements
 
 import Text.Parsec

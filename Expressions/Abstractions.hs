@@ -1,8 +1,8 @@
 module Expressions.Abstractions where
 
 import Expressions.Evaluation
-import Parsers.Tokens
 import Lexical.Lexemes
+import Lexical.Tokens
 
 import Text.Parsec
 
