@@ -30,7 +30,7 @@ tokenizer:
 .PHONY: generate
 generate:
 	@echo "compiling..."
-	$(LC) $(PARSER_PATH)/Parser.hs -o $(BIN_NAME)
+	$(LC) $(PARSER_PATH)/Main.hs -o $(BIN_NAME)
 
 .PHONY: clean
 clean: 
