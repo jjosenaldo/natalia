@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Lexical.Tokens
+import Lexical.Lexems
 import Text.Parsec
 import Control.Monad.IO.Class
 
@@ -14,6 +14,10 @@ mainToken = tokenPrim show update_pos get_token where
 -- terminal: block opening character
 leftBraceToken = tokenPrim show update_pos get_token where
     get_token LBrace = Just LBrace
+    get_token _       = Nothing
+
+plusToken = tokenPrim show update_pos get_token where
+    get_token Plus = Just Plus
     get_token _       = Nothing
 
 -- terminal: block closing character
@@ -52,24 +56,19 @@ update_pos :: SourcePos -> Token -> [Token] -> SourcePos
 update_pos pos _ (tok:_) = pos -- necessita melhoria
 update_pos pos _ []      = pos  
 
--- | intializes a variable, inserting in the memory and returns the memory
-behaveInitialization :: Token -- the name of the type 
-                     -> Token -- the name of the variable (it's a value of the form (Id x))
-                     -> Token -- the value of the variable (it's a value of the form (Int Int))
-                     -> [(Token, Token)] -> [(Token, Token)] -- sei la
-behaveInitialization a b d
-    | typeName a =="int" = symtable_insert (b,d)
-    | typeName a =="{int}" = symtable_insert (b,d)
-    | otherwise = error "unsupported type (se vc viu esse erro, a gente ta lascado)"
-
 -- nonterminal: initialization of an *int* variable
-varInitialization :: ParsecT [Token] [(Token,Token)] IO([Token])
-varInitialization = do
+var_initialization :: ParsecT [Token] [(Token,Token)] IO([Token])
+var_initialization = do
     a <- typeToken
     b <- idToken
     c <- assignToken
-    d <- intToken
-    updateState(behaveInitialization a b d)
+    d <- expression
+    e <- getState
+
+    if (not (is_compatible a d)) then fail "type mismatch"
+    else
+        do
+            updateState(symtable_insert (b, d))
 
     -- optional: print symbols_table content
     s <- getState
@@ -78,8 +77,8 @@ varInitialization = do
     return (a:b:c:[d])
 
 -- nonterminal: attribution of a value to an *int* variable
-varAttribution :: ParsecT [Token] [(Token,Token)] IO([Token])
-varAttribution = do
+var_attribution :: ParsecT [Token] [(Token,Token)] IO([Token])
+var_attribution = do
     a <- idToken
     b <- assignToken
     c <- intToken
@@ -95,11 +94,11 @@ varAttribution = do
 statement :: ParsecT [Token] [(Token,Token)] IO([Token])
 statement = 
     (do
-        a <- varInitialization
+        a <- var_initialization
         return (a))
     <|>
     (do
-        a <- varAttribution
+        a <- var_attribution
         return (a))
 
 -- nonterminal: list of statements
@@ -124,23 +123,52 @@ program = do
             eof
             return (a:b:c ++ [d])
 
+-- functions for types
+
+get_value :: Token -> [(Token, Token)] -> Token
+get_value _ [] = error "getValue error: variable not found"
+get_value (Id id1) ((Id id2, value):t) = if id1 == id2 then value
+                                                else get_value (Id id1) t
+-- checks if two VALUES are of compatible types
+is_compatible :: Token -> Token -> Bool
+is_compatible (Int _ ) (Int _ ) = True
+is_compatible (Type x) (Int _ ) 
+    | x == "int" = True
+    | otherwise = False
+is_compatible _ _ = False
+
+-- expression evaluation
+expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression = try bin_expression <|> zeroary_expression
+
+zeroary_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+zeroary_expression = do
+                   a <- intToken 
+                   return (a)
+
+bin_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+bin_expression = do
+                   a <- intToken
+                   b <- plusToken
+                   c <- intToken
+                   return (eval a b c)
+
+eval :: Token -> Token -> Token -> Token
+eval (Int x ) (Plus ) (Int y) = Int (x + y)
+
 -- functions for the table of symbols
-
--- get_default_value :: Token -> Token
--- get_default_value (TypeInt) = Int 0          
-
 symtable_insert :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
 symtable_insert symbol []  = [symbol]
 symtable_insert symbol symtable = symtable ++ [symbol]
 
 symtable_update :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
-symtable_update _ [] = fail "variable not found"
+symtable_update _ [] = fail "update fail: variable not found"
 symtable_update (id1, v1) ((id2, v2):t) = 
                                 if id1 == id2 then (id1, v1) : t
                                 else (id2, v2) : symtable_update (id1, v1) t
 
 symtable_remove :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
-symtable_remove _ [] = fail "variable not found"
+symtable_remove _ [] = fail "deletion fail: variable not found"
 symtable_remove (id1, v1) ((id2, v2):t) = 
                                 if id1 == id2 then t
                                 else (id2, v2) : symtable_remove (id1, v1) t                               
@@ -158,6 +186,7 @@ main = case unsafePerformIO (parser (getTokens "./Programs/init-int.nat")) of
             }
 
 
--- Dúvida: vai ter um varInialization pra cada tipo, ou só 1? Se a segunda: quando a checagem é feita?
+
+
 -- Qual a diferença exata da symtable pra memória?
 -- Precisa de float e double?
