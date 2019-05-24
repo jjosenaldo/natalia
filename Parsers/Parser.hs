@@ -4,6 +4,7 @@ import Expressions.Abstractions
 import Lexical.Lexemes
 import Memory.Memory
 import Parsers.Tokens
+import Types.Types
 
 import Text.Parsec
 import Control.Monad.IO.Class
@@ -75,20 +76,6 @@ program = do
             d <- rightBraceToken
             eof
             return (a:b:c ++ [d])
-
--- functions for types
-
-get_value :: Token -> [(Token, Token)] -> Token
-get_value _ [] = error "getValue error: variable not found"
-get_value (Id id1) ((Id id2, value):t) = if id1 == id2 then value
-                                                else get_value (Id id1) t
--- checks if two VALUES are of compatible types
-is_compatible :: Token -> Token -> Bool
-is_compatible (Int _ ) (Int _ ) = True
-is_compatible (Type x) (Int _ ) 
-    | x == "int" = True
-    | otherwise = False
-is_compatible _ _ = False
 
 -- invocação do parser para o símbolo de partida 
 
