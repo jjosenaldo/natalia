@@ -1,6 +1,6 @@
 module Statements.Statements where
 
-import Expressions.Abstractions
+import Expressions.Expressions
 import Memory.Memory
 import Lexical.Lexemes
 import Lexical.Tokens
@@ -34,7 +34,7 @@ var_attribution :: ParsecT [Token] [(Token,Token)] IO([Token])
 var_attribution = do
     a <- idToken
     b <- assignToken
-    c <- intToken
+    c <- int_token
     updateState(symtable_update(a,c))
 
     -- optional: print symbols_table content
@@ -46,6 +46,7 @@ var_attribution = do
 -- nonterminal: statement
 statement :: ParsecT [Token] [(Token,Token)] IO([Token])
 statement = 
+    try
     (do
         a <- var_initialization
         return (a))
@@ -57,6 +58,7 @@ statement =
 -- nonterminal: list of statements
 statements :: ParsecT [Token] [(Token,Token)] IO([Token])
 statements = 
+    try
     (do
         a <- statement
         b <- semiColonToken
