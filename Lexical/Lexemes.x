@@ -55,10 +55,12 @@ tokens :-
   -- OPERATORS  --------------------------------------------
 
   =                                { \p s -> Assign (getLC p)}
+  \%                               { \p s -> Mod (getLC p)}
+  \^                               { \p s -> Exp (getLC p)}
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
-  \*                               { \p s -> Asterisk (getLC p)}
-  \/                               { \p s -> Bar (getLC p)}
+  \*                               { \p s -> Times (getLC p)}
+  \/                               { \p s -> Div (getLC p)}
   "+="                             { \p s -> PlusEquals (getLC p)}
   "-="                             { \p s -> MinusEqual (getLC p)}
   "*="                             { \p s -> AsteriskEquals (getLC p)}
@@ -122,10 +124,12 @@ data Token =
   -- OPERATORS  --------------------------------------------
 
   Assign (Int, Int)          |
+  Mod (Int, Int)             |
+  Exp (Int, Int)             |
   Plus (Int, Int)            |
   Minus (Int, Int)           |
-  Asterisk (Int, Int)        |
-  Bar (Int, Int)             |
+  Times (Int, Int)           |
+  Div (Int, Int)             |
   PlusEquals (Int, Int)      |
   MinusEqual (Int, Int)      |
   AsteriskEquals (Int, Int)  |
