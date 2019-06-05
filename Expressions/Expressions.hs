@@ -37,11 +37,14 @@ var_attribution = do
 
     return (c);
 
+expression_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
+expression_const = int_token
+
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
-expression = expression0
+expression = expression4
 
 expression0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression0 = var_attribution
+expression0 = var_attribution <|> expression_const
 
 expression1 :: ParsecT [Token] [(Token,Token)] IO(Token)
 expression1 = 
@@ -73,6 +76,7 @@ expression3 =
 
 eval_remaining_3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_3 n1 = 
+    try
     (do
         op <- bin_op_left_3_token
         n2 <- expression2
@@ -91,6 +95,7 @@ expression4 =
 
 eval_remaining_4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_4 n1 = 
+    try
     (do
         op <- bin_op_left_4_token
         n2 <- expression3
