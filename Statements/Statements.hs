@@ -29,41 +29,27 @@ var_initialization = do
 
     return (a:b:c:[d])
 
--- nonterminal: attribution of a value to an *int* variable
-var_attribution :: ParsecT [Token] [(Token,Token)] IO([Token])
-var_attribution = do
-    a <- idToken
-    b <- assignToken
-    c <- int_token
-    updateState(symtable_update(a,c))
-
-    -- optional: print symbols_table content
-    s <- getState
-    liftIO (print s)
-
-    return (a:b:[c])
-
 -- nonterminal: statement
-statement :: ParsecT [Token] [(Token,Token)] IO([Token])
+statement :: ParsecT [Token] [(Token,Token)] IO()
 statement = 
     try
     (do
         a <- var_initialization
-        return (a))
+        return ())
     <|>
     (do
         a <- var_attribution
-        return (a))
+        return ())
 
 -- nonterminal: list of statements
-statements :: ParsecT [Token] [(Token,Token)] IO([Token])
+statements :: ParsecT [Token] [(Token,Token)] IO()
 statements = 
     try
     (do
         a <- statement
         b <- semiColonToken
         c <- statements
-        return (a ++ b:c))
+        return ())
     <|>
     (do
-        return ([]))
+        return ())

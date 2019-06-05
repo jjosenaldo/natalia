@@ -1,77 +1,101 @@
 module Expressions.Expressions where
 
 import Expressions.Evaluation
+import Expressions.Operations
 import Lexical.Lexemes
 import Lexical.Tokens
+import Memory.Memory
 
 import Text.Parsec
 import Control.Monad.IO.Class
 
--- <expr> ::= <expr3>
--- <expr3> ::= <expr3> + <expr2> | 
---             <expr3> - <expr2> | 
---             <expr2> 
--- <expr2> ::= <expr2> * <expr1> | 
---             <expr2> / <expr1> | <expr1>
--- <expr1> ::= <expr1> % <expr0> | <expr0>
+{-
 
-expression :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression = expression3
+    =, ++x, --x, x++, x--
 
-expression3 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression3 = 
-    try
-    (do
-        a <- expression3
-        b <- plus_token
-        c <- expression2
-        return (eval a b c))
-     <|>
-     (do
-        a <- expression3
-        b <- minus_token
-        c <- expression2
-        return (eval a b c))
-     <|>
-     (do
-        a <- expression2
-        return (a))
+    un -
+  
+    ^
 
-expression2 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression2 = 
-    try
-    (do
-        c <- expression1
-        b <- times_token
-        a <- expression2
-        return (eval c b a))
-    <|>
-    (do
-        c <- expression1
-        b <- div_token
-        a <- expression2
-        return (eval c b a))
-    <|>
-    (do
-        a <- expression1
-        return (a))
+    *, /, %
+
+    +, bin -
+
+-}
+
+-- nonterminal: attribution of a value to an *int* variable
+var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
+var_attribution = do
+    a <- idToken
+    b <- assignToken
+    c <- int_token
+    updateState(symtable_update(a,c))
+
+    -- optional: print symbols_table content
+    s <- getState
+    liftIO (print s)
+
+    return (c);
+
+expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
+expression = expression0
+
+expression0 :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression0 = var_attribution
 
 expression1 :: ParsecT [Token] [(Token,Token)] IO(Token)
 expression1 = 
     try
     (do
-        c <- expression0
-        b <- mod_token
-        a <- expression1
-        return (eval c b a))
+        op <- minus_token
+        n2 <- expression1
+        return (unary_eval op n2))
     <|>
-    (do
-        a <- expression0
-        return (a))
-    
-expression0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression0 = 
+    expression0
+
+expression2 :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression2 = 
     try
     (do
-        a <- int_token
-        return (a))
+        n1 <- expression1
+        op <- exp_token
+        n2 <- expression2
+        return (binary_eval n1 op n2))
+    <|>
+    expression1
+
+expression3 :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression3 = 
+    do
+        n1 <- expression2
+        result <- eval_remaining_3 n1 
+        return (result)
+
+eval_remaining_3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_3 n1 = 
+    (do
+        op <- bin_op_left_3_token
+        n2 <- expression2
+        result <- eval_remaining_3 (binary_eval n1 op n2)
+        return (result))
+    <|>
+    (do
+        return (n1))
+
+expression4 :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression4 = 
+    do
+        n1 <- expression3
+        result <- eval_remaining_4 n1 
+        return (result)
+
+eval_remaining_4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_4 n1 = 
+    (do
+        op <- bin_op_left_4_token
+        n2 <- expression3
+        result <- eval_remaining_4 (binary_eval n1 op n2)
+        return (result))
+    <|>
+    (do
+        return (n1))
