@@ -1,0 +1,6 @@
+@main{
+	double x = toDouble(read());
+	double y = toDouble(read());
+	int c = toInt(read());
+	print(toString(x^2 - y + c));
+}

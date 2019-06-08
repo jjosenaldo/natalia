@@ -1,0 +1,23 @@
+@subprograms{
+	proc gcd(int n, int m, int &r) {
+		if(n%m == 0){
+			r = m;
+		}
+		else {
+			if(m%n == 0){
+				r = n;
+			}
+			else{
+				gcd(m, n&m, r);	
+			}
+		}
+	}
+}
+
+@main{
+	int r = 0;
+	int n = 104;
+	int m = 56;
+	gcd(n, m, r);
+	print("gcd(" + toString(n) + ", " + toString(m) + ") = " + r + "\n");
+}
