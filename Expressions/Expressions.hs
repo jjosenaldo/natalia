@@ -9,20 +9,6 @@ import Memory.Memory
 import Text.Parsec
 import Control.Monad.IO.Class
 
-{-
-
-    =, ++x, --x, x++, x--
-
-    un -
-  
-    ^
-
-    *, /, %
-
-    +, bin -
-
--}
-
 -- nonterminal: attribution of a value to an *int* variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
