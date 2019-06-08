@@ -29,8 +29,8 @@ exp_const = int_token
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
 expression = exp_num4
 
-expression0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression0 = var_attribution <|> exp_const
+exp_num0 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num0 = var_attribution <|> exp_const
 
 exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num1 = 
@@ -40,7 +40,7 @@ exp_num1 =
         n2 <- exp_num1
         return (unary_eval op n2))
     <|>
-    expression0
+    exp_num0
 
 exp_num2 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num2 = 
