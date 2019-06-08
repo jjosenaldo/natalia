@@ -20,7 +20,7 @@ var_initialization = do
 
     let expr_type = get_value_type expr_value
 
-    if (not (attr_compatible_types t expr_type)) then fail "type mismatch on var initialization"
+    if (not (attr_compatible_types t expr_type)) then fail ("ERROR at " ++ show(get_pos expr_value)  ++ ": type mismatch in the initialization of a variable.")
     else
         do
             updateState(symtable_insert (name, expr_value))

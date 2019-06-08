@@ -1,4 +1,5 @@
 @main{
+    int asajdh = 2/3;
     int j = -2 ^ 5;
     j = -4 / -2;
     double zz = 4/3;
