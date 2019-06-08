@@ -1,5 +1,5 @@
 {
-module Lexical.Lexemes (getTokens, Token(..), typeName) where
+module Lexical.Lexemes (getTokens, Token(..), typeName, get_pos) where
 
 import System.IO
 import System.IO.Unsafe
@@ -181,6 +181,50 @@ data Token =
 typeName :: Token -> String
 typeName (Type x p) = x
 typeName _ = error "typeName error"
+
+get_pos :: Token -> (Int, Int)
+get_pos (LBrace p) = p
+get_pos (RBrace p) = p
+get_pos (LParen p) = p
+get_pos (RParen p) = p
+get_pos (LBracket p) = p
+get_pos (RBracket p) = p
+get_pos (Import p) = p
+get_pos (Globals p) = p
+get_pos (Subprograms p) = p
+get_pos (Main p) = p
+get_pos (SemiColon p) = p
+get_pos (Assign p) = p
+get_pos (Mod p) = p
+get_pos (Expo p) = p
+get_pos (Plus p) = p
+get_pos (Minus p) = p
+get_pos (Times p) = p
+get_pos (Div p) = p
+get_pos (PlusEquals p) = p
+get_pos (MinusEqual p) = p
+get_pos (AsteriskEquals p) = p
+get_pos (BarEquals p) = p
+get_pos (PlusPlus p) = p
+get_pos (MinusMinus p) = p
+get_pos (LessThan p) = p
+get_pos (GreaterThan p) = p
+get_pos (LessEquals p) = p
+get_pos (GreaterEquals p) = p
+get_pos (Negation p) = p
+get_pos (AndShortCircuit p) = p
+get_pos (And p) = p
+get_pos (OrShortCircuit p) = p
+get_pos (Or p) = p
+get_pos (If p) = p
+get_pos (Else p) = p
+get_pos (ElseIf p) = p
+get_pos (Type _ p) = p
+get_pos (Loop _ p) = p
+get_pos (Id _ p) = p
+get_pos (Filename _ p) = p
+get_pos (Int _ p) = p
+get_pos (Double _ p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 
