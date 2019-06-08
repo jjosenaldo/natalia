@@ -6,13 +6,13 @@ import Control.Monad.IO.Class
 
 import System.IO.Unsafe
 
--- terminal: pre-defined block (main)
+-- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (Token)
 mainToken = tokenPrim show update_pos get_token where
     get_token (Main p) = Just (Main p)
     get_token _       = Nothing
 
--- terminal: block opening character
+-- Block opening character
 leftBraceToken :: ParsecT [Token] st IO (Token)
 leftBraceToken = tokenPrim show update_pos get_token where
     get_token (LBrace p) = Just (LBrace p)

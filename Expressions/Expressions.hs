@@ -10,7 +10,7 @@ import Types.Types
 import Text.Parsec
 import Control.Monad.IO.Class
 
--- nonterminal: attribution of a value to an *int* variable
+-- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
     a <- idToken
@@ -30,9 +30,11 @@ var_attribution = do
             liftIO (print s)
             return (c)
 
+-- Constant expression
 exp_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
 exp_const = int_token <|> double_token
 
+-- General expression
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
 expression = exp_num4
 
