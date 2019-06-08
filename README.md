@@ -9,5 +9,5 @@ $ make
 ## How to execute
 
 ~~~~
-$ ./natalia.out
+$ ./natalia.out <.nat file>
 ~~~~
