@@ -49,7 +49,8 @@ tokens :-
   ";"                              { \p s -> SemiColon (getLC p)}
 
   -- LITERALS  ---------------------------------------------
-
+  
+  $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
@@ -170,7 +171,8 @@ data Token =
 
   -- LITERALS  ---------------------------------------------
 
-  Int Int (Int, Int)         
+  Int Int (Int, Int)         |
+  Double Double (Int, Int)         
 
   ----------------------------------------------------------
 

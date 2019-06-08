@@ -5,6 +5,7 @@ import Expressions.Operations
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
+import Types.Types
 
 import Text.Parsec
 import Control.Monad.IO.Class
@@ -14,17 +15,23 @@ var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
     a <- idToken
     b <- assignToken
-    c <- int_token
-    updateState(symtable_update(a,c))
-
-    -- optional: print symbols_table content
+    c <- expression
     s <- getState
-    liftIO (print s)
+    let var_type = var_type_from_name a s
+    let expr_type = get_value_type c
 
-    return (c);
+    if (not (attr_compatible_types var_type expr_type)) then fail "type mismatch on var attribution"
+    else
+        do
+            updateState(symtable_update(a,c))
+            
+            -- optional: print symbols_table content
+            s <- getState
+            liftIO (print s)
+            return (c)
 
 exp_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
-exp_const = int_token
+exp_const = int_token <|> double_token
 
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
 expression = exp_num4
