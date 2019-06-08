@@ -1,0 +1,57 @@
+@main{
+	int n1 = fromString(read());
+	int m1 = fromString(read());
+
+	int mat1[][] = makeArray(n1, makeArray(m1, 0));
+
+	for(int i = 0; i < n1; i++){
+		for(int j = 0; j < m1; j++){
+			mat1[i][j] = fromString(read());
+		}
+	}
+	
+	int n2 = fromString(read());
+	int m2 = fromString(read());
+	
+	int mat2[][] = makeArray(n2, makeArray(m2, 0));
+
+	for(int i = 0; i < n2; i++){
+		for(int i = 0; i < m2; i++){
+			mat2[i][j] = fromString(read());
+		}
+	}
+	
+	if(n1 == n2 && m1 == m2){
+		for(int i = 0; i < n1; i++){
+			for(int j = 0; j < m1; j++){
+				print(toString(mat1[i][j] + mat2[i][j]) + " ");
+			}
+			print("\n");
+		}
+	}
+	else{
+		print("Impossível realizar a soma.\n");
+	}
+
+	if(m1 == n2){
+		int mat3[][] = makeArray(n1, makeArray(m2, 0));
+		for(int i = 0; i < n1; i++){
+			for(int j = 0; j < m2; j++){
+				int s = 0;
+				for(int k = 0; k < m1; k++){
+					s = s + mat1[i][k] * mat2[k][j];
+				}
+				mat3[i][j] = s;
+			}
+		}
+
+		for(int i = 0; i < n1; i++){
+			for(int j = 0; j < m2; j++){
+				print(toString(mat3[i][j]));
+			}
+		}
+	}
+	else{
+		print("Impossível realizar o produto.\n");
+	}
+}

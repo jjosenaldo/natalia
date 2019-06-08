@@ -5,101 +5,94 @@ import Expressions.Operations
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
+import Types.Types
 
 import Text.Parsec
 import Control.Monad.IO.Class
-
-{-
-
-    =, ++x, --x, x++, x--
-
-    un -
-  
-    ^
-
-    *, /, %
-
-    +, bin -
-
--}
 
 -- nonterminal: attribution of a value to an *int* variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
     a <- idToken
     b <- assignToken
-    c <- int_token
-    updateState(symtable_update(a,c))
-
-    -- optional: print symbols_table content
+    c <- expression
     s <- getState
-    liftIO (print s)
+    let var_type = var_type_from_name a s
+    let expr_type = get_value_type c
 
-    return (c);
+    if (not (attr_compatible_types var_type expr_type)) then fail ("ERROR at " ++ show(get_pos c)  ++ ": type mismatch in the attribution of a value to a variable.")
+    else
+        do
+            updateState(symtable_update(a,c))
+            
+            -- optional: print symbols_table content
+            s <- getState
+            liftIO (print s)
+            return (c)
 
-expression_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
-expression_const = int_token
+exp_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
+exp_const = int_token <|> double_token
 
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
-expression = expression4
+expression = exp_num4
 
-expression0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression0 = var_attribution <|> expression_const
+exp_num0 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num0 = var_attribution <|> exp_const
 
-expression1 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression1 = 
+exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num1 = 
     try
     (do
         op <- minus_token
-        n2 <- expression1
+        n2 <- exp_num1
         return (unary_eval op n2))
     <|>
-    expression0
+    exp_num0
 
-expression2 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression2 = 
+exp_num2 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num2 = 
     try
     (do
-        n1 <- expression1
-        op <- exp_token
-        n2 <- expression2
+        n1 <- exp_num1
+        op <- expo_token
+        n2 <- exp_num2
         return (binary_eval n1 op n2))
     <|>
-    expression1
+    exp_num1
 
-expression3 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression3 = 
+exp_num3 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num3 = 
     do
-        n1 <- expression2
-        result <- eval_remaining_3 n1 
+        n1 <- exp_num2
+        result <- eval_remaining3 n1 
         return (result)
 
-eval_remaining_3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining_3 n1 = 
+eval_remaining3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining3 n1 = 
     try
     (do
         op <- bin_op_left_3_token
-        n2 <- expression2
-        result <- eval_remaining_3 (binary_eval n1 op n2)
+        n2 <- exp_num2
+        result <- eval_remaining3 (binary_eval n1 op n2)
         return (result))
     <|>
     (do
         return (n1))
 
-expression4 :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression4 = 
+exp_num4 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_num4 = 
     do
-        n1 <- expression3
-        result <- eval_remaining_4 n1 
+        n1 <- exp_num3
+        result <- eval_remaining4 n1 
         return (result)
 
-eval_remaining_4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining_4 n1 = 
+eval_remaining4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining4 n1 = 
     try
     (do
         op <- bin_op_left_4_token
-        n2 <- expression3
-        result <- eval_remaining_4 (binary_eval n1 op n2)
+        n2 <- exp_num3
+        result <- eval_remaining4 (binary_eval n1 op n2)
         return (result))
     <|>
     (do

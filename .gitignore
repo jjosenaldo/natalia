@@ -6,4 +6,4 @@
 *.out
 
 # buildable alex file 
-Lexical/*.hs
+Lexical/Lexemes.hs

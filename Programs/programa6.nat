@@ -1,0 +1,78 @@
+@globals{
+	struct arvore{
+		arvore *l;
+		arvore *r;
+		int chave;
+	};
+}
+
+@subprograms{
+	proc insereNaArvore(int valor, arvore *raiz) {
+		if(valor <= raiz->chave){
+			if(raiz->l == NULL){
+				raiz->l = new arvore{l = NULL, r = NULL, chave = valor};
+			}
+			else {
+				insereNaArvore(valor, raiz->l)
+			}
+		}
+		if(valor > raiz->chave){
+			if(raiz->r == NULL){
+				raiz->r = new arvore{l = NULL, r = NULL, chave = valor};
+			}
+			else {
+				insereNaArvore(valor, raiz->r);
+			}
+		}
+	}
+	func makeArvore(int arr[], int n) : arvore* {
+		arvore *t = new arvore{l = NULL, r = NULL, chave = arr[0]};
+		for(int i = 1; i < n; i++){
+			insereNaArvore(arr[i], t);
+		}
+		return t;
+	}
+	
+	func levelMin(arvore *raiz, int level = 1) : int {
+		if(raiz->l == NULL) return level;
+		return levelMin(arvore->l, level+1);
+	}
+	
+	func valMin(arvore * raiz) : int{
+		if(raiz->l == NULL) return raiz->chave;
+		return valMin(raiz->l);
+	}
+	
+	func levelMax(arvore *raiz, int level = 1) : int {
+		if(raiz->r == NULL) return level;
+		return levelMax(arvore->r, level+1);
+	}
+
+	func valMax(arvore *raiz) : int {
+		if(raiz->r == NULL) return raiz->chave;
+		return levelMax(arvore->r);
+	}
+	
+	func exibeLevel(arvore *raiz, int level, int atLevel = 1) : bool {
+		if(level == atLevel){
+			print(toString(raiz->chave) + " ");
+			return true;
+		}
+		bool ans = false;
+		if(atLevel < level){
+			ans = ans || exibeLevel(raiz->l, level, atLevel+1);
+			ans = ans || exibeLevel(raiz->r, level, atLevel+1);
+		}
+	}
+	
+	proc exibeArvore(arvore *raiz){
+		int i = 1;
+		while(exibeLevel(raiz, i)){
+			i++;
+		}
+	}
+}
+
+@main{
+	
+}

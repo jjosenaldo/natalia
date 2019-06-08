@@ -1,0 +1,65 @@
+@globals{
+    struct rational_t{
+        int num;
+        int den;
+    };
+}
+
+@subprograms{
+	func gcd(int a, int b) : int {
+		if(b == 0) {
+			return a;
+		}
+		return gcd(b, a%b);
+	}
+	func lcm(int a, int b) : int {
+		return a*b/gcd(a, b);
+	}
+    func makeRational(int a, int b) : rational_t {
+        return rational_t(num=a, den=b);
+    }
+
+    func cmpRational(rational_t r1, rational_t r2) : bool {
+        return (r1.num*r2.den)/(r1.den*r2.num) == 1;
+    }
+    
+    func sumRational(rational_t r1, rational_t r2) : rational_t {
+    	int d = lcm(r1.den, r2.den);
+    	int snum = (d/r1.den)*r1.num + (d/r2.den)*r2.num;
+    	int sden = d;
+    	return rational_t{num = snum/gcd(snum, sden), den = sden/gcd(snum, sden)};
+    }
+    
+    func negRational(rational_t r1) : rational_t {
+    	return rational_t{num = -r1.num, den = r1.den};
+    }
+    
+    func subRational(rational_t r1, rational_t r2) : rational_t {
+    	return sumRational(r1, negRational(r2));
+    }
+    
+    func multRational(rational_t r1, rational_t r2) : rational_t {
+    	return rational_t{num = r1.num * r2.num, den = r1.den * r2.den};
+    }
+    
+    func invRational(rational_t r1) : rational_t {
+    	return rational_t{num = r1.den, den = r1.num};
+    }
+    
+    func divRational(rational_t r1, rational_t r2) : rational_t {
+    	return multRational(r1, invRational(r2));
+    }
+}
+
+@main{
+	rational_t r1 = rational_t{num = 4, den = 7};
+	rational_t r2 = rational_t{num = 13, den = 3};
+	print("r1: " toString(r1.num) + "/" + toString(r1.den) + "\n");
+	print("r2: " toString(r2.num) + "/" + toString(r2.den) + "\n");
+	print("sum: " toString(sumRational(r1, r2).num) + "/" + toString(sumRational(r1, r2).den) + "\n");
+	print("negation (r1): " toString(negRational(r1).num) + "/" + toString(negRational(r1).den) + "\n");
+	print("subtraction: " toString(subRational(r1, r2).num) + "/" + toString(subRational(r1, r2).den) + "\n");
+	print("multiplication: " toString(multRational(r1, r2).num) + "/" + toString(multRational(r1, r2).den) + "\n");
+	print("inversion (r1): " toString(invRational(r1).num) + "/" + toString(invRational(r1).den) + "\n");
+	print("division: " toString(divRational(r1, r2).num) + "/" + toString(divRational(r1, r2).den) + "\n");					
+}

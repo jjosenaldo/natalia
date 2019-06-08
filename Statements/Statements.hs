@@ -10,24 +10,24 @@ import Text.Parsec
 import Control.Monad.IO.Class
 
 -- nonterminal: initialization of an *int* variable
-var_initialization :: ParsecT [Token] [(Token,Token)] IO([Token])
+var_initialization :: ParsecT [Token] [(Token,Token)] IO()
 var_initialization = do
-    a <- typeToken
-    b <- idToken
-    c <- assignToken
-    d <- expression
-    e <- getState
+    t <- typeToken
+    name <- idToken
+    ass <- assignToken
+    expr_value <- expression
+    s <- getState
 
-    if (not (is_compatible a d)) then fail "type mismatch"
+    let expr_type = get_value_type expr_value
+
+    if (not (attr_compatible_types t expr_type)) then fail ("ERROR at " ++ show(get_pos expr_value)  ++ ": type mismatch in the initialization of a variable.")
     else
         do
-            updateState(symtable_insert (b, d))
-
-    -- optional: print symbols_table content
-    s <- getState
-    liftIO (print s)
-
-    return (a:b:c:[d])
+            updateState(symtable_insert (name, expr_value))
+            -- optional: print symbols_table content
+            s <- getState
+            liftIO (print s)
+            return ()
 
 -- nonterminal: statement
 statement :: ParsecT [Token] [(Token,Token)] IO()
