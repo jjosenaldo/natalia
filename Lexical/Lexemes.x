@@ -56,7 +56,7 @@ tokens :-
 
   =                                { \p s -> Assign (getLC p)}
   \%                               { \p s -> Mod (getLC p)}
-  \^                               { \p s -> Exp (getLC p)}
+  \^                               { \p s -> Expo (getLC p)}
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
   \*                               { \p s -> Times (getLC p)}
@@ -125,7 +125,7 @@ data Token =
 
   Assign (Int, Int)          |
   Mod (Int, Int)             |
-  Exp (Int, Int)             |
+  Expo (Int, Int)             |
   Plus (Int, Int)            |
   Minus (Int, Int)           |
   Times (Int, Int)           |
