@@ -20,7 +20,7 @@ var_attribution = do
     let var_type = var_type_from_name a s
     let expr_type = get_value_type c
 
-    if (not (attr_compatible_types var_type expr_type)) then fail "type mismatch on var attribution"
+    if (not (attr_compatible_types var_type expr_type)) then fail ("ERROR at " ++ show(get_pos c)  ++ ": type mismatch in the attribution of a value to a variable.")
     else
         do
             updateState(symtable_update(a,c))
