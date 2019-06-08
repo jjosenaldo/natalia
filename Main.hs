@@ -4,9 +4,10 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Statements.Statements
 
-import Text.Parsec
 import Control.Monad.IO.Class
+import System.Environment
 import System.IO.Unsafe
+import Text.Parsec
 
 -- the entire program
 program :: ParsecT [Token] [(Token,Token)] IO ()
@@ -24,10 +25,16 @@ parser :: [Token] -> IO (Either ParseError ())
 parser tokens = runParserT program [] "Error message" tokens
 
 main :: IO ()
-main = case unsafePerformIO (parser (getTokens "./Programs/init-int.nat")) of
-            { Left err -> print err; 
-                Right ans -> print ans
-            }
+main = do
+    args <- getArgs
+
+    if length args == 0 then
+        putStrLn "You must pass a natalia program as an argument!"
+    else
+        case unsafePerformIO (parser (getTokens (head args))) of
+                { Left err -> print err; 
+                    Right ans -> print ans
+                }
 
 
 
