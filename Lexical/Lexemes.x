@@ -49,14 +49,15 @@ tokens :-
   ";"                              { \p s -> SemiColon (getLC p)}
 
   -- LITERALS  ---------------------------------------------
-
+  
+  $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
   =                                { \p s -> Assign (getLC p)}
   \%                               { \p s -> Mod (getLC p)}
-  \^                               { \p s -> Exp (getLC p)}
+  \^                               { \p s -> Expo (getLC p)}
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
   \*                               { \p s -> Times (getLC p)}
@@ -125,7 +126,7 @@ data Token =
 
   Assign (Int, Int)          |
   Mod (Int, Int)             |
-  Exp (Int, Int)             |
+  Expo (Int, Int)             |
   Plus (Int, Int)            |
   Minus (Int, Int)           |
   Times (Int, Int)           |
@@ -170,7 +171,8 @@ data Token =
 
   -- LITERALS  ---------------------------------------------
 
-  Int Int (Int, Int)         
+  Int Int (Int, Int)         |
+  Double Double (Int, Int)         
 
   ----------------------------------------------------------
 
