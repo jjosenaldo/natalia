@@ -1,5 +1,5 @@
 {
-module Lexical.Lexemes (getTokens, Token(..), typeName, get_pos) where
+module Lexical.Lexemes (getTokens, Token(..), typeName, get_pos, get_id_name) where
 
 import System.IO
 import System.IO.Unsafe
@@ -181,6 +181,9 @@ data Token =
 typeName :: Token -> String
 typeName (Type x p) = x
 typeName _ = error "typeName error"
+
+get_id_name :: Token -> String
+get_id_name (Id s _) = s
 
 get_pos :: Token -> (Int, Int)
 get_pos (LBrace p) = p

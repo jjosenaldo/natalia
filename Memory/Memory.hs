@@ -27,3 +27,11 @@ symtable_get (Id name p) [] = error ("ERROR when getting the value of the variab
 symtable_get (Id name p) ((Id id _, v):t) = 
     if id == name then v
     else symtable_get (Id name p) t
+
+symtable_has_variable :: Token -- ^ the name of the variable to be searched
+                      -> [(Token, Token)] -- ^ the memory
+                      -> Bool -- True if the variable is in the memory, False otherwise
+symtable_has_variable _ [] = False
+symtable_has_variable (Id name p) ((Id id _, v):t) 
+    | name == id = True
+    | otherwise = symtable_has_variable (Id name p) t

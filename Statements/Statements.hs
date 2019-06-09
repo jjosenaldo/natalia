@@ -12,22 +12,27 @@ import Control.Monad.IO.Class
 -- nonterminal: initialization of an *int* variable
 var_initialization :: ParsecT [Token] [(Token,Token)] IO()
 var_initialization = do
+    mem <- getState
     t <- typeToken
     name <- id_token
-    ass <- assignToken
-    expr_value <- expression
-    s <- getState
 
-    let expr_type = get_value_type expr_value
-
-    if (not (attr_compatible_types t expr_type)) then fail ("ERROR at " ++ show(get_pos expr_value)  ++ ": type mismatch in the initialization of a variable.")
-    else
+    if symtable_has_variable name mem then fail ("ERROR on the initialization of '" ++ (get_id_name name) ++ "' at " ++ show (get_pos name) ++ ": variable already exists.")
+    else 
         do
-            updateState(symtable_insert (name, expr_value))
-            -- optional: print symbols_table content
-            s <- getState
-            liftIO (print s)
-            return ()
+            ass <- assignToken
+            expr_value <- expression
+            
+
+            let expr_type = get_value_type expr_value
+
+            if (not (attr_compatible_types t expr_type)) then fail ("ERROR at " ++ show(get_pos expr_value)  ++ ": type mismatch in the initialization of a variable.")
+            else
+                do
+                    updateState(symtable_insert (name, expr_value))
+                    -- optional: print symbols_table content
+                    s <- getState
+                    liftIO (print s)
+                    return ()
 
 -- nonterminal: statement
 statement :: ParsecT [Token] [(Token,Token)] IO()
