@@ -55,6 +55,7 @@ exp_parenthesized =
 exp0 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp0 = var_attribution <|> exp_const <|> exp_parenthesized
 
+-- Numeric expression that has precedence 1
 exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num1 = 
     try
@@ -65,6 +66,7 @@ exp_num1 =
     <|>
     exp0
 
+-- Numeric expression that has precedence 2
 exp_num2 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num2 = 
     try
@@ -76,6 +78,7 @@ exp_num2 =
     <|>
     exp_num1
 
+-- Numeric expression that has precedence 3
 exp_num3 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num3 = 
     do
@@ -83,6 +86,7 @@ exp_num3 =
         result <- eval_remaining3 n1 
         return (result)
 
+-- Evaluates an expression that has precedence 3
 eval_remaining3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining3 n1 = 
     try
@@ -95,6 +99,7 @@ eval_remaining3 n1 =
     (do
         return (n1))
 
+-- Numeric expression that has precedence 4
 exp_num4 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num4 = 
     do
@@ -102,6 +107,7 @@ exp_num4 =
         result <- eval_remaining4 n1 
         return (result)
 
+-- Evaluates an expression that has precedence 4
 eval_remaining4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining4 n1 = 
     try
