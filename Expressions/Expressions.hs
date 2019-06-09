@@ -10,6 +10,14 @@ import Types.Types
 import Text.Parsec
 import Control.Monad.IO.Class
 
+-- General expression
+expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
+expression = exp_num
+
+-- A numeric expression
+exp_num :: ParsecT [Token] [(Token,Token)] IO(Token)     
+exp_num = exp_num4
+
 -- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
@@ -34,12 +42,18 @@ var_attribution = do
 exp_const :: ParsecT [Token] [(Token,Token)] IO(Token)     
 exp_const = int_token <|> double_token
 
--- General expression
-expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
-expression = exp_num4
+-- Parenthesized expression
+exp_parenthesized :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_parenthesized = 
+    do
+        lparen <- left_paren_token
+        expr <- expression
+        rparen <- right_paren_token
+        return (expr)
 
-exp_num0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp_num0 = var_attribution <|> exp_const
+-- Expression that has precedence 0
+exp0 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp0 = var_attribution <|> exp_const <|> exp_parenthesized
 
 exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num1 = 
@@ -49,7 +63,7 @@ exp_num1 =
         n2 <- exp_num1
         return (unary_eval op n2))
     <|>
-    exp_num0
+    exp0
 
 exp_num2 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num2 = 
