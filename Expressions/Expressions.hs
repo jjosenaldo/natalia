@@ -83,17 +83,17 @@ exp_num3 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num3 = 
     do
         n1 <- exp_num2
-        result <- eval_remaining3 n1 
+        result <- eval_remaining_exp_num3 n1 
         return (result)
 
 -- Evaluates an expression that has precedence 3
-eval_remaining3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining3 n1 = 
+eval_remaining_exp_num3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_exp_num3 n1 = 
     try
     (do
         op <- bin_op_left_3_token
         n2 <- exp_num2
-        result <- eval_remaining3 (binary_eval n1 op n2)
+        result <- eval_remaining_exp_num3 (binary_eval n1 op n2)
         return (result))
     <|>
     (do
@@ -104,17 +104,17 @@ exp_num4 :: ParsecT [Token] [(Token,Token)] IO(Token)
 exp_num4 = 
     do
         n1 <- exp_num3
-        result <- eval_remaining4 n1 
+        result <- eval_remaining_exp_num4 n1 
         return (result)
 
 -- Evaluates an expression that has precedence 4
-eval_remaining4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining4 n1 = 
+eval_remaining_exp_num4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_exp_num4 n1 = 
     try
     (do
         op <- bin_op_left_4_token
         n2 <- exp_num3
-        result <- eval_remaining4 (binary_eval n1 op n2)
+        result <- eval_remaining_exp_num4 (binary_eval n1 op n2)
         return (result))
     <|>
     (do
