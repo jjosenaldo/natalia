@@ -13,7 +13,7 @@ import Control.Monad.IO.Class
 var_initialization :: ParsecT [Token] [(Token,Token)] IO()
 var_initialization = do
     t <- typeToken
-    name <- idToken
+    name <- id_token
     ass <- assignToken
     expr_value <- expression
     s <- getState
