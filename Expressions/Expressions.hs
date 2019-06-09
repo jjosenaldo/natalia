@@ -86,7 +86,7 @@ exp_num3 =
         result <- eval_remaining_exp_num3 n1 
         return (result)
 
--- Evaluates an expression that has precedence 3
+-- Evaluates the remainder of a numeric expression that has precedence 3
 eval_remaining_exp_num3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_exp_num3 n1 = 
     try
@@ -107,7 +107,7 @@ exp_num4 =
         result <- eval_remaining_exp_num4 n1 
         return (result)
 
--- Evaluates an expression that has precedence 4
+-- Evaluates the remainder of a numeric expression that has precedence 4
 eval_remaining_exp_num4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_exp_num4 n1 = 
     try
