@@ -21,7 +21,7 @@ exp_num = exp_num4
 -- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
 var_attribution = do
-    a <- idToken
+    a <- id_token
     b <- assignToken
     c <- expression
     s <- getState
@@ -51,9 +51,18 @@ exp_parenthesized =
         rparen <- right_paren_token
         return (expr)
 
+-- Expression that consists of a local variable
+exp_local_var :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp_local_var = 
+    do
+        mem <- getState
+        name <- id_token
+        let value = symtable_get name mem
+        return (value)
+
 -- Expression that has precedence 0
 exp0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp0 = var_attribution <|> exp_const <|> exp_parenthesized
+exp0 = try var_attribution <|> exp_const <|> exp_parenthesized <|> exp_local_var
 
 -- Numeric expression that has precedence 1
 exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)

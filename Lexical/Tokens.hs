@@ -72,9 +72,9 @@ typeToken = tokenPrim show update_pos get_token where
     get_token (Type x p) = Just (Type x p)
     get_token _        = Nothing 
 
--- terminal: identifier name
-idToken :: ParsecT [Token] st IO (Token)
-idToken = tokenPrim show update_pos get_token where
+-- Identifier (of a variable/function/procedure/etc)
+id_token :: ParsecT [Token] st IO (Token)
+id_token = tokenPrim show update_pos get_token where
     get_token (Id x p) = Just (Id x p)
     get_token _      = Nothing
 
