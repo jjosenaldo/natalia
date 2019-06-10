@@ -52,7 +52,7 @@ memory_update (Subprogram s) mem = error ("ERROR you can't update the value of s
 
 -- | Gets the value of a variable in the table of symbols
 memory_get :: String -- ^ the name of the memory cell to be searched
-             -> (Int, Int)
+             -> (Int, Int) -- ^ the (line, column) where the variable was used in program
              -> [MemoryCell] -- ^ the memory 
              -> MemoryCell -- ^ the value of the memory cell
 memory_get name p [] = error ("ERROR when fetching name " ++ name ++ " at "++show(p)++": it is not in the memory.")
