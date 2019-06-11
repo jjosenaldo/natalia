@@ -175,7 +175,7 @@ module Expressions.Expressions where
             return (a))
     
     expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-    expGroup0 = int_token <|> localVariable
+    expGroup0 = int_token <|> localVariable <|> exp_parenthesized
 
     localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     localVariable = 
@@ -283,13 +283,13 @@ module Expressions.Expressions where
     exp_const = int_token -- <|> double_token
     
     -- Parenthesized expression
-    -- exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp_parenthesized = 
-    --     do
-    --         lparen <- left_paren_token
-    --         expr <- expression
-    --         rparen <- right_paren_token
-    --         return (expr)
+    exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    exp_parenthesized = 
+        do
+            lparen <- left_paren_token
+            expr <- expression
+            rparen <- right_paren_token
+            return (expr)
     
     -- Expression that consists of a local variable
 
@@ -303,10 +303,10 @@ module Expressions.Expressions where
             if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")
             else do return (RetMemoryCell var)
 
-    exp_local_var :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-    exp_local_var = 
-        do
-            mem <- getState
-            name <- id_token -- RetToken Id
-            let value = getValue (memory_get (get_id_name (getRetToken name)) (get_pos (getRetToken name)) mem)
-            return (RetValue value)
+    -- exp_local_var :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    -- exp_local_var = 
+    --     do
+    --         mem <- getState
+    --         name <- id_token -- RetToken Id
+    --         let value = getValue (memory_get (get_id_name (getRetToken name)) (get_pos (getRetToken name)) mem)
+    --         return (RetValue value)
