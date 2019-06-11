@@ -2,6 +2,33 @@ module Types.Types where
 
 import Lexical.Lexemes
 
+--                                                                              name
+data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
+data Value = ConsNatInt Integer | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
+
+getTypeFromValue::Value -> Type
+getTypeFromValue (ConsNatInt _) = NatInt 
+getTypeFromValue (ConsNatBool _) = NatBool 
+getTypeFromValue (ConsNatString _) = NatString 
+getTypeFromValue (ConsNatDouble _) = NatDouble 
+getTypeFromValue (ConsNatSet tp _) = NatSet tp
+getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
+
+checkCompatibleTypes :: Type 
+                     -> Type
+                     -> Bool
+checkCompatibleTypes NatInt NatInt = True
+checkCompatibleTypes NatDouble NatInt = True
+checkCompatibleTypes NatDouble NatDouble = True
+checkCompatibleTypes NatBool NatBool = True
+checkCompatibleTypes NatString NatString = True
+checkCompatibleTypes (NatStruct str1 l1) (NatStruct str2 l2) = str1 == str2 
+checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
+
+getTypeFromTypeToken (Type str _) 
+    | str == "int" = NatInt
+    | otherwise = error ("Not supported type: " ++ str)
+
 -- | Checks if the types involved in an assignment are compatible
 attr_compatible_types :: Token -- ^ the type of the variable 
                       -> Token -- ^ the type of the value being assigned
