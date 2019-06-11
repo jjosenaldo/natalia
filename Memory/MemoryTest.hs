@@ -1,6 +1,6 @@
 module Memory.MemoryTest where
 
-import Types.Types
+--import Types.Types
 --import Lexical.Lexemes
 -- this should be in types.hs
 --                                                                              name
@@ -24,8 +24,8 @@ mem = memory_insert structx (memory_insert procx (memory_insert funx (memory_ins
 
 
 -- Functions to access important fields of memory cells
-getId (Variable (ConstructVariable x _)) = x
-getId (Variable (ConstructConstantVariable x _)) = x
+getId (Variable (ConstructVariable x _ True)) = x
+getId (Variable (ConstructConstantVariable x _ True)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 
@@ -78,8 +78,17 @@ memory_get name p (cell:m) =
 
 memory_has_name :: String -- ^ the name of the variable or subprogram to be searched
     -> [MemoryCell] -- ^ the memory
-    -> Bool -- True if the variable is in the memory, False otherwise
+    -> Bool -- ^ True if the variable is in the memory, False otherwise
 memory_has_name _ [] = False
 memory_has_name str (v:t) 
     | str == getId v = True
     | otherwise = memory_has_name str t
+
+memory_delete :: String -- ^ the name of the variable 
+        -> [MemoryCell] -- ^ the memory before removal
+        -> [MemoryCell] -- ^ the memory after removal
+memory_delete name (v:m) = 
+    if (getId v) == name then
+        if (isVariable v) then m
+        else error ("ERROR you can't delete a subprogram")
+    else (v : (memory_delete name m))
