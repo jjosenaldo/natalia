@@ -12,6 +12,7 @@ data ReturnObject =
     RetToken Token | 
     RetValue Value | 
     RetType Type | 
+    RetNothing |
     RetMemoryCell MemoryCell deriving (Eq, Show)
 
 getRetToken::ReturnObject -> Token
