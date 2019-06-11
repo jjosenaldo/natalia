@@ -51,6 +51,13 @@ binary_eval (ConsNatInt x) (Div _) (ConsNatInt y )
     | (rem x y) == 0 = ConsNatInt (div x y)
     | otherwise = ConsNatDouble ((fromIntegral x) / (fromIntegral y))
 
+-- Operator *
+binary_eval (ConsNatInt x) (Times p) (ConsNatInt y) = ConsNatInt(x*y)
+binary_eval (ConsNatDouble x) (Times p) (ConsNatInt y) = ConsNatDouble(x*fromIntegral(y))
+binary_eval (ConsNatInt x) (Times p) (ConsNatDouble y) = ConsNatDouble(fromIntegral(x)*y)
+binary_eval (ConsNatDouble x) (Times p) (ConsNatDouble y) = ConsNatDouble(x*y)
+binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator expects two numbers.")
+
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
 
 -- | Implementation of binary operations
