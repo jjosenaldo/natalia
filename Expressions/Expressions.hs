@@ -54,7 +54,7 @@ module Expressions.Expressions where
         (do
             -- this group contains only the operation &&
             l <- expGroup6
-            result <- evalRemainingGroup8 (getRetValue l)
+            result <- evalRemainingGroup7 (getRetValue l)
             return (result))
 
     evalRemainingGroup7 :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
