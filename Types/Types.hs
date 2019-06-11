@@ -25,7 +25,7 @@ checkCompatibleTypes NatString NatString = True
 checkCompatibleTypes (NatStruct str1 l1) (NatStruct str2 l2) = str1 == str2 
 checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
 
-getTypeFromToken (Type str _) 
+getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt
     | otherwise = error ("Not supported type: " ++ str)
 

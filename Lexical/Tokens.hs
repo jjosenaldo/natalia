@@ -5,16 +5,22 @@ import Text.Parsec
 import Control.Monad.IO.Class
 import Types.Types
 import System.IO.Unsafe
+import Memory.Memory
 
-data ReturnObject = RetToken Token | RetValue Value
+
+data ReturnObject = RetToken Token | RetValue Value | RetMemoryCell MemoryCell deriving (Eq, Show)
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
-getRetToken _ = error "Invalid conversion from RetValue to RetToken"
+getRetToken _ = error "Invalid conversion from ReturnObject to RetToken"
 
 getRetValue::ReturnObject -> Value
 getRetValue (RetValue v) = v
-getRetValue _ = error "Invalid conversion from RetToken to RetValue"
+getRetValue _ = error "Invalid conversion from ReturnObject to RetValue"
+
+getRetMemoryCell::ReturnObject -> MemoryCell
+getRetMemoryCell (RetMemoryCell var) = var
+getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetValue"
 
 -- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (ReturnObject)
@@ -47,34 +53,40 @@ right_paren_token = tokenPrim show update_pos get_token where
     get_token (RParen p) = Just (RParen p)
     get_token _       = Nothing
 
-plus_token :: ParsecT [Token] st IO (Token)
+plus_token :: ParsecT [Token] st IO (ReturnObject)
 plus_token = tokenPrim show update_pos get_token where
-    get_token (Plus p) = Just (Plus p)
+    get_token (Plus p) = Just (RetToken (Plus p))
     get_token _       = Nothing
 
-minus_token :: ParsecT [Token] st IO (Token)
+
+less_than_token :: ParsecT [Token] st IO (ReturnObject)
+less_than_token = tokenPrim show update_pos get_token where
+    get_token (LessThan p)  = Just (RetToken (LessThan p))
+    get_token _             = Nothing
+
+minus_token :: ParsecT [Token] st IO (ReturnObject)
 minus_token = tokenPrim show update_pos get_token where
-    get_token (Minus p) = Just (Minus p)
+    get_token (Minus p) = Just (RetToken (Minus p))
     get_token _       = Nothing
 
-times_token :: ParsecT [Token] st IO (Token)
+times_token :: ParsecT [Token] st IO (ReturnObject)
 times_token = tokenPrim show update_pos get_token where
-    get_token (Times p) = Just (Times p)
+    get_token (Times p) = Just (RetToken (Times p))
     get_token _       = Nothing
 
-expo_token :: ParsecT [Token] st IO (Token)
+expo_token :: ParsecT [Token] st IO (ReturnObject)
 expo_token = tokenPrim show update_pos get_token where
-    get_token (Expo p) = Just (Expo p)
+    get_token (Expo p) = Just (RetToken (Expo p))
     get_token _       = Nothing
 
-div_token :: ParsecT [Token] st IO (Token)
+div_token :: ParsecT [Token] st IO (ReturnObject)
 div_token = tokenPrim show update_pos get_token where
-    get_token (Div p) = Just (Div p)
+    get_token (Div p) = Just (RetToken (Div p))
     get_token _       = Nothing
 
-mod_token :: ParsecT [Token] st IO (Token)
+mod_token :: ParsecT [Token] st IO (ReturnObject)
 mod_token = tokenPrim show update_pos get_token where
-    get_token (Mod p) = Just (Mod p)
+    get_token (Mod p) = Just (RetToken (Mod p))
     get_token _       = Nothing
 
 
@@ -91,9 +103,9 @@ id_token = tokenPrim show update_pos get_token where
     get_token _      = Nothing
 
 -- terminal: assignment symbol
-assignToken :: ParsecT [Token] st IO (Token)
+assignToken :: ParsecT [Token] st IO (ReturnObject)
 assignToken = tokenPrim show update_pos get_token where
-    get_token (Assign p) = Just (Assign p)
+    get_token (Assign p) = Just (RetToken (Assign p))
     get_token _      = Nothing
 
 -- terminal: literal of type int
@@ -108,11 +120,34 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (Double x p)
     get_token _       = Nothing
 
+equalsToken :: ParsecT [Token] st IO (ReturnObject)
+equalsToken = tokenPrim show update_pos get_token where
+    get_token (Equals p) = Just (RetToken (Equals p))
+    get_token _            = Nothing
+
+andToken :: ParsecT [Token] st IO (ReturnObject)
+andToken = tokenPrim show update_pos get_token where
+    get_token (And p) = Just (RetToken (And p))
+    get_token _         = Nothing
+
+orToken :: ParsecT [Token] st IO (ReturnObject)
+orToken = tokenPrim show update_pos get_token where
+    get_token (Or p) = Just (RetToken (Or p))
+    get_token _         = Nothing
+    
+
 -- terminal: command terminator
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
 semiColonToken = tokenPrim show update_pos get_token where
     get_token (SemiColon p) = Just (RetToken (SemiColon p))
     get_token _         = Nothing
+
+negationToken :: ParsecT [Token] st IO (ReturnObject)
+negationToken = tokenPrim show update_pos get_token where
+    get_token (Negation p)  = Just (RetToken (Negation p))
+    get_token _             = Nothing
+
+
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos

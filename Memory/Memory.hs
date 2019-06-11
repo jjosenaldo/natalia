@@ -3,9 +3,6 @@ module Memory.Memory where
 import Lexical.Lexemes
 import Types.Types
 
-
--- THESE FUNCTIONS ARE HERE JUST FOR 'BACKWARDS COMPATIBILITY', THEY'LL BE REMOVED SOON!
-
 data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
@@ -18,6 +15,11 @@ getId (Variable (ConstructVariable x _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
+
+setValue::MemoryCell -> Value -> MemoryCell
+setValue (Variable (ConstructVariable name v1 isGlobal)) v2
+    | checkCompatibleTypes (getTypeFromValue v1) (getTypeFromValue v2) = Variable (ConstructVariable name v2 isGlobal)
+    | otherwise = error ("ERROR type mismatch in variable " ++ name)
 
 getValue::MemoryCell -> Value
 getValue (Variable (ConstructVariable _ val _)) = val

@@ -72,11 +72,10 @@ tokens :-
   ">"                              { \p s -> GreaterThan (getLC p)}
   "<="                             { \p s -> LessEquals (getLC p)}
   ">="                             { \p s -> GreaterEquals (getLC p)}
+  "=="                             { \p s -> Equals (getLC p)}
   "!"                              { \p s -> Negation (getLC p)}
-  "&&"                             { \p s -> AndShortCircuit (getLC p)}
-  "and"                            { \p s -> And (getLC p)}
-  "||"                             { \p s -> OrShortCircuit (getLC p)}
-  "or"                             { \p s -> Or (getLC p)}
+  "&&"                             { \p s -> And (getLC p)}
+  "||"                             { \p s -> Or (getLC p)}
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -141,10 +140,9 @@ data Token =
   GreaterThan (Int, Int)     |
   LessEquals (Int, Int)      |
   GreaterEquals (Int, Int)   |
+  Equals (Int, Int)          |
   Negation (Int, Int)        |
-  AndShortCircuit (Int, Int) |
   And (Int, Int)             |
-  OrShortCircuit (Int, Int)  |
   Or (Int, Int)              |
   
   -- CONDITIONALS  -----------------------------------------
@@ -214,10 +212,9 @@ get_pos (LessThan p) = p
 get_pos (GreaterThan p) = p
 get_pos (LessEquals p) = p
 get_pos (GreaterEquals p) = p
+get_pos (Equals p) = p
 get_pos (Negation p) = p
-get_pos (AndShortCircuit p) = p
 get_pos (And p) = p
-get_pos (OrShortCircuit p) = p
 get_pos (Or p) = p
 get_pos (If p) = p
 get_pos (Else p) = p

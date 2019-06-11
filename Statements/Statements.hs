@@ -25,7 +25,7 @@ var_initialization = do
 
             let expr_type = getTypeFromValue (getRetValue expr_value)
 
-            if (not (checkCompatibleTypes (getTypeFromToken (getRetToken t)) expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable.")
+            if (not (checkCompatibleTypes (getTypeFromTypeToken (getRetToken t)) expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable.")
             else
                 do
                     let variableToInsert = Variable (ConstructVariable (get_id_name (getRetToken name)) (getRetValue expr_value) False)
