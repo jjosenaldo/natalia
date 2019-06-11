@@ -24,9 +24,11 @@ checkCompatibleTypes NatBool NatBool = True
 checkCompatibleTypes NatString NatString = True
 checkCompatibleTypes (NatStruct str1 l1) (NatStruct str2 l2) = str1 == str2 
 checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
+checkCompatibleTypes _ _ = False
 
 getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt
+    | str == "double" = NatDouble
     | str == "bool" = NatBool
     | otherwise = error ("Not supported type: " ++ str)
 
