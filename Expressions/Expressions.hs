@@ -81,7 +81,7 @@ module Expressions.Expressions where
     
     -- Expression that has precedence 0
     exp0 :: ParsecT [Token] [MemoryCell] IO(Value)
-    exp0 = try var_attribution <|> exp_const <|> exp_parenthesized <|> exp_local_var
+    exp0 = try var_attribution <|> exp_const <|> (Right exp_parenthesized) <|> exp_local_var
     
     
     
@@ -112,12 +112,12 @@ module Expressions.Expressions where
     exp_const = int_token <|> double_token
     
     -- Parenthesized expression
-    exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(Value)
+    exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(Either Token Value)
     exp_parenthesized = 
         do
-            lparen <- left_paren_token
-            expr <- expression
-            rparen <- right_paren_token
+            lparen <- Left left_paren_token
+            expr <- Right expression
+            rparen <- Left right_paren_token
             return (expr)
     
     -- Expression that consists of a local variable
