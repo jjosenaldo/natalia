@@ -1,49 +1,46 @@
-module Memory.Memory where
+module Memory.MemoryTest where
 
-import Lexical.Lexemes
-import Types.Types
+--import Types.Types
+--import Lexical.Lexemes
+-- this should be in types.hs
+--                                                                              name
+--data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
+--data Value = ConsNatInt Int | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
 
-
-<<<<<<< HEAD
---                                  id     value
-data Variable = ConstructVariable String Value | ConstructConstantVariable String Value deriving (Show, Eq)
-=======
--- THESE FUNCTIONS ARE HERE JUST FOR 'BACKWARDS COMPATIBILITY', THEY'LL BE REMOVED SOON!
-
+--                                  id         global                                        global
 data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
->>>>>>> memory
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name
 data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure String [Parameter] deriving (Show, Eq)
 data MemoryCell = Variable Variable | Subprogram Subprogram deriving (Show, Eq)
 
-<<<<<<< HEAD
 --CONSTANTS FOR TESTING!!!! THESE SHOULD NOT BE AT MASTER...
--- funx = Subprogram (ConstructFunction "soma" [ConsParameter "a" NatInt, ConsParameter "b" NatInt] NatInt)
--- procx = Subprogram (ConstructProcedure "nada" [])
--- varx = Variable (ConstructVariable "x" (ConsNatInt 2))
--- structx = Variable (ConstructVariable "a" (ConsNatStruct "rational_t" [("num", ConsNatInt 1), ("den", ConsNatInt 2), ("set_to_test", ConsNatSet NatInt [ConsNatInt 1, ConsNatInt 2, ConsNatInt 3])]))
--- mem = memory_insert structx (memory_insert procx (memory_insert funx (memory_insert varx [])))
+funx = Subprogram (ConstructFunction "soma" [ConsParameter "a" NatInt, ConsParameter "b" NatInt] NatInt)
+procx = Subprogram (ConstructProcedure "nada" [])
+varx = Variable (ConstructVariable "x" (ConsNatInt 2))
+structx = Variable (ConstructVariable "a" (ConsNatStruct "rational_t" [("num", ConsNatInt 1), ("den", ConsNatInt 2), ("set_to_test", ConsNatSet NatInt [ConsNatInt 1, ConsNatInt 2, ConsNatInt 3])]))
+mem = memory_insert structx (memory_insert procx (memory_insert funx (memory_insert varx [])))
 
 
 -- Functions to access important fields of memory cells
-=======
--- functions to access important fields
->>>>>>> memory
-getId (Variable (ConstructVariable x _)) = x
-getId (Variable (ConstructConstantVariable x _)) = x
+getId (Variable (ConstructVariable x _ True)) = x
+getId (Variable (ConstructConstantVariable x _ True)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 
 getValue (Variable (ConstructVariable _ val)) = val
 getValue (Variable (ConstructConstantVariable _ val)) = val
 
-<<<<<<< HEAD
-getType (Variable )
+--this should be in types.hs
+-- getTypeFromValue (ConsNatInt _) = NatInt 
+-- getTypeFromValue (ConsNatBool _) = NatBool 
+-- getTypeFromValue (ConsNatString _) = NatString 
+-- getTypeFromValue (ConsNatDouble _) = NatDouble 
+-- getTypeFromValue (ConsNatSet tp _) = NatSet tp
+-- getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
 
-=======
->>>>>>> memory
+
 isVariable :: MemoryCell -> Bool
 isVariable (Variable v) = True
 isVariable _ = False
@@ -81,13 +78,10 @@ memory_get name p (cell:m) =
 
 memory_has_name :: String -- ^ the name of the variable or subprogram to be searched
     -> [MemoryCell] -- ^ the memory
-    -> Bool -- True if the variable is in the memory, False otherwise
+    -> Bool -- ^ True if the variable is in the memory, False otherwise
 memory_has_name _ [] = False
 memory_has_name str (v:t) 
     | str == getId v = True
-<<<<<<< HEAD
-    | otherwise = memory_has_name str t
-=======
     | otherwise = memory_has_name str t
 
 memory_delete :: String -- ^ the name of the variable 
@@ -98,4 +92,3 @@ memory_delete name (v:m) =
         if (isVariable v) then m
         else error ("ERROR you can't delete a subprogram")
     else (v : (memory_delete name m))
->>>>>>> memory
