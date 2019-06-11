@@ -14,19 +14,19 @@ data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure
 data MemoryCell = Variable Variable | Subprogram Subprogram deriving (Show, Eq)
 
 -- functions to access important fields
-getId (Variable (ConstructVariable x _)) = x
-getId (Variable (ConstructConstantVariable x _)) = x
+getId (Variable (ConstructVariable x _ _)) = x
+getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 
-getValue (Variable (ConstructVariable _ val)) = val
-getValue (Variable (ConstructConstantVariable _ val)) = val
+getValue (Variable (ConstructVariable _ val _)) = val
+getValue (Variable (ConstructConstantVariable _ val _)) = val
 
 isVariable :: MemoryCell -> Bool
 isVariable (Variable v) = True
 isVariable _ = False
 
-isConstantVariable (Variable (ConstructConstantVariable c _)) = True
+isConstantVariable (Variable (ConstructConstantVariable c _ _)) = True
 isConstantVariable _ = False
 
 memory_insert :: MemoryCell -- ^ the variable to be inserted
@@ -40,7 +40,7 @@ memory_update :: MemoryCell -- ^ the variable with its new value
                 -> [MemoryCell] -- ^ the memory before the update
                 -> [MemoryCell] -- ^ the memory after the update
 memory_update (Variable v) [] = error ("ERROR on the update of the variable " ++ (getId (Variable v)) ++ ": it is not present in the memory.")
-memory_update (Variable (ConstructConstantVariable _ _)) m = error ("ERROR impossible to change value of a constant variable")
+memory_update (Variable (ConstructConstantVariable _ _ _)) m = error ("ERROR impossible to change value of a constant variable")
 memory_update (Variable v1) (v2:t) = 
     if (isVariable v2) && ((getId (Variable v1)) == (getId v2)) then (Variable v1) : t
     else v2 : memory_update (Variable v1) t

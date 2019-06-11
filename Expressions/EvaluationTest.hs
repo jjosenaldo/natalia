@@ -1,7 +1,9 @@
 module Expressions.Evaluation where
 
-import Lexical.Lexemes
+
 import Memory.Memory
+import Lexical.Lexemes
+--import Lexical.Tokens
 import Types.Types
 
 -- | Implementation of binary operations
@@ -50,6 +52,13 @@ binary_eval _ (Div p) (ConsNatDouble 0.0) = error ("ERROR at " ++ show(p) ++ ": 
 binary_eval (ConsNatInt x) (Div _) (ConsNatInt y )  
     | (rem x y) == 0 = ConsNatInt (div x y)
     | otherwise = ConsNatDouble ((fromIntegral x) / (fromIntegral y))
+
+-- Operator *
+binary_eval (ConsNatInt x) (Div p) (ConsNatInt y) = ConsNatInt(x*y)
+binary_eval (ConsNatDouble x) (Div p) (ConsNatInt y) = ConsNatDouble(x*y)
+binary_eval (ConsNatInt x) (Div p) (ConsNatDouble y) = ConsNatDouble(x*y)
+binary_eval (ConsNatDouble x) (Div p) (ConsNatDouble y) = ConsNatDouble(x*y)
+binary_eval _ (Div p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator expects two numbers.")
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
 
