@@ -258,25 +258,26 @@ module Expressions.Expressions where
     
     
     -- Assignment of a value to a variable
-    -- var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-    -- var_attribution = do
-    --     a <- id_token
-    --     let var = memory_get a
-    --     b <- assignToken
-    --     expr_val <- expression
-    --     s <- getState
-    --     let var_type = var_type_from_name a s
-    --     let expr_type = getTypeFromValue expr_val
+    var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    var_attribution = do
+        a <- id_token -- RetToken
+        b <- assignToken -- RetToken
+        expr_val <- expression -- RetValue
+        s <- getState -- [MemoryCell]
+        let var = memory_get (get_id_name (getRetToken a)) (get_pos (getRetToken a)) s --MemoryCell
+        let var_type = getTypeFromValue (getValue var)
+        let expr_type = getTypeFromValue (getRetValue expr_val)
     
-    --     if (not (attr_compatible_types var_type expr_type)) then fail ("ERROR at " ++ show(get_pos expr_val)  ++ ": type mismatch in the attribution of a value to a variable.")
-    --     else
-    --         do
-    --             updateState(memory_update(a,s))
+        if (not (checkCompatibleTypes var_type expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
+        else
+            do
+                let updatedVar = setValue var (getRetValue expr_val)
+                updateState(memory_update updatedVar)
                 
-    --             -- optional: print symbols_table content
-    --             s <- getState
-    --             liftIO (print s)
-    --             return (RetValue expr_val)
+                -- optional: print symbols_table content
+                s <- getState
+                --liftIO (print s)
+                return (expr_val)
     
     -- Constant expression
     exp_const :: ParsecT [Token] [MemoryCell] IO(ReturnObject)     

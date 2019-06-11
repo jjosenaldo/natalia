@@ -42,10 +42,10 @@ statement =
     (do
         a <- var_initialization
         return ())
-    -- <|>
-    -- (do
-    --     a <- var_attribution
-    --     return ())
+    <|>
+    (do
+        a <- var_attribution
+        return ())
 
 -- nonterminal: list of statements
 statements :: ParsecT [Token] [MemoryCell] IO()
