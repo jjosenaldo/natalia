@@ -115,9 +115,9 @@ int_token = tokenPrim show update_pos get_token where
     get_token _       = Nothing
 
 -- literal of type double
-double_token :: ParsecT [Token] st IO (Token)
+double_token :: ParsecT [Token] st IO (ReturnObject)
 double_token = tokenPrim show update_pos get_token where
-    get_token (Double x p) = Just (Double x p)
+    get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
 -- literal of type boolean
