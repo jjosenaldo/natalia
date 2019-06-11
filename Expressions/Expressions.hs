@@ -175,7 +175,7 @@ module Expressions.Expressions where
             return (a))
     
     expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-    expGroup0 = int_token <|> localVariable <|> exp_parenthesized
+    expGroup0 = int_token <|> localVariable <|> exp_parenthesized <|> bool_token
 
     localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     localVariable = 

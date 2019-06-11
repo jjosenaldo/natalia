@@ -120,6 +120,12 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (Double x p)
     get_token _       = Nothing
 
+-- literal of type boolean
+bool_token :: ParsecT [Token] st IO (ReturnObject)
+bool_token = tokenPrim show update_pos get_token where
+    get_token (Bool x p) = Just (RetValue (ConsNatBool x))
+    get_token _       = Nothing
+
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show update_pos get_token where
     get_token (Equals p) = Just (RetToken (Equals p))

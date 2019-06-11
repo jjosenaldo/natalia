@@ -69,3 +69,6 @@ unary_eval :: Token -- ^ operator
 unary_eval (Minus p) (ConsNatInt x) = ConsNatInt (-x) 
 unary_eval (Minus p) (ConsNatDouble x) = ConsNatDouble (-x) 
 unary_eval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a number.")
+
+unary_eval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
+unary_eval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")

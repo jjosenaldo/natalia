@@ -52,6 +52,8 @@ tokens :-
   
   $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
+  "True"                           { \p s -> Bool (read s) (getLC p) }
+  "False"                          { \p s -> Bool (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -170,7 +172,8 @@ data Token =
   -- LITERALS  ---------------------------------------------
 
   Int Integer (Int, Int)         |
-  Double Double (Int, Int)         
+  Double Double (Int, Int)       |
+  Bool Bool (Int, Int)        
 
   ----------------------------------------------------------
 
@@ -225,7 +228,8 @@ get_pos (Id _ p) = p
 get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
-
+get_pos (Bool _ p) = p
+ 
 getLC (AlexPn _ l c) = (l, c) 
 
 getTokens fn = unsafePerformIO (getTokensAux fn)
