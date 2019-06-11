@@ -3,19 +3,36 @@ module Lexical.Tokens where
 import Lexical.Lexemes
 import Text.Parsec
 import Control.Monad.IO.Class
-
+import Types.Types
 import System.IO.Unsafe
 
+data ReturnObject = RetToken Token | RetValue Value
+
+getRetToken::ReturnObject -> Token
+getRetToken (RetToken t) = t
+getRetToken _ = error "Invalid conversion from RetValue to RetToken"
+
+getRetValue::ReturnObject -> Value
+getRetValue (RetValue v) = v
+getRetValue _ = error "Invalid conversion from RetToken to RetValue"
+
 -- Pre-defined block (main)
-mainToken :: ParsecT [Token] st IO (Token)
+mainToken :: ParsecT [Token] st IO (ReturnObject)
 mainToken = tokenPrim show update_pos get_token where
-    get_token (Main p) = Just (Main p)
+    get_token (Main p) = Just (RetToken (Main p))
     get_token _       = Nothing
 
 -- Block opening character
-leftBraceToken :: ParsecT [Token] st IO (Token)
+leftBraceToken :: ParsecT [Token] st IO (ReturnObject)
 leftBraceToken = tokenPrim show update_pos get_token where
-    get_token (LBrace p) = Just (LBrace p)
+    get_token (LBrace p) = Just (RetToken (LBrace p))
+    get_token _       = Nothing
+
+
+-- terminal: block closing character
+rightBraceToken :: ParsecT [Token] st IO (ReturnObject)
+rightBraceToken = tokenPrim show update_pos get_token where
+    get_token (RBrace p) = Just (RetToken (RBrace p))
     get_token _       = Nothing
 
 -- Left parenthesis
@@ -60,22 +77,17 @@ mod_token = tokenPrim show update_pos get_token where
     get_token (Mod p) = Just (Mod p)
     get_token _       = Nothing
 
--- terminal: block closing character
-rightBraceToken :: ParsecT [Token] st IO (Token)
-rightBraceToken = tokenPrim show update_pos get_token where
-    get_token (RBrace p) = Just (RBrace p)
-    get_token _       = Nothing
 
 -- terminal: name of the *int* type %TODO: update comment
-typeToken :: ParsecT [Token] st IO (Token)
+typeToken :: ParsecT [Token] st IO (ReturnObject)
 typeToken = tokenPrim show update_pos get_token where
-    get_token (Type x p) = Just (Type x p)
+    get_token (Type x p) = Just (RetToken (Type x p))
     get_token _        = Nothing 
 
 -- Identifier (of a variable/function/procedure/etc)
-id_token :: ParsecT [Token] st IO (Token)
+id_token :: ParsecT [Token] st IO (ReturnObject)
 id_token = tokenPrim show update_pos get_token where
-    get_token (Id x p) = Just (Id x p)
+    get_token (Id x p) = Just (RetToken (Id x p))
     get_token _      = Nothing
 
 -- terminal: assignment symbol
@@ -85,9 +97,9 @@ assignToken = tokenPrim show update_pos get_token where
     get_token _      = Nothing
 
 -- terminal: literal of type int
-int_token :: ParsecT [Token] st IO (Token)
+int_token :: ParsecT [Token] st IO (ReturnObject)
 int_token = tokenPrim show update_pos get_token where
-    get_token (Int x p) = Just (Int x p)
+    get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
 
 -- literal of type double
@@ -97,9 +109,9 @@ double_token = tokenPrim show update_pos get_token where
     get_token _       = Nothing
 
 -- terminal: command terminator
-semiColonToken :: ParsecT [Token] st IO (Token)
+semiColonToken :: ParsecT [Token] st IO (ReturnObject)
 semiColonToken = tokenPrim show update_pos get_token where
-    get_token (SemiColon p) = Just (SemiColon p)
+    get_token (SemiColon p) = Just (RetToken (SemiColon p))
     get_token _         = Nothing
 
 -- TODO

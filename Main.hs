@@ -4,13 +4,14 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Statements.Statements
 
+import Memory.Memory
 import Control.Monad.IO.Class
 import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
 -- the entire program
-program :: ParsecT [Token] [(Token,Token)] IO ()
+program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
             a <- mainToken
             b <- leftBraceToken

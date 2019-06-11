@@ -10,44 +10,45 @@ import Text.Parsec
 import Control.Monad.IO.Class
 
 -- nonterminal: initialization of an *int* variable
-var_initialization :: ParsecT [Token] [(Token,Token)] IO()
+var_initialization :: ParsecT [Token] [MemoryCell] IO()
 var_initialization = do
-    mem <- getState
-    t <- typeToken
-    name <- id_token
+    mem <- getState -- [MemoryCell]
+    t <- typeToken -- RetToken Type
+    name <- id_token -- RetTOken Id
 
-    if symtable_has_variable name mem then fail ("ERROR on the initialization of '" ++ (get_id_name name) ++ "' at " ++ show (get_pos name) ++ ": variable already exists.")
+    if memory_has_name (get_id_name (getRetToken name)) mem then fail ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
     else 
         do
             ass <- assignToken
-            expr_value <- expression
+            expr_value <- expression -- RetValue Value
             
 
-            let expr_type = get_value_type expr_value
+            let expr_type = getTypeFromValue (getRetValue expr_value)
 
-            if (not (attr_compatible_types t expr_type)) then fail ("ERROR at " ++ show(get_pos expr_value)  ++ ": type mismatch in the initialization of a variable.")
+            if (not (checkCompatibleTypes (getTypeFromToken (getRetToken t)) expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable.")
             else
                 do
-                    updateState(symtable_insert (name, expr_value))
+                    let variableToInsert = Variable (ConstructVariable (get_id_name (getRetToken name)) (getRetValue expr_value) False)
+                    updateState (memory_insert variableToInsert)
                     -- optional: print symbols_table content
-                    s <- getState
+                    s <- getState --[MemoryCell]
                     liftIO (print s)
                     return ()
 
 -- nonterminal: statement
-statement :: ParsecT [Token] [(Token,Token)] IO()
+statement :: ParsecT [Token] [MemoryCell] IO()
 statement = 
-    try
+    --try
     (do
         a <- var_initialization
         return ())
-    <|>
-    (do
-        a <- var_attribution
-        return ())
+    -- <|>
+    -- (do
+    --     a <- var_attribution
+    --     return ())
 
 -- nonterminal: list of statements
-statements :: ParsecT [Token] [(Token,Token)] IO()
+statements :: ParsecT [Token] [MemoryCell] IO()
 statements = 
     try
     (do

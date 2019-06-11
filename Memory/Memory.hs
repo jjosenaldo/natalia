@@ -19,6 +19,7 @@ getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 
+getValue::MemoryCell -> Value
 getValue (Variable (ConstructVariable _ val _)) = val
 getValue (Variable (ConstructConstantVariable _ val _)) = val
 
