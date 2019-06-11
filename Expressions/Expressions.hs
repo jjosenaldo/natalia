@@ -100,7 +100,7 @@ eval_remaining_exp_num3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_exp_num3 n1 = 
     try
     (do
-        op <- bin_op_left_3_token
+        op <- bin_num_op_left_3_token
         n2 <- exp_num2
         result <- eval_remaining_exp_num3 (binary_eval n1 op n2)
         return (result))
@@ -121,7 +121,7 @@ eval_remaining_exp_num4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
 eval_remaining_exp_num4 n1 = 
     try
     (do
-        op <- bin_op_left_4_token
+        op <- bin_num_op_left_4_token
         n2 <- exp_num3
         result <- eval_remaining_exp_num4 (binary_eval n1 op n2)
         return (result))
