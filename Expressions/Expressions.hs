@@ -12,11 +12,79 @@ import Control.Monad.IO.Class
 
 -- General expression
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)     
-expression = exp_num
+expression = exp4
 
--- A numeric expression
-exp_num :: ParsecT [Token] [(Token,Token)] IO(Token)     
-exp_num = exp_num4
+-- Expression that has precedence 4
+exp4 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp4 = 
+    do
+        n1 <- exp3
+        result <- eval_remaining_exp4 n1 
+        return (result)
+
+-- Evaluates the remainder of a expression that has precedence 4
+eval_remaining_exp4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_exp4 n1 = 
+    try
+    (do
+        op <- bin_num_op_left_4_token
+        n2 <- exp3
+        result <- eval_remaining_exp4 (binary_eval n1 op n2)
+        return (result))
+    <|>
+    (do
+        return (n1))
+
+-- Expression that has precedence 3
+exp3 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp3 = 
+    do
+        n1 <- exp2
+        result <- eval_remaining_exp3 n1 
+        return (result)
+
+-- Evaluates the remainder of a expression that has precedence 3
+eval_remaining_exp3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
+eval_remaining_exp3 n1 = 
+    try
+    (do
+        op <- bin_num_op_left_3_token
+        n2 <- exp2
+        result <- eval_remaining_exp3 (binary_eval n1 op n2)
+        return (result))
+    <|>
+    (do
+        return (n1))
+
+-- Expression that has precedence 2
+exp2 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp2 = 
+    try
+    (do
+        n1 <- exp1
+        op <- expo_token
+        n2 <- exp2
+        return (binary_eval n1 op n2))
+    <|>
+    exp1
+
+-- Expression that has precedence 1
+exp1 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp1 = 
+    try
+    (do
+        op <- minus_token
+        n2 <- exp1
+        return (unary_eval op n2))
+    <|>
+    exp0
+
+-- Expression that has precedence 0
+exp0 :: ParsecT [Token] [(Token,Token)] IO(Token)
+exp0 = try var_attribution <|> exp_const <|> exp_parenthesized <|> exp_local_var
+
+
+
 
 -- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [(Token,Token)] IO(Token)
@@ -60,71 +128,3 @@ exp_local_var =
         let value = symtable_get name mem
         return (value)
 
--- Expression that has precedence 0
-exp0 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp0 = try var_attribution <|> exp_const <|> exp_parenthesized <|> exp_local_var
-
--- Numeric expression that has precedence 1
-exp_num1 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp_num1 = 
-    try
-    (do
-        op <- minus_token
-        n2 <- exp_num1
-        return (unary_eval op n2))
-    <|>
-    exp0
-
--- Numeric expression that has precedence 2
-exp_num2 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp_num2 = 
-    try
-    (do
-        n1 <- exp_num1
-        op <- expo_token
-        n2 <- exp_num2
-        return (binary_eval n1 op n2))
-    <|>
-    exp_num1
-
--- Numeric expression that has precedence 3
-exp_num3 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp_num3 = 
-    do
-        n1 <- exp_num2
-        result <- eval_remaining_exp_num3 n1 
-        return (result)
-
--- Evaluates the remainder of a numeric expression that has precedence 3
-eval_remaining_exp_num3 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining_exp_num3 n1 = 
-    try
-    (do
-        op <- bin_num_op_left_3_token
-        n2 <- exp_num2
-        result <- eval_remaining_exp_num3 (binary_eval n1 op n2)
-        return (result))
-    <|>
-    (do
-        return (n1))
-
--- Numeric expression that has precedence 4
-exp_num4 :: ParsecT [Token] [(Token,Token)] IO(Token)
-exp_num4 = 
-    do
-        n1 <- exp_num3
-        result <- eval_remaining_exp_num4 n1 
-        return (result)
-
--- Evaluates the remainder of a numeric expression that has precedence 4
-eval_remaining_exp_num4 :: Token -> ParsecT [Token] [(Token,Token)] IO(Token)
-eval_remaining_exp_num4 n1 = 
-    try
-    (do
-        op <- bin_num_op_left_4_token
-        n2 <- exp_num3
-        result <- eval_remaining_exp_num4 (binary_eval n1 op n2)
-        return (result))
-    <|>
-    (do
-        return (n1))
