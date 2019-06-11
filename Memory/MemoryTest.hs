@@ -15,7 +15,7 @@ data MemoryCell = Variable Variable | Subprogram Subprogram deriving (Show, Eq)
 funx = Subprogram (ConstructFunction "soma" [ConsParameter "a" NatInt, ConsParameter "b" NatInt] NatInt)
 procx = Subprogram (ConstructProcedure "nada" [])
 varx = Variable (ConstructVariable "x" (ConsNatInt 2))
-mem = memory_insert varx (memory_insert funx (memory_insert procx []))
+mem = memory_insert procx (memory_insert funx (memory_insert varx []))
 
 -- Functions to access important fields of memory cells
 getId (Variable (ConstructVariable x _)) = x
@@ -45,7 +45,7 @@ memory_update :: MemoryCell -- ^ the variable with its new value
                 -> [MemoryCell] -- ^ the memory after the update
 memory_update (Variable v) [] = error ("ERROR on the update of the variable " ++ (getId (Variable v)) ++ ": it is not present in the memory.")
 memory_update (Variable v1) (v2:t) = 
-    if (isVariable v2) && (id (Variable v1)) == (id v2) then (Variable v1) : t
+    if (isVariable v2) && ((getId (Variable v1)) == (getId v2)) then (Variable v1) : t
     else v2 : memory_update (Variable v1) t
 
 memory_update (Subprogram s) mem = error ("ERROR you can't update the value of subprogram in memory")
