@@ -1,8 +1,8 @@
 module Memory.Memory where
 
 import Lexical.Lexemes
---                                                                              name
-data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
+import Types.Types
+
 
 --                                  id     value
 data Variable = ConstructVariable String Value | ConstructConstantVariable String Value deriving (Show, Eq)
@@ -26,15 +26,10 @@ getId (Variable (ConstructConstantVariable x _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 
-getTypeFromValue (ConsNatInt _) = NatInt 
-getTypeFromValue (ConsNatBool _) = NatBool 
-getTypeFromValue (ConsNatString _) = NatString 
-getTypeFromValue (ConsNatDouble _) = NatDouble 
-getTypeFromValue (ConsNatSet tp _) = NatSet tp
-getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
-
 getValue (Variable (ConstructVariable _ val)) = val
 getValue (Variable (ConstructConstantVariable _ val)) = val
+
+getType (Variable )
 
 isVariable :: MemoryCell -> Bool
 isVariable (Variable v) = True

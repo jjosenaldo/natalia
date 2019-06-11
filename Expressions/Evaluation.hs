@@ -2,6 +2,7 @@ module Expressions.Evaluation where
 
 import Lexical.Lexemes
 import Memory.Memory
+import Types.Types
 
 -- | Implementation of binary operations
 binary_eval :: Value -- ^ first operand

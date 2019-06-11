@@ -126,6 +126,6 @@ exp_local_var =
     do
         mem <- getState
         name <- id_token
-        let value = memory_get name mem
+        let value = getValue(memory_get name mem)
         return (value)
 
