@@ -60,6 +60,9 @@ binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator e
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
 
+binary_eval (ConsNatBool x) (And p) (ConsNatBool y) = ConsNatBool (x && y)
+binary_eval _ (And p) _ = error ("ERROR at " ++ show(p) ++ ": the && operator expects two booleans.")
+
 -- | Implementation of binary operations
 unary_eval :: Token -- ^ operator
             -> Value -- ^ operand

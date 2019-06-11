@@ -1,4 +1,5 @@
 @main{
     bool x = True;
     bool y = !x;
+    bool z = (x && y);
 }
