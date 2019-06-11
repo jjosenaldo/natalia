@@ -171,7 +171,7 @@ data Token =
 
   -- LITERALS  ---------------------------------------------
 
-  Int Int (Int, Int)         |
+  Int Integer (Int, Int)         |
   Double Double (Int, Int)         
 
   ----------------------------------------------------------
