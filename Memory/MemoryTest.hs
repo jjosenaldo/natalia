@@ -1,10 +1,13 @@
+module Memory.MemoryTest where
+
+import Types.Types
 --import Lexical.Lexemes
 --                                                                              name
-data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
-data Value = ConsNatInt Int | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
+--data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
+--data Value = ConsNatInt Int | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
 
---                                  id     value
-data Variable = ConstructVariable String Value | ConstructConstantVariable String Value deriving (Show, Eq)
+--                                  id         global                                        global
+data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name

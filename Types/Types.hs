@@ -2,6 +2,17 @@ module Types.Types where
 
 import Lexical.Lexemes
 
+data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
+data Value = ConsNatInt Int | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
+
+getTypeFromValue::Value -> Type
+getTypeFromValue (ConsNatInt _) = NatInt 
+getTypeFromValue (ConsNatBool _) = NatBool 
+getTypeFromValue (ConsNatString _) = NatString 
+getTypeFromValue (ConsNatDouble _) = NatDouble 
+getTypeFromValue (ConsNatSet tp _) = NatSet tp
+getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
+
 -- | Checks if the types involved in an assignment are compatible
 attr_compatible_types :: Token -- ^ the type of the variable 
                       -> Token -- ^ the type of the value being assigned
