@@ -10,18 +10,6 @@ import Types.Types
 import Text.Parsec
 import Control.Monad.IO.Class
 
---                                                                              name
-data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
-data Value = ConsNatInt Int | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
-
---                                  id     value
-data Variable = ConstructVariable String Value | ConstructConstantVariable String Value deriving (Show, Eq)
-data Parameter = ConsParameter String Type deriving (Show, Eq)
-
---                                  id                return                     name
-data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure String [Parameter] deriving (Show, Eq)
-data MemoryCell = Variable Variable | Subprogram Subprogram deriving (Show, Eq)
-
 -- General expression
 expression :: ParsecT [Token] [MemoryCell] IO(Value)     
 expression = exp4
@@ -102,21 +90,22 @@ exp0 = try var_attribution <|> exp_const <|> exp_parenthesized <|> exp_local_var
 var_attribution :: ParsecT [Token] [MemoryCell] IO(Value)
 var_attribution = do
     a <- id_token
+    let var = memory_get a
     b <- assignToken
-    c <- expression
+    expr_val <- expression
     s <- getState
     let var_type = var_type_from_name a s
-    let expr_type = get_value_type c
+    let expr_type = getTypeFromValue expr_val
 
-    if (not (attr_compatible_types var_type expr_type)) then fail ("ERROR at " ++ show(get_pos c)  ++ ": type mismatch in the attribution of a value to a variable.")
+    if (not (attr_compatible_types var_type expr_type)) then fail ("ERROR at " ++ show(get_pos expr_val)  ++ ": type mismatch in the attribution of a value to a variable.")
     else
         do
-            updateState(symtable_update(a,c))
+            updateState(memory_update(a,s))
             
             -- optional: print symbols_table content
             s <- getState
             liftIO (print s)
-            return (c)
+            return (expr_val)
 
 -- Constant expression
 exp_const :: ParsecT [Token] [MemoryCell] IO(Value)     
@@ -137,6 +126,6 @@ exp_local_var =
     do
         mem <- getState
         name <- id_token
-        let value = symtable_get name mem
+        let value = memory_get name mem
         return (value)
 
