@@ -38,7 +38,7 @@ var_initialization = do
 -- nonterminal: statement
 statement :: ParsecT [Token] [MemoryCell] IO()
 statement = 
-    --try
+    try
     (do
         a <- var_initialization
         return ())

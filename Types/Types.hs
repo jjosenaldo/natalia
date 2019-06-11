@@ -27,6 +27,7 @@ checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
 
 getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt
+    | str == "string" = NatString
     | otherwise = error ("Not supported type: " ++ str)
 
 -- | Checks if the types involved in an assignment are compatible

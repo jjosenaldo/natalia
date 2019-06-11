@@ -17,6 +17,7 @@ binary_eval (ConsNatInt x) (Plus _) (ConsNatInt y) = ConsNatInt (x + y)
 binary_eval (ConsNatInt x) (Plus _) (ConsNatDouble y) = ConsNatDouble ((fromIntegral x) + y)
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatInt y) = ConsNatDouble (x + (fromIntegral y))
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatDouble y) = ConsNatDouble (x + y)
+binary_eval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
 binary_eval _ (Plus p) _ = error ("ERROR at " ++ show(p) ++ ": the + operator expects two numbers.")
 
 -- Operator - (binary)

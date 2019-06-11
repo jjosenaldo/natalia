@@ -52,6 +52,7 @@ tokens :-
   
   $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
+  \" ([.\n]#\")* \"                { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -170,7 +171,8 @@ data Token =
   -- LITERALS  ---------------------------------------------
 
   Int Integer (Int, Int)         |
-  Double Double (Int, Int)         
+  Double Double (Int, Int)       |
+  String String (Int, Int)  
 
   ----------------------------------------------------------
 
@@ -225,6 +227,7 @@ get_pos (Id _ p) = p
 get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
+get_pos (String _ p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 
