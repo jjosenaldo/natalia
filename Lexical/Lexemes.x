@@ -52,6 +52,7 @@ tokens :-
   
   $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
+  "True"                           { \p s -> Bool (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -170,7 +171,8 @@ data Token =
   -- LITERALS  ---------------------------------------------
 
   Int Integer (Int, Int)         |
-  Double Double (Int, Int)         
+  Double Double (Int, Int)       |
+  Bool Bool (Int, Int)
 
   ----------------------------------------------------------
 

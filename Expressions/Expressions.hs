@@ -34,80 +34,80 @@ module Expressions.Expressions where
         (do
             -- this group contains only the operation ||
             l <- expGroup7
-            result <- evalRemainingGroup8 (getRetValue l)
+            result <- evalRemainingGroup8 (l)
             return (result))
 
-    evalRemainingGroup8 :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    evalRemainingGroup8 :: ReturnObject -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
     evalRemainingGroup8 l =
         try
         (do
             op <- group8OpToken
             r <- expGroup7
-            result <- evalRemainingGroup8 (binary_eval l (getRetToken op) (getRetValue r))
+            result <- evalRemainingGroup8 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
             return (result))
         <|>
         (do
-            return (RetValue l))
+            return (l))
 
     expGroup7 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     expGroup7 =
         (do
             -- this group contains only the operation &&
             l <- expGroup6
-            result <- evalRemainingGroup8 (getRetValue l)
+            result <- evalRemainingGroup7 (l)
             return (result))
 
-    evalRemainingGroup7 :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    evalRemainingGroup7 :: ReturnObject -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
     evalRemainingGroup7 l =
         try
         (do
             op <- group7OpToken
             r <- expGroup6
-            result <- evalRemainingGroup7 (binary_eval l (getRetToken op) (getRetValue r))
+            result <- evalRemainingGroup7 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
             return (result))
         <|>
         (do
-            return (RetValue l))
+            return (l))
 
     expGroup6 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     expGroup6 =
         (do
             -- this group contains only the operation == (potentially will contain !=)
             l <- expGroup5
-            result <- evalRemainingGroup8 (getRetValue l)
+            result <- evalRemainingGroup6 (l)
             return (result))
 
-    evalRemainingGroup6 :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    evalRemainingGroup6 :: ReturnObject -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
     evalRemainingGroup6 l =
         try
         (do
             op <- group6OpToken
             r <- expGroup5
-            result <- evalRemainingGroup6 (binary_eval l (getRetToken op) (getRetValue r))
+            result <- evalRemainingGroup6 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
             return (result))
         <|>
         (do
-            return (RetValue l))
+            return (l))
 
     expGroup5 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     expGroup5 =
         (do
             -- this group contains only the operation < (potentially will contain >, <=, >=)
             l <- expGroup4
-            result <- evalRemainingGroup8 (getRetValue l)
+            result <- evalRemainingGroup5 l
             return (result))
 
-    evalRemainingGroup5 :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+    evalRemainingGroup5 :: ReturnObject -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
     evalRemainingGroup5 l =
         try
         (do
             op <- group5OpToken
             r <- expGroup4
-            result <- evalRemainingGroup5 (binary_eval l (getRetToken op) (getRetValue r))
+            result <- evalRemainingGroup5 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
             return (result))
         <|>
         (do
-            return (RetValue l))
+            return (l))
 
     expGroup4 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     expGroup4 =
@@ -175,7 +175,7 @@ module Expressions.Expressions where
             return (a))
     
     expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-    expGroup0 = int_token <|> localVariable <|> exp_parenthesized
+    expGroup0 = int_token <|> double_token <|> localVariable <|> exp_parenthesized
 
     localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
     localVariable = 
@@ -185,77 +185,6 @@ module Expressions.Expressions where
             if (memory_has_name (get_id_name (getRetToken id)) mem) then do return (RetValue (getValue (memory_get (get_id_name (getRetToken id)) (get_pos (getRetToken id)) mem)))
             else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not a variable")
     
-    -- Expression that has precedence 4
-    -- exp4 :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp4 = 
-    --     do
-    --         n1 <- exp3
-    --         result <- eval_remaining_exp4 n1 
-    --         return (result)
-    
-    -- Evaluates the remainder of a expression that has precedence 4
-    -- eval_remaining_exp4 :: Value -> ParsecT [Token] [MemoryCell] IO(Value)
-    -- eval_remaining_exp4 n1 = 
-    --     try
-    --     (do
-    --         op <- bin_op_left_4_token
-    --         n2 <- exp3
-    --         result <- eval_remaining_exp4 (binary_eval n1 op n2)
-    --         return (result))
-    --     <|>
-    --     (do
-    --         return (n1))
-    
-    -- Expression that has precedence 3
-    -- exp3 :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp3 = 
-    --     do
-    --         n1 <- exp2
-    --         result <- eval_remaining_exp3 n1 
-    --         return (result)
-    
-    -- Evaluates the remainder of a expression that has precedence 3
-    -- eval_remaining_exp3 :: Value -> ParsecT [Token] [MemoryCell] IO(Value)
-    -- eval_remaining_exp3 n1 = 
-    --     try
-    --     (do
-    --         op <- bin_op_left_3_token
-    --         n2 <- exp2
-    --         result <- eval_remaining_exp3 (binary_eval n1 op n2)
-    --         return (result))
-    --     <|>
-    --     (do
-    --         return (n1))
-    
-    -- Expression that has precedence 2
-    -- exp2 :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp2 = 
-    --     try
-    --     (do
-    --         n1 <- exp1
-    --         op <- expo_token
-    --         n2 <- exp2
-    --         return (binary_eval n1 op n2))
-    --     <|>
-    --     exp1
-    
-    -- Expression that has precedence 1
-    -- exp1 :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp1 = 
-    --     try
-    --     (do
-    --         op <- minus_token
-    --         n2 <- exp1
-    --         return (unary_eval op n2))
-    --     <|>
-    --     exp0
-    
-    -- Expression that has precedence 0
-    -- exp0 :: ParsecT [Token] [MemoryCell] IO(Value)
-    -- exp0 = try var_attribution <|> exp_const -- <|> exp_parenthesized -- <|> exp_local_var
-    
-    
-    
     
     -- Assignment of a value to a variable
     var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
@@ -264,10 +193,10 @@ module Expressions.Expressions where
         b <- assignToken -- RetToken
         expr_val <- expression -- RetValue
         s <- getState -- [MemoryCell]
+        
         let var = memory_get (get_id_name (getRetToken a)) (get_pos (getRetToken a)) s --MemoryCell
         let var_type = getTypeFromValue (getValue var)
         let expr_type = getTypeFromValue (getRetValue expr_val)
-    
         if (not (checkCompatibleTypes var_type expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
         else
             do

@@ -15,16 +15,14 @@ var_initialization = do
     mem <- getState -- [MemoryCell]
     t <- typeToken -- RetToken Type
     name <- id_token -- RetTOken Id
-
-    if memory_has_name (get_id_name (getRetToken name)) mem then fail ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
+    
+    if (memory_has_name (get_id_name (getRetToken name)) mem) then fail ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
     else 
         do
             ass <- assignToken
             expr_value <- expression -- RetValue Value
-            
-
             let expr_type = getTypeFromValue (getRetValue expr_value)
-
+            
             if (not (checkCompatibleTypes (getTypeFromTypeToken (getRetToken t)) expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable.")
             else
                 do
