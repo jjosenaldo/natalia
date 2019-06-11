@@ -53,6 +53,7 @@ tokens :-
   $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
   \" ([.\n]#\")* \"                { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
+  "True"                           { \p s -> Bool (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -173,6 +174,7 @@ data Token =
   Int Integer (Int, Int)         |
   Double Double (Int, Int)       |
   String String (Int, Int)  
+  Bool Bool (Int, Int)
 
   ----------------------------------------------------------
 
