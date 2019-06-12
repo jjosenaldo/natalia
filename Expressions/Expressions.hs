@@ -208,10 +208,6 @@ var_attribution = do
             --liftIO (print s)
             return (expr_val)
 
--- Constant expression
-exp_const :: ParsecT [Token] [MemoryCell] IO(ReturnObject)     
-exp_const = int_token -- <|> double_token
-
 -- Parenthesized expression
 exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 exp_parenthesized = 
@@ -242,22 +238,22 @@ lValue =
 --         return (RetValue value)
 
 
-setElements :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-setElements = 
+parseSetElements :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+parseSetElements = 
     try
     (do
         ret_value <- expression -- RetValue Value
         let value = getRetValue ret_value -- Value
         let current_type = getTypeFromValue value -- Type
-        result_value <- setNextElement [value] current_type
+        result_value <- parseNextSetElement [value] current_type
         return (result_value))
     <|>
     (do
         return (RetValue(ConsNatSet NatGenType [])))
 
 
-setNextElement :: [Value] -> Type -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
-setNextElement elements lastType =
+parseNextSetElement :: [Value] -> Type -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+parseNextSetElement elements lastType =
     try
     (do
         ret_comma <- commaToken -- RetToken Comma
@@ -269,7 +265,7 @@ setNextElement elements lastType =
             fail ("ERROR: " ++ show(current_type) ++ " was provided when " ++ show(lastType) ++ " was expected." )
         else 
             do 
-                ret <- setNextElement (elements ++ [value]) current_type
+                ret <- parseNextSetElement (elements ++ [value]) current_type
                 return (ret)) 
     <|>
     (do
@@ -279,7 +275,7 @@ set_value :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 set_value = 
     do 
         retlbrace <- leftBraceToken -- RetToken LBrace
-        ret_value <- setElements -- RetValue NatSet Type
+        ret_value <- parseSetElements -- RetValue NatSet Type
         retrbrace <- rightBraceToken -- RetToken RBrace
         let actual_value =  getRetValue ret_value -- Value
 
