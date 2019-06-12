@@ -20,6 +20,8 @@ remDups (x:xs) list2
     | (x `elem` list2) = remDups xs list2
     | otherwise = x : remDups xs (x:list2)
 
+
+
 --  OPERATORS WITH NUMERIC RESULT --------------------------------------------------------------------------------------
 -- Operator +
 binary_eval (ConsNatInt x) (Plus _) (ConsNatInt y) = ConsNatInt (x + y)
@@ -28,8 +30,8 @@ binary_eval (ConsNatDouble x) (Plus _) (ConsNatInt y) = ConsNatDouble (x + (from
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatDouble y) = ConsNatDouble (x + y)
 binary_eval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
 binary_eval (ConsNatSet type1 x) (Plus _) (ConsNatSet type2 y)  
-        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (removeDuplicates(x ++ y))
-        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (removeDuplicates(x ++ y))
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (removeDuplicates (x ++ y))
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (removeDuplicates (x ++ y))
         | otherwise = error ("ERROR : You can't unite a set of " ++ show(type1) ++ " with a set of " ++
                              show(type2))
 
@@ -40,6 +42,12 @@ binary_eval (ConsNatInt x) (Minus _) (ConsNatInt y) = ConsNatInt (x - y)
 binary_eval (ConsNatInt x) (Minus _) (ConsNatDouble y) = ConsNatDouble ((fromIntegral x) - y)
 binary_eval (ConsNatDouble x) (Minus _) (ConsNatInt y) = ConsNatDouble (x - (fromIntegral y))
 binary_eval (ConsNatDouble x) (Minus _) (ConsNatDouble y) = ConsNatDouble (x - y)
+binary_eval (ConsNatSet type1 x) (Minus _) (ConsNatSet type2 y)
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (remDups x y)
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (remDups x y)
+        | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
+
 binary_eval _ (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the binary - operator expects two numbers.")
 
 -- Operator %
