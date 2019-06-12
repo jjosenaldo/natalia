@@ -1,10 +1,11 @@
 module Main (main) where
 
+import Blocks.Blocks
 import Lexical.Lexemes
 import Lexical.Tokens
+import Memory.Memory
 import Statements.Statements
 
-import Memory.Memory
 import Control.Monad.IO.Class
 import System.Environment
 import System.IO.Unsafe
@@ -13,6 +14,7 @@ import Text.Parsec
 -- the entire program
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
+            retTypedefBlock <- typedefsBlock
             a <- mainToken
             b <- leftBraceToken
             c <- statements

@@ -1,0 +1,10 @@
+@typedefs{
+    si {int},
+    sii {{int}},
+    siii {{{int}}},
+    ssstring {{{string}}}
+}
+
+@main{
+    int a = 1;
+}

@@ -22,6 +22,7 @@ getId (Variable (ConstructVariable x _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
+getId (Typedef (ConsTypedef x _)) = x
 
 setValue::MemoryCell -> Value -> MemoryCell
 setValue (Variable (ConstructVariable name v1 isGlobal)) v2

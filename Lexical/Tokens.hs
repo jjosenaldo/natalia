@@ -40,6 +40,12 @@ mainToken = tokenPrim show update_pos get_token where
     get_token (Main p) = Just (RetToken (Main p))
     get_token _       = Nothing
 
+-- Pre-defined block (typedefs)
+typedefsToken :: ParsecT [Token] st IO (ReturnObject)
+typedefsToken = tokenPrim show update_pos get_token where
+    get_token (Typedefs p) = Just (RetToken (Typedefs p))
+    get_token _       = Nothing
+
 -- Block opening character
 leftBraceToken :: ParsecT [Token] st IO (ReturnObject)
 leftBraceToken = tokenPrim show update_pos get_token where
