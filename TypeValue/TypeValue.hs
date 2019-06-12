@@ -18,3 +18,11 @@ data Value =
     ConsNatDouble Double | 
     ConsNatSet Type [Value] | 
     ConsNatStruct String [(String, Value)] deriving (Show, Eq)
+
+getTypeFromValue::Value -> Type
+getTypeFromValue (ConsNatInt _) = NatInt 
+getTypeFromValue (ConsNatBool _) = NatBool 
+getTypeFromValue (ConsNatString _) = NatString 
+getTypeFromValue (ConsNatDouble _) = NatDouble 
+getTypeFromValue (ConsNatSet tp _) = NatSet tp
+getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))

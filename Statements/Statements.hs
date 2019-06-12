@@ -5,6 +5,7 @@ import Memory.Memory
 import Lexical.Lexemes
 import Lexical.Tokens
 import Types.Types
+import TypeValue.TypeValue
 
 import Text.Parsec
 import Control.Monad.IO.Class
