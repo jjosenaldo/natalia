@@ -2,4 +2,8 @@
     bool x = True;
     bool y = !x;
     bool z = (x && y);
+    bool k = (z || True);
+    int a = 10;
+    bool sjd = (a < 45);
+    sjd = (187 > a);
 }

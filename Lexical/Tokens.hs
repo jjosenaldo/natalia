@@ -64,6 +64,11 @@ less_than_token = tokenPrim show update_pos get_token where
     get_token (LessThan p)  = Just (RetToken (LessThan p))
     get_token _             = Nothing
 
+greater_than_token :: ParsecT [Token] st IO (ReturnObject)
+greater_than_token = tokenPrim show update_pos get_token where
+    get_token (GreaterThan p)  = Just (RetToken (GreaterThan p))
+    get_token _             = Nothing
+
 minus_token :: ParsecT [Token] st IO (ReturnObject)
 minus_token = tokenPrim show update_pos get_token where
     get_token (Minus p) = Just (RetToken (Minus p))
