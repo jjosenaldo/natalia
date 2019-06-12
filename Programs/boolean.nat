@@ -1,0 +1,15 @@
+@main{
+    bool x = True;
+    bool y = True;
+    bool z = (x && y);
+    bool k = (z || True);
+    int a = 10;
+    bool sjd = (a < 45);
+    sjd = (187 > a);
+    x = (10 >= 10);
+    y = (50 <= 30);
+    z = ((a + 145) <= 180);
+    bool kkk = z;
+    bool gasdsh = (a == 10);
+    bool oi = 13 != 13;
+}

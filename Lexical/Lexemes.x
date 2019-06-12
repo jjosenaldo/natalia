@@ -53,8 +53,9 @@ tokens :-
   
   $digit+ \. $digit+               { \p s -> Double (read s) (getLC p)}
   $digit+                          { \p s -> Int (read s) (getLC p)}
+  "True"                           { \p s -> Bool (read s) (getLC p) }
+  "False"                          { \p s -> Bool (read s) (getLC p)}
   \" ([.\n]#\")* \"                { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
-  "True"                           { \p s -> Bool (read s) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -76,6 +77,7 @@ tokens :-
   "<="                             { \p s -> LessEquals (getLC p)}
   ">="                             { \p s -> GreaterEquals (getLC p)}
   "=="                             { \p s -> Equals (getLC p)}
+  "!="                             { \p s -> Difference (getLC p)}
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
@@ -129,7 +131,7 @@ data Token =
 
   Assign (Int, Int)          |
   Mod (Int, Int)             |
-  Expo (Int, Int)             |
+  Expo (Int, Int)            |
   Plus (Int, Int)            |
   Minus (Int, Int)           |
   Times (Int, Int)           |
@@ -148,6 +150,7 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
+  Difference (Int, Int)      |
   
   -- CONDITIONALS  -----------------------------------------
 
@@ -222,6 +225,7 @@ get_pos (Equals p) = p
 get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
+get_pos (Difference p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
 get_pos (ElseIf p) = p
@@ -231,6 +235,7 @@ get_pos (Id _ p) = p
 get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
+get_pos (Bool _ p) = p
 get_pos (Comma p) = p
 get_pos (String _ p) = p
 

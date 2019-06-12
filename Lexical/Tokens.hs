@@ -83,6 +83,21 @@ less_than_token = tokenPrim show update_pos get_token where
     get_token (LessThan p)  = Just (RetToken (LessThan p))
     get_token _             = Nothing
 
+greater_than_token :: ParsecT [Token] st IO (ReturnObject)
+greater_than_token = tokenPrim show update_pos get_token where
+    get_token (GreaterThan p)  = Just (RetToken (GreaterThan p))
+    get_token _             = Nothing
+
+less_equals_token :: ParsecT [Token] st IO (ReturnObject)
+less_equals_token = tokenPrim show update_pos get_token where
+    get_token (LessEquals p)  = Just (RetToken (LessEquals p))
+    get_token _             = Nothing
+    
+greater_equals_token :: ParsecT [Token] st IO (ReturnObject)
+greater_equals_token = tokenPrim show update_pos get_token where
+    get_token (GreaterEquals p)  = Just (RetToken (GreaterEquals p))
+    get_token _             = Nothing
+
 minus_token :: ParsecT [Token] st IO (ReturnObject)
 minus_token = tokenPrim show update_pos get_token where
     get_token (Minus p) = Just (RetToken (Minus p))
@@ -144,9 +159,20 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
+-- literal of type boolean
+bool_token :: ParsecT [Token] st IO (ReturnObject)
+bool_token = tokenPrim show update_pos get_token where
+    get_token (Bool x p) = Just (RetValue (ConsNatBool x))
+    get_token _       = Nothing
+
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show update_pos get_token where
     get_token (Equals p) = Just (RetToken (Equals p))
+    get_token _            = Nothing
+
+differenceToken :: ParsecT [Token] st IO (ReturnObject)
+differenceToken = tokenPrim show update_pos get_token where
+    get_token (Difference p) = Just (RetToken (Difference p))
     get_token _            = Nothing
 
 andToken :: ParsecT [Token] st IO (ReturnObject)

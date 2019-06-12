@@ -175,7 +175,7 @@ expGroup1 =
         return (a))
 
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-expGroup0 = set_value <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
+expGroup0 = set_value <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
 
 localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 localVariable = 

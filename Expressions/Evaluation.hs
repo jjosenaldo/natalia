@@ -61,6 +61,69 @@ binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator e
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
 
+-- Operator &&
+binary_eval (ConsNatBool x) (And p) (ConsNatBool y) = ConsNatBool (x && y)
+binary_eval _ (And p) _ = error ("ERROR at " ++ show(p) ++ ": the && operator expects two booleans.")
+
+-- Operator ||
+binary_eval (ConsNatBool x) (Or p) (ConsNatBool y) = ConsNatBool (x || y)
+binary_eval _ (Or p) _ = error ("ERROR at " ++ show(p) ++ ": the || operator expects two booleans.")
+
+-- Operator <
+binary_eval (ConsNatInt x) (LessThan p) (ConsNatInt y) = ConsNatBool (x < y)
+binary_eval (ConsNatDouble x) (LessThan p) (ConsNatDouble y) = ConsNatBool (x < y)
+binary_eval (ConsNatInt x) (LessThan p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (LessThan p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (LessThan p) _ = error ("ERROR at " ++ show(p) ++ ": the < operator expects two numbers.")
+
+-- Operator >
+binary_eval (ConsNatInt x) (GreaterThan p) (ConsNatInt y) = ConsNatBool (x > y)
+binary_eval (ConsNatDouble x) (GreaterThan p) (ConsNatDouble y) = ConsNatBool (x > y)
+binary_eval (ConsNatInt x) (GreaterThan p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (GreaterThan p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (GreaterThan p) _ = error ("ERROR at " ++ show(p) ++ ": the > operator expects two numbers.")
+
+-- Operator <=
+binary_eval (ConsNatInt x) (LessEquals p) (ConsNatInt y) = ConsNatBool (x <= y)
+binary_eval (ConsNatDouble x) (LessEquals p) (ConsNatDouble y) = ConsNatBool (x <= y)
+binary_eval (ConsNatInt x) (LessEquals p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (LessEquals p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (LessEquals p) _ = error ("ERROR at " ++ show(p) ++ ": the <= operator expects two numbers.")
+
+-- Operator >=
+binary_eval (ConsNatInt x) (GreaterEquals p) (ConsNatInt y) = ConsNatBool (x >= y)
+binary_eval (ConsNatDouble x) (GreaterEquals p) (ConsNatDouble y) = ConsNatBool (x >= y)
+binary_eval (ConsNatInt x) (GreaterEquals p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (GreaterEquals p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (GreaterEquals p) _ = error ("ERROR at " ++ show(p) ++ ": the >= operator expects two numbers.")
+
+-- Operator ==
+binary_eval (ConsNatInt x) (Equals p) (ConsNatInt y) = ConsNatBool (x == y)
+binary_eval (ConsNatDouble x) (Equals p) (ConsNatDouble y) = ConsNatBool (x == y)
+binary_eval (ConsNatInt x) (Equals p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (Equals p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (Equals p) _ = error ("ERROR at " ++ show(p) ++ ": the == operator expects two numbers.")
+
+-- Operator !=
+binary_eval (ConsNatInt x) (Difference p) (ConsNatInt y) = ConsNatBool (x /= y)
+binary_eval (ConsNatDouble x) (Difference p) (ConsNatDouble y) = ConsNatBool (x /= y)
+binary_eval (ConsNatInt x) (Difference p) (ConsNatDouble y) = 
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatDouble x) (Difference p) (ConsNatInt y) =
+    error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval _ (Difference p) _ = error ("ERROR at " ++ show(p) ++ ": the != operator expects two numbers.")
+
+
 -- | Implementation of binary operations
 unary_eval :: Token -- ^ operator
             -> Value -- ^ operand
@@ -70,3 +133,6 @@ unary_eval :: Token -- ^ operator
 unary_eval (Minus p) (ConsNatInt x) = ConsNatInt (-x) 
 unary_eval (Minus p) (ConsNatDouble x) = ConsNatDouble (-x) 
 unary_eval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a number.")
+
+unary_eval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
+unary_eval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
