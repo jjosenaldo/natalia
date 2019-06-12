@@ -178,16 +178,7 @@ expGroup1 =
         return (a))
 
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-expGroup0 = expSet <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
-
-localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-localVariable = 
-    do
-        mem <- getState
-        id <- id_token
-        if (memory_has_name (get_id_name (getRetToken id)) mem) then do return (RetValue (getValue (memory_get (get_id_name (getRetToken id)) (get_pos (getRetToken id)) mem)))
-        else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not a variable")
-
+expGroup0 = expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
 
 -- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
@@ -220,25 +211,46 @@ exp_parenthesized =
         rparen <- right_paren_token
         return (expr)
 
--- Expression that consists of a local variable
+        -- Expression that consists of a local variable
 
-lValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-lValue = 
-    do
-        mem <- getState -- [MemoryCell]
-        name <- id_token -- RetToken Id
-        let nameRetToken = getRetToken name -- Token Id
-        let var = memory_get (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
-        if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")
-        else do return (RetMemoryCell var)
 
--- exp_local_var :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
--- exp_local_var = 
---     do
---         mem <- getState
---         name <- id_token -- RetToken Id
---         let value = getValue (memory_get (get_id_name (getRetToken name)) (get_pos (getRetToken name)) mem)
---         return (RetValue value)
+
+localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+localVariable = 
+    try
+    (do
+        mem <- getState
+        id <- id_token -- RetToken
+        if (memory_has_name (get_id_name (getRetToken id)) mem) then 
+            do 
+                let pos = get_pos (getRetToken id)
+                let name = (get_id_name (getRetToken id))
+                res <- getChainedAccess (getValue (memory_get name pos mem))
+                return res
+
+        else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not accessible"))
+    <|>
+    (do
+        mem <- getState
+        id <- id_token
+        let name = name
+        let pos = get_pos (getRetToken id)
+        if (memory_has_name name mem) then do return (RetValue (getValue (memory_get name pos mem)))
+        else error ("ERROR " ++ name ++ " is not accessible"))
+
+getChainedAccess :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+getChainedAccess var =
+    try
+    (do
+        mem <- getState
+        retlbracket <- leftBracketToken
+        exprRetVal <- expression
+        retrbracket <- rightBracketToken
+        res <- getChainedAccess (arrayAccess var (getRetValue exprRetVal))
+        return res)
+    <|>
+    (return (RetValue var))
+
 
 parseSetElements :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 parseSetElements = 
@@ -273,11 +285,45 @@ parseNextSetElement elements lastType =
                 return (ret) 
         else 
             fail ("ERROR: " ++ show(current_type) ++ " was provided when " ++ show(lastType) ++ " was expected." ))
-           
-                
     <|>
     (do
         return (RetValue(ConsNatSet lastType elements)))
+
+parseArrayElements :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+parseArrayElements = 
+    try
+    (do
+        ret_value <- expression -- RetValue Value
+        let value = getRetValue ret_value -- Value
+        let current_type = getTypeFromValue value -- Type
+        result_value <- parseNextArrayElement [value] current_type
+        return (result_value))
+    <|>
+    (do
+        return (RetValue(ConsNatArray NatGenType [])))
+
+parseNextArrayElement :: [Value] -> Type -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+parseNextArrayElement elements lastType =
+    try
+    (do
+        ret_comma <- commaToken -- RetToken Comma
+        ret_value <- expression -- RetValue Value
+        let value = getRetValue ret_value -- Value
+        let current_type = getTypeFromValue value -- Type
+
+        if(checkCompatibleTypes current_type lastType ) then 
+            do
+                ret <- parseNextArrayElement (elements ++ [value]) current_type
+                return (ret) 
+        else if (checkCompatibleTypes lastType current_type  ) then
+            do
+                ret <- parseNextArrayElement (elements ++ [value]) lastType
+                return (ret) 
+        else 
+            fail ("ERROR: " ++ show(current_type) ++ " was provided when " ++ show(lastType) ++ " was expected." ))
+    <|>
+    (do
+        return (RetValue(ConsNatArray lastType elements)))
 
 expSet :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 expSet = 
@@ -288,3 +334,24 @@ expSet =
         let actual_value =  getRetValue ret_value -- Value
 
         return(RetValue actual_value)
+
+expArray :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+expArray = 
+    do 
+        retlbracket <- leftBracketToken -- RetToken LBrace
+        ret_value <- parseArrayElements -- RetValue NatArray Type
+        retlbracket <- rightBracketToken -- RetToken RBrace
+        let actual_value =  getRetValue ret_value -- Value
+
+        return(RetValue actual_value)
+
+
+lValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+lValue = 
+    do
+        mem <- getState -- [MemoryCell]
+        name <- id_token -- RetToken Id
+        let nameRetToken = getRetToken name -- Token Id
+        let var = memory_get (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
+        if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")
+        else do return (RetMemoryCell var)

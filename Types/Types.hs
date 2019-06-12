@@ -14,6 +14,7 @@ checkCompatibleTypes NatBool NatBool = True
 checkCompatibleTypes NatString NatString = True
 checkCompatibleTypes (NatStruct str1 l1) (NatStruct str2 l2) = str1 == str2 
 checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
+checkCompatibleTypes (NatArray t1) (NatArray t2) = checkCompatibleTypes t1 t2
 checkCompatibleTypes _ _ = False
 
 getTypeFromTypeToken :: Token -> Type
