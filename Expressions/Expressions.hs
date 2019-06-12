@@ -227,7 +227,7 @@ var_attribution =
     let var = memory_get (get_id_name (getRetToken a)) (get_pos (getRetToken a)) s --MemoryCell
     let var_type = getTypeFromValue (getValue var)
     let expr_type = getTypeFromValue (getRetValue expr_val)
-    if (not (checkCompatibleTypes var_type expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
+    if (not (checkCompatibleTypes var_type expr_type)) then error ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
     else
         do
             let updatedVar = setValue var (getRetValue expr_val)

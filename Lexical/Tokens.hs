@@ -47,6 +47,18 @@ typedefsToken = tokenPrim show update_pos get_token where
     get_token (Typedefs p) = Just (RetToken (Typedefs p))
     get_token _       = Nothing
 
+-- Pre-defined block (subprograms)
+subprogramsToken :: ParsecT [Token] st IO (ReturnObject)
+subprogramsToken = tokenPrim show update_pos get_token where
+    get_token (Subprograms p) = Just (RetToken (Subprograms p))
+    get_token _       = Nothing
+
+-- Pre-defined block (globals)
+globalsToken :: ParsecT [Token] st IO (ReturnObject)
+globalsToken = tokenPrim show update_pos get_token where
+    get_token (Globals p) = Just (RetToken (Globals p))
+    get_token _       = Nothing
+
 -- Block opening character
 leftBraceToken :: ParsecT [Token] st IO (ReturnObject)
 leftBraceToken = tokenPrim show update_pos get_token where
@@ -261,7 +273,7 @@ setType =
 
         return (return_type)
 
-arrayType :: ParsecT [Token] st IO (ReturnObject)
+arrayType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 arrayType =
     do
         lbrack <- leftBracketToken

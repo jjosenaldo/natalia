@@ -1,3 +1,7 @@
+@typedefs{
+    
+}
+
 @main{
     bool x = True;
     bool y = True;

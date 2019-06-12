@@ -1,3 +1,7 @@
+@typedefs{
+    
+}
+
 @main{
     string str1 = "lpcp";
     string str2 = "eh";
