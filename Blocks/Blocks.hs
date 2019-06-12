@@ -18,11 +18,22 @@ predefinedBlocks currentBlocks =
     try
     (do
         retPredefinedBlock <- predefinedBlock currentBlocks
-        retPredefinedBlocks <- predefinedBlocks (ConsNatInt(getIntFromNatInt (getRetValue retPredefinedBlock)))
-        return ()
+        let valueCurrentBlocks = getIntFromNatInt (getRetValue retPredefinedBlock)
+
+        if(valueCurrentBlocks .&. 1 == 1) then
+            do
+                return ()
+        else
+            do
+                retPredefinedBlocks <- predefinedBlocks (ConsNatInt valueCurrentBlocks)
+                return ()
     )
     <|>
     (do
+        -- let valueCurrentBlocks = getIntFromNatInt currentBlocks
+
+        -- if(valueCurrentBlocks .&. 1 == 0) then error ("Your program must have a @main block!")
+        --else return()
         return ())
 
 

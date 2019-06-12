@@ -1,15 +1,4 @@
 @main{
-
+    {int} a = 1
 }
 
-@subprograms{
-
-}
-
-@typedefs{
-    
-}
-
-@globals{
-
-}

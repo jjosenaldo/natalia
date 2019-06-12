@@ -18,14 +18,14 @@ var_initialization = do
     let var_type = getRetType rettype -- Type
     name <- id_token -- RetTOken Id
     
-    if (memory_has_name (get_id_name (getRetToken name)) mem) then fail ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
+    if (memory_has_name (get_id_name (getRetToken name)) mem) then error ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
     else 
         do
             ass <- assignToken
             expr_value <- expression -- RetValue Value
             let expr_type = getTypeFromValue (getRetValue expr_value)
             
-            if (not (checkCompatibleTypes var_type expr_type)) then fail ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable. expected: " ++ show(var_type) ++", got: " ++ show(expr_type))
+            if (not (checkCompatibleTypes var_type expr_type)) then error ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable. expected: " ++ show(var_type) ++", got: " ++ show(expr_type))
             else
                 do
                     let variableToInsert = Variable (ConstructVariable (get_id_name (getRetToken name)) (getRetValue expr_value) False)
