@@ -1,4 +1,4 @@
 @main{
-    {int} setInt = {1,2,3};
+    {double} setInt = {1,2.0,3};
 
 }
