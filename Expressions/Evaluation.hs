@@ -3,6 +3,7 @@ module Expressions.Evaluation where
 import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
+import Types.Types
 
 -- | Implementation of binary operations
 binary_eval :: Value -- ^ first operand
@@ -10,6 +11,14 @@ binary_eval :: Value -- ^ first operand
             -> Value -- ^ second operand
             -> Value -- ^ result of the operation
 
+removeDuplicates :: (Eq a) => [a] -> [a]
+removeDuplicates list = remDups list []
+
+remDups :: (Eq a) => [a] -> [a] -> [a]
+remDups [] _ = []
+remDups (x:xs) list2
+    | (x `elem` list2) = remDups xs list2
+    | otherwise = x : remDups xs (x:list2)
 
 --  OPERATORS WITH NUMERIC RESULT --------------------------------------------------------------------------------------
 -- Operator +
@@ -18,6 +27,12 @@ binary_eval (ConsNatInt x) (Plus _) (ConsNatDouble y) = ConsNatDouble ((fromInte
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatInt y) = ConsNatDouble (x + (fromIntegral y))
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatDouble y) = ConsNatDouble (x + y)
 binary_eval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
+binary_eval (ConsNatSet type1 x) (Plus _) (ConsNatSet type2 y)  
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (removeDuplicates(x ++ y))
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (removeDuplicates(x ++ y))
+        | otherwise = error ("ERROR : You can't unite a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
+
 binary_eval _ (Plus p) _ = error ("ERROR at " ++ show(p) ++ ": the + operator expects two numbers.")
 
 -- Operator - (binary)
