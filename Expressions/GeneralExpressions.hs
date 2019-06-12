@@ -1,4 +1,4 @@
-module Expressions.Expressions where
+module Expressions.GeneralExpressions where
 
 import Expressions.Evaluation
 import Expressions.Operations
