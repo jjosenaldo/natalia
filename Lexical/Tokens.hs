@@ -146,6 +146,11 @@ equalsToken = tokenPrim show update_pos get_token where
     get_token (Equals p) = Just (RetToken (Equals p))
     get_token _            = Nothing
 
+differenceToken :: ParsecT [Token] st IO (ReturnObject)
+differenceToken = tokenPrim show update_pos get_token where
+    get_token (Difference p) = Just (RetToken (Difference p))
+    get_token _            = Nothing
+
 andToken :: ParsecT [Token] st IO (ReturnObject)
 andToken = tokenPrim show update_pos get_token where
     get_token (And p) = Just (RetToken (And p))

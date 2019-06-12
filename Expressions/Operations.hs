@@ -17,7 +17,9 @@ group4OpToken = expo_token
 group5OpToken = less_than_token    <|> 
                 greater_than_token <|> 
                 less_equals_token  <|>
-                greater_equals_token
+                greater_equals_token <|>
+                equalsToken <|>
+                differenceToken 
 group6OpToken = equalsToken
 group7OpToken = andToken
 group8OpToken = orToken

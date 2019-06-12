@@ -10,4 +10,6 @@
     y = (50 <= 30);
     z = ((a + 145) <= 180);
     bool kkk = z;
+    bool gasdsh = (a == 10);
+    bool oi = 13 != 13;
 }
