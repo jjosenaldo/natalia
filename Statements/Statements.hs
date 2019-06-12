@@ -1,6 +1,6 @@
 module Statements.Statements where
 
-import Expressions.GeneralExpressions
+import Expressions.Expressions
 import Memory.Memory
 import Lexical.Lexemes
 import Lexical.Tokens

@@ -1,4 +1,4 @@
-module Expressions.GeneralExpressions where
+module Expressions.Expressions where
 
 -- natalia's modules
 import Expressions.Evaluation
