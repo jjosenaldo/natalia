@@ -81,6 +81,7 @@ tokens :-
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
+  "?"                              { \p s -> Subset (getLC p)}
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -151,7 +152,8 @@ data Token =
   And (Int, Int)             |
   Or (Int, Int)              |
   Difference (Int, Int)      |
-  
+  Subset (Int, Int)          |
+
   -- CONDITIONALS  -----------------------------------------
 
   If (Int, Int)              |
@@ -226,6 +228,7 @@ get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
 get_pos (Difference p) = p
+get_pos (Subset p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
 get_pos (ElseIf p) = p

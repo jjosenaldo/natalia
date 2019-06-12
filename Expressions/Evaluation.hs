@@ -21,6 +21,13 @@ remDups (x:xs) list2
     | (x `elem` list2) = remDups xs list2
     | otherwise = x : remDups xs (x:list2)
 
+subList :: Eq a => [a] -> [a] -> Bool
+subList [] [] = True
+subList _ []    = False
+subList [] _    = True
+subList (x:xs) (y:ys) 
+    | x == y    = subList xs ys   
+    | otherwise = subList (x:xs) ys
 
 
 --  OPERATORS WITH NUMERIC RESULT --------------------------------------------------------------------------------------
@@ -89,6 +96,14 @@ binary_eval (ConsNatSet type1 x) (Times _) (ConsNatSet type2 y)
 binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator expects two numbers.")
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
+
+
+-- Operator ?
+binary_eval (ConsNatSet type1 x) (Subset _) (ConsNatSet type2 y)  
+    | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
+    | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
+    | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+                            show(type2))
 
 -- Operator &&
 binary_eval (ConsNatBool x) (And p) (ConsNatBool y) = ConsNatBool (x && y)
