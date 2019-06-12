@@ -6,5 +6,6 @@
 
     {double} setDouble3 = {1,2,3,4} + setDouble2;
     {double} setDouble4 = setDouble3 - {1,2};
+    {double} setDouble5 = setDouble3 * {1,2, 12, 23};
 }
 

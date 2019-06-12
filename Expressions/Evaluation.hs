@@ -4,6 +4,7 @@ import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
 import Types.Types
+import Data.List
 
 -- | Implementation of binary operations
 binary_eval :: Value -- ^ first operand
@@ -80,6 +81,11 @@ binary_eval (ConsNatInt x) (Times p) (ConsNatInt y) = ConsNatInt(x*y)
 binary_eval (ConsNatDouble x) (Times p) (ConsNatInt y) = ConsNatDouble(x*fromIntegral(y))
 binary_eval (ConsNatInt x) (Times p) (ConsNatDouble y) = ConsNatDouble(fromIntegral(x)*y)
 binary_eval (ConsNatDouble x) (Times p) (ConsNatDouble y) = ConsNatDouble(x*y)
+binary_eval (ConsNatSet type1 x) (Times _) (ConsNatSet type2 y)
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (intersect x y)
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (intersect x y)
+        | otherwise = error ("ERROR : You can't intersect a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
 binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator expects two numbers.")
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
