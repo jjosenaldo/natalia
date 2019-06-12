@@ -133,6 +133,11 @@ int_token = tokenPrim show update_pos get_token where
     get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
 
+stringToken :: ParsecT [Token] st IO (ReturnObject)
+stringToken = tokenPrim show update_pos get_token where
+    get_token (String x _) = Just (RetValue (ConsNatString x))
+    get_token _            = Nothing
+
 -- literal of type double
 double_token :: ParsecT [Token] st IO (ReturnObject)
 double_token = tokenPrim show update_pos get_token where

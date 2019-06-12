@@ -36,6 +36,7 @@ checkCompatibleTypes _ _ = False
 getTypeFromTypeToken :: Token -> Type
 getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt
+    | str == "string" = NatString
     | str == "double" = NatDouble
     | str == "bool" = NatBool
     | otherwise = error ("Not supported type: " ++ str)
