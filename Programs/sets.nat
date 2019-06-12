@@ -1,3 +1,7 @@
+@typedefs{
+    
+}
+
 @main{
     {double} setDouble1 = {1,2.0,3};
     {double} setDouble2 = {1,2.0,3};

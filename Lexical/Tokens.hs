@@ -261,7 +261,7 @@ setType =
 
         return (return_type)
 
-arrayType :: ParsecT [Token] st IO (ReturnObject)
+arrayType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 arrayType =
     do
         lbrack <- leftBracketToken
