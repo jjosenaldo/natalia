@@ -15,10 +15,7 @@ import Text.Parsec
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
             retTypedefBlock <- typedefsBlock
-            a <- mainToken
-            b <- leftBraceToken
-            c <- statements
-            d <- rightBraceToken
+            retMainBlock <- mainBlock
             eof
             return ()
 

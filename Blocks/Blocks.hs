@@ -3,9 +3,19 @@ module Blocks.Blocks where
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
+import Statements.Statements
 import Types.Typedef
 
 import Text.Parsec
+
+mainBlock :: ParsecT [Token] [MemoryCell] IO ()
+mainBlock = 
+    do
+        a <- mainToken
+        b <- leftBraceToken
+        c <- statements
+        d <- rightBraceToken
+        return ()
 
 typedefsBlock :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 typedefsBlock =
