@@ -1,12 +1,15 @@
 module Lexical.Tokens where
 
+-- natalia's modules
 import Lexical.Lexemes
+import Memory.Memory
+import TypeValue.TypeValue
+import Types.Types
+
+-- External modules
 import Text.Parsec
 import Control.Monad.IO.Class
-import Types.Types
 import System.IO.Unsafe
-import Memory.Memory
-
 
 data ReturnObject = 
     RetToken Token | 
@@ -91,12 +94,12 @@ greater_than_token = tokenPrim show update_pos get_token where
 less_equals_token :: ParsecT [Token] st IO (ReturnObject)
 less_equals_token = tokenPrim show update_pos get_token where
     get_token (LessEquals p)  = Just (RetToken (LessEquals p))
-    get_token _             = Nothing
-    
+    get_token _ = Nothing
+
 greater_equals_token :: ParsecT [Token] st IO (ReturnObject)
 greater_equals_token = tokenPrim show update_pos get_token where
     get_token (GreaterEquals p)  = Just (RetToken (GreaterEquals p))
-    get_token _             = Nothing
+    get_token _ = Nothing   
 
 minus_token :: ParsecT [Token] st IO (ReturnObject)
 minus_token = tokenPrim show update_pos get_token where
@@ -125,8 +128,8 @@ mod_token = tokenPrim show update_pos get_token where
 
 
 -- terminal: name of the *int* type %TODO: update comment
-primitiveTypeToken :: ParsecT [Token] st IO (ReturnObject)
-primitiveTypeToken = tokenPrim show update_pos get_token where
+lexicalTypeToken :: ParsecT [Token] st IO (ReturnObject)
+lexicalTypeToken = tokenPrim show update_pos get_token where
     get_token (Type x p) = Just (RetToken (Type x p))
     get_token _        = Nothing 
 
@@ -159,11 +162,10 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
--- literal of type boolean
 bool_token :: ParsecT [Token] st IO (ReturnObject)
 bool_token = tokenPrim show update_pos get_token where
     get_token (Bool x p) = Just (RetValue (ConsNatBool x))
-    get_token _       = Nothing
+    get_token _ = Nothing   
 
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show update_pos get_token where
@@ -173,7 +175,7 @@ equalsToken = tokenPrim show update_pos get_token where
 differenceToken :: ParsecT [Token] st IO (ReturnObject)
 differenceToken = tokenPrim show update_pos get_token where
     get_token (Difference p) = Just (RetToken (Difference p))
-    get_token _            = Nothing
+    get_token _ = Nothing
 
 andToken :: ParsecT [Token] st IO (ReturnObject)
 andToken = tokenPrim show update_pos get_token where
@@ -200,15 +202,33 @@ negationToken = tokenPrim show update_pos get_token where
 commaToken :: ParsecT [Token] st IO (ReturnObject)
 commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
-    get_token _             = Nothing
+    get_token _ = Nothing   
 
+generalType :: ParsecT [Token] st IO (ReturnObject)
+generalType = 
+    try
+    primitiveType
+    <|>
+    aggregateType
 
+primitiveType :: ParsecT [Token] st IO (ReturnObject) 
+primitiveType = 
+    do
+        retprimitivetype <- lexicalTypeToken -- ReturnObject
+        let primitivetype = getRetToken retprimitivetype -- Token 
+        let typeToReturn = getTypeFromTypeToken primitivetype -- Type
+
+        return (RetType typeToReturn)
+
+aggregateType :: ParsecT [Token] st IO (ReturnObject)
+aggregateType = 
+    setType
 
 setType :: ParsecT [Token] st IO (ReturnObject)
 setType =
     do
         retlbrace <- leftBraceToken
-        rettype <- typeToken
+        rettype <- generalType
         retrbrace <- rightBraceToken
 
         let ttype = getRetType rettype -- Type
@@ -216,32 +236,6 @@ setType =
 
         return (return_type)
 
-arrayType :: ParsecT [Token] st IO (ReturnObject)
-arrayType = 
-    do
-        retlbracket <- leftBracketToken
-        rettype <- typeToken
-        retrbracket <- rightBracketToken
-
-        let ttype = getRetType rettype -- Type
-        let return_type = RetType (NatArray ttype) -- ReturnObject
-
-        return(return_type)
-
-typeToken :: ParsecT [Token] st IO (ReturnObject)
-typeToken = 
-    try
-    (do
-        retprimitivetype <- primitiveTypeToken -- ReturnObject
-        let primitivetype = getRetToken retprimitivetype -- Token 
-        let typeToReturn = getTypeFromTypeToken primitivetype -- Type
-
-        return (RetType typeToReturn)
-    )
-    <|>
-    arrayType
-    <|>
-    setType
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos

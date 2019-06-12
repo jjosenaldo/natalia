@@ -5,6 +5,7 @@ import Memory.Memory
 import Lexical.Lexemes
 import Lexical.Tokens
 import Types.Types
+import TypeValue.TypeValue
 
 import Text.Parsec
 import Control.Monad.IO.Class
@@ -13,7 +14,7 @@ import Control.Monad.IO.Class
 var_initialization :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 var_initialization = do
     mem <- getState -- [MemoryCell]
-    rettype <- typeToken -- RetType Type
+    rettype <- generalType -- RetType Type
     let var_type = getRetType rettype -- Type
     name <- id_token -- RetTOken Id
     

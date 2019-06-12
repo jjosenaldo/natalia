@@ -2,6 +2,7 @@ module Memory.Memory where
 
 import Lexical.Lexemes
 import Types.Types
+import TypeValue.TypeValue
 
 data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
