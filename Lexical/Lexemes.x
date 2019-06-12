@@ -47,6 +47,7 @@ tokens :-
 
   -- statement separator
   ";"                              { \p s -> SemiColon (getLC p)}
+  ","                              { \p s -> Comma (getLC p)}
 
   -- LITERALS  ---------------------------------------------
   
@@ -122,6 +123,7 @@ data Token =
 
   -- statement separator
   SemiColon (Int, Int)       |
+  Comma (Int, Int)           |
   
   -- OPERATORS  --------------------------------------------
 
@@ -173,7 +175,7 @@ data Token =
 
   Int Integer (Int, Int)         |
   Double Double (Int, Int)       |
-  String String (Int, Int)  
+  String String (Int, Int)       |
   Bool Bool (Int, Int)
 
   ----------------------------------------------------------
@@ -229,6 +231,7 @@ get_pos (Id _ p) = p
 get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
+get_pos (Comma p) = p
 get_pos (String _ p) = p
 
 getLC (AlexPn _ l c) = (l, c) 

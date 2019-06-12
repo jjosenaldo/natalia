@@ -1,0 +1,3 @@
+@main{
+    {string} oi = {"oi"};
+}

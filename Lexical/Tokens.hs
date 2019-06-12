@@ -171,6 +171,24 @@ negationToken = tokenPrim show update_pos get_token where
     get_token (Negation p)  = Just (RetToken (Negation p))
     get_token _             = Nothing
 
+commaToken :: ParsecT [Token] st IO (ReturnObject)
+commaToken = tokenPrim show update_pos get_token where
+    get_token (Comma p)  = Just (RetToken (Comma p))
+    get_token _             = Nothing
+
+
+
+setType :: ParsecT [Token] st IO (ReturnObject)
+setType =
+    do
+        retlbrace <- leftBraceToken
+        rettype <- typeToken
+        retrbrace <- rightBraceToken
+
+        let ttype = getRetType rettype -- Type
+        let return_type = RetType (NatSet ttype)
+
+        return (return_type)
 
 arrayType :: ParsecT [Token] st IO (ReturnObject)
 arrayType = 
@@ -196,6 +214,8 @@ typeToken =
     )
     <|>
     arrayType
+    <|>
+    setType
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
