@@ -1,0 +1,14 @@
+@typedefs{
+    si {int},
+    sii {{int}},
+    siii {{{int}}},
+    ssstring {{{string}}}
+}
+
+@main{
+    int a = 1;
+
+    si jah = {1};
+    {int} jah2 = {1,2,3};
+    bool res = jah < jah2;
+}

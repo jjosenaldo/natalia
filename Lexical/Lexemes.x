@@ -42,6 +42,7 @@ tokens :-
   \@globals                        { \p s -> Globals (getLC p)}
   \@subprograms                    { \p s -> Subprograms (getLC p)}
   \@main                           { \p s -> Main (getLC p)}
+  \@typedefs                       { \p s -> Typedefs (getLC p)}
   
   -- SEPARATORS -------------------------------------------
 
@@ -117,10 +118,11 @@ data Token =
 
   -- SECTIONS ---------------------------------------------
   
-  Import (Int, Int)         |
+  Import (Int, Int)          |
   Globals (Int, Int)         |
   Subprograms (Int, Int)     |
   Main (Int, Int)            |
+  Typedefs (Int, Int)        |
 
   -- SEPARATORS -------------------------------------------
 
@@ -205,6 +207,7 @@ get_pos (Import p) = p
 get_pos (Globals p) = p
 get_pos (Subprograms p) = p
 get_pos (Main p) = p
+get_pos (Typedefs p) = p
 get_pos (SemiColon p) = p
 get_pos (Assign p) = p
 get_pos (Mod p) = p
