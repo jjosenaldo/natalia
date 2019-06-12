@@ -22,7 +22,6 @@ expGroup9 =
     try
     (do
         -- this group contains only expression of attribution
-        var
         l <- lValue -- RetMemoryCell
         op <- group9OpToken
         r <- expGroup9
@@ -179,7 +178,7 @@ expGroup1 =
         return (a))
 
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-expGroup0 = expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
+expGroup0 = memoryAccess <|> expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
 
 editArray :: MemoryCell -> [Value] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
 editArray arr list =
@@ -191,16 +190,16 @@ editArray arr list =
         let exprVal = getRetValue exprRetVal
         if (checkCompatibleTypes NatInt (getTypeFromValue exprVal)) then 
             do
-                newarr <- editArray arr ([list]++[exprVal]
+                newarr <- editArray arr (list++[exprVal])
                 return (newarr)
-    )
+        else error "ERROR index of array must be an integer")
     <|>
     (do
         assignRetToken <- assignToken
         exprRetVal <- expression
-        let exprVal = getRetVal exprRetVal
+        let exprVal = getRetValue exprRetVal
         updateState(memory_update (setValueArray arr list exprVal))
-        return (exprVal)
+        return (RetValue exprVal)
     )
 
 
@@ -209,13 +208,12 @@ editArray arr list =
 var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 var_attribution = 
     try
-    -- arrayAccess (arrayAcess v 1) 2
     -- when the attribution is of type arr[p1][p2] = expr
     (do
         mem <- getState
         nameRetToken <- id_token -- RetToken
         let name = get_id_name (getRetToken nameRetToken) -- "arr"
-        let var = memory_get name mem
+        let var = memory_get name (get_pos (getRetToken nameRetToken)) mem
         res <- editArray var [] -- RetValue
         return (res))
     <|>

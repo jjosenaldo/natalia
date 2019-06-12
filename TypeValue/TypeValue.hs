@@ -39,6 +39,11 @@ data Value =
     ConsNatStruct String [(String, Value)]  |
     ConsNatArray Type [Value] deriving (Show, Eq)
 
+
+
+getIntFromNatInt (ConsNatInt x) = x
+getIntFromNatInt v = error ("Trying to fetch Int from " ++ (show (getTypeFromValue v)))
+
 getTypeFromValue::Value -> Type
 getTypeFromValue (ConsNatInt _) = NatInt 
 getTypeFromValue (ConsNatBool _) = NatBool 

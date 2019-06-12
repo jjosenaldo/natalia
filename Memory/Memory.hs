@@ -78,6 +78,26 @@ memory_delete name (v:m) =
         else error ("ERROR you can't delete a subprogram")
     else (v : (memory_delete name m))
 
-setValueArray :: Value -> [Value] -> Value
-setValueArray arr [] val = val
-setValueArray arr (h:list) val = setValueArray (arrayAccess arr h) list val
+
+-- Receives a variable, a list of NatInts (representing indexes) and a value, returns the same variable with new value setted
+setValueArray :: MemoryCell -> [Value] -> Value -> MemoryCell
+setValueArray (Variable (ConstructVariable name val isGlobal)) [] newVal = 
+    if checkCompatibleTypes t1 t2 then Variable (ConstructVariable name newVal isGlobal)
+    else error ("ERROR type mismatch, trying to insert "++ show(t1) ++ " in " ++ show(t2))
+    where 
+        t1 = getTypeFromValue val
+        t2 = getTypeFromValue newVal
+
+setValueArray (Variable (ConstructVariable name val isGlobal)) list newVal = Variable (ConstructVariable name (setValueArray' val list newVal) isGlobal)
+
+-- Auxiliar function, that receives an array, a list of NatInt (representing indexes), and a new value, and sets the value correspondingly
+setValueArray' :: Value -> [Value] -> Value -> Value
+setValueArray' val [] newVal = 
+    if checkCompatibleTypes t1 t2 then newVal
+    else error ("ERROR type mismatch, trying to insert " ++ show(t1) ++ " in " ++ show(t2))
+    where 
+        t1 = getTypeFromValue val
+        t2 = getTypeFromValue newVal
+setValueArray' (ConsNatArray t arr) (h:list) newVal = ConsNatArray t ((take index arr) ++ [setValueArray' (arrayAccess (ConsNatArray t arr) h) list newVal] ++ (drop (index+1) arr))
+        where
+            index = fromIntegral (getIntFromNatInt h)
