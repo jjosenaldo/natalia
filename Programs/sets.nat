@@ -1,4 +1,4 @@
 @main{
-    string a = "1";
+    {int} setInt = {1,2,3};
 
 }

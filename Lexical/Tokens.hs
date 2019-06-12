@@ -128,8 +128,8 @@ mod_token = tokenPrim show update_pos get_token where
 
 
 -- terminal: name of the *int* type %TODO: update comment
-primitiveTypeToken :: ParsecT [Token] st IO (ReturnObject)
-primitiveTypeToken = tokenPrim show update_pos get_token where
+lexicalTypeToken :: ParsecT [Token] st IO (ReturnObject)
+lexicalTypeToken = tokenPrim show update_pos get_token where
     get_token (Type x p) = Just (RetToken (Type x p))
     get_token _        = Nothing 
 
@@ -204,30 +204,38 @@ commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
     get_token _ = Nothing   
 
-arrayType :: ParsecT [Token] st IO (ReturnObject)
-arrayType = 
-    do
-        retlbracket <- leftBracketToken
-        rettype <- typeToken
-        retrbracket <- rightBracketToken
-
-        let ttype = getRetType rettype -- Type
-        let return_type = RetType (NatArray ttype) -- ReturnObject
-
-        return(return_type)
-
-typeToken :: ParsecT [Token] st IO (ReturnObject)
-typeToken = 
+generalType :: ParsecT [Token] st IO (ReturnObject)
+generalType = 
     try
-    (do
-        retprimitivetype <- primitiveTypeToken -- ReturnObject
+    primitiveType
+    <|>
+    aggregateType
+
+primitiveType :: ParsecT [Token] st IO (ReturnObject) 
+primitiveType = 
+    do
+        retprimitivetype <- lexicalTypeToken -- ReturnObject
         let primitivetype = getRetToken retprimitivetype -- Token 
         let typeToReturn = getTypeFromTypeToken primitivetype -- Type
 
         return (RetType typeToReturn)
-    )
-    <|>
-    arrayType
+
+aggregateType :: ParsecT [Token] st IO (ReturnObject)
+aggregateType = 
+    setType
+
+setType :: ParsecT [Token] st IO (ReturnObject)
+setType =
+    do
+        retlbrace <- leftBraceToken
+        rettype <- generalType
+        retrbrace <- rightBraceToken
+
+        let ttype = getRetType rettype -- Type
+        let return_type = RetType (NatSet ttype)
+
+        return (return_type)
+
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos

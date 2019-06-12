@@ -8,8 +8,9 @@ import Lexical.Tokens
 import Memory.Memory
 import Types.Types
 import TypeValue.TypeValue
+import Values.Values
 
--- Haskell modules
+-- Haskell's modules
 import Text.Parsec
 import Control.Monad.IO.Class
 
@@ -178,7 +179,7 @@ expGroup1 =
         return (a))
 
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-expGroup0 = set_value <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
+expGroup0 = expSet <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
 
 localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 localVariable = 
@@ -240,7 +241,6 @@ lValue =
 --         let value = getValue (memory_get (get_id_name (getRetToken name)) (get_pos (getRetToken name)) mem)
 --         return (RetValue value)
 
-
 parseSetElements :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 parseSetElements = 
     try
@@ -274,8 +274,8 @@ parseNextSetElement elements lastType =
     (do
         return (RetValue(ConsNatSet lastType elements)))
 
-set_value :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-set_value = 
+expSet :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+expSet = 
     do 
         retlbrace <- leftBraceToken -- RetToken LBrace
         ret_value <- parseSetElements -- RetValue NatSet Type
