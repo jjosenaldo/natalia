@@ -6,7 +6,7 @@ import TypeValue.TypeValue
 checkCompatibleTypes :: Type 
                      -> Type
                      -> Bool
-checkCompatibleTypes NatGenType _ = True
+checkCompatibleTypes _ NatGenType = True
 checkCompatibleTypes NatInt NatInt = True
 checkCompatibleTypes NatDouble NatInt = True
 checkCompatibleTypes NatDouble NatDouble = True

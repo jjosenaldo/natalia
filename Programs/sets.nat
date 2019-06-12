@@ -1,4 +1,6 @@
 @main{
-    {double} setInt = {1,2.0,3};
-
+    {double} setDouble1 = {1,2.0,3};
+    {double} setDouble2 = {1,2.0,3};
+    {int} setInt = {1,2,3};
+    {{string}} setsetstring = {{"oi"},{"tudo"}, {"bem", "com",  "vc?"}};
 }

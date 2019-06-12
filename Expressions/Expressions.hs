@@ -263,12 +263,18 @@ parseNextSetElement elements lastType =
         let value = getRetValue ret_value -- Value
         let current_type = getTypeFromValue value -- Type
 
-        if(not (checkCompatibleTypes lastType current_type)) then 
-            fail ("ERROR: " ++ show(current_type) ++ " was provided when " ++ show(lastType) ++ " was expected." )
-        else 
-            do 
+        if(checkCompatibleTypes current_type lastType ) then 
+            do
                 ret <- parseNextSetElement (elements ++ [value]) current_type
-                return (ret)) 
+                return (ret) 
+        else if (checkCompatibleTypes lastType current_type  ) then
+            do
+                ret <- parseNextSetElement (elements ++ [value]) lastType
+                return (ret) 
+        else 
+            fail ("ERROR: " ++ show(current_type) ++ " was provided when " ++ show(lastType) ++ " was expected." ))
+           
+                
     <|>
     (do
         return (RetValue(ConsNatSet lastType elements)))
