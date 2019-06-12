@@ -24,6 +24,8 @@ getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 getId (Typedef (ConsTypedef x _)) = x
 
+getMemoryCellType (Typedef x) = x  
+
 setValue::MemoryCell -> Value -> MemoryCell
 setValue (Variable (ConstructVariable name v1 isGlobal)) v2
     | checkCompatibleTypes (getTypeFromValue v1) (getTypeFromValue v2) = Variable (ConstructVariable name v2 isGlobal)

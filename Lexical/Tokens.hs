@@ -4,6 +4,7 @@ module Lexical.Tokens where
 import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
+import Types.Typedef
 import Types.Types
 
 -- External modules
@@ -215,14 +216,24 @@ commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
     get_token _ = Nothing   
 
-generalType :: ParsecT [Token] st IO (ReturnObject)
+generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 generalType = 
-    try
-    primitiveType
-    <|>
-    aggregateType
+    try typedefType <|> primitiveType <|> aggregateType
 
-primitiveType :: ParsecT [Token] st IO (ReturnObject) 
+
+typedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+typedefType = 
+    do
+        retIdToken <- id_token -- RetToken
+        let actualIdToken = getRetToken retIdToken -- Id
+        memory <- getState
+        let pos = get_pos actualIdToken -- (Int, Int)
+        let idName = get_id_name actualIdToken -- String
+        let typedefReturnType = getMemoryCellType (memory_get idName pos memory)
+
+        return (RetType(getTypedefType typedefReturnType))
+
+primitiveType :: ParsecT [Token] [MemoryCell] IO (ReturnObject) 
 primitiveType = 
     do
         retprimitivetype <- lexicalTypeToken -- ReturnObject
@@ -231,11 +242,11 @@ primitiveType =
 
         return (RetType typeToReturn)
 
-aggregateType :: ParsecT [Token] st IO (ReturnObject)
+aggregateType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 aggregateType = 
     setType
 
-setType :: ParsecT [Token] st IO (ReturnObject)
+setType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 setType =
     do
         retlbrace <- leftBraceToken
