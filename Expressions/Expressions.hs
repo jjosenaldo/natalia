@@ -8,7 +8,6 @@ import Lexical.Tokens
 import Memory.Memory
 import Types.Types
 import TypeValue.TypeValue
-import Values.Values
 
 -- Haskell's modules
 import Text.Parsec
