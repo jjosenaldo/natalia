@@ -16,6 +16,7 @@ var_initialization = do
     mem <- getState -- [MemoryCell]
     rettype <- generalType -- RetType Type
     let var_type = getRetType rettype -- Type
+    --liftIO (print(rettype))
     name <- id_token -- RetTOken Id
     
     if (memory_has_name (get_id_name (getRetToken name)) mem) then fail ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")

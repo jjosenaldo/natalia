@@ -4,6 +4,7 @@ module Lexical.Tokens where
 import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
+import Types.Typedef
 import Types.Types
 
 -- External modules
@@ -38,6 +39,12 @@ getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetValue"
 mainToken :: ParsecT [Token] st IO (ReturnObject)
 mainToken = tokenPrim show update_pos get_token where
     get_token (Main p) = Just (RetToken (Main p))
+    get_token _       = Nothing
+
+-- Pre-defined block (typedefs)
+typedefsToken :: ParsecT [Token] st IO (ReturnObject)
+typedefsToken = tokenPrim show update_pos get_token where
+    get_token (Typedefs p) = Just (RetToken (Typedefs p))
     get_token _       = Nothing
 
 -- Block opening character
@@ -187,6 +194,11 @@ orToken = tokenPrim show update_pos get_token where
     get_token (Or p) = Just (RetToken (Or p))
     get_token _         = Nothing
 
+-- operator ?
+inToken :: ParsecT [Token] st IO (ReturnObject)
+inToken = tokenPrim show update_pos get_token where
+    get_token (In p) = Just (RetToken (In p))
+    get_token _         = Nothing
 
 -- terminal: command terminator
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
@@ -204,14 +216,24 @@ commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
     get_token _ = Nothing   
 
-generalType :: ParsecT [Token] st IO (ReturnObject)
+generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 generalType = 
-    try
-    primitiveType
-    <|>
-    aggregateType
+    try typedefType <|> primitiveType <|> aggregateType
 
-primitiveType :: ParsecT [Token] st IO (ReturnObject) 
+
+typedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+typedefType = 
+    do
+        retIdToken <- id_token -- RetToken
+        let actualIdToken = getRetToken retIdToken -- Id
+        memory <- getState
+        let pos = get_pos actualIdToken -- (Int, Int)
+        let idName = get_id_name actualIdToken -- String
+        let typedefReturnType = getMemoryCellType (memory_get idName pos memory)
+
+        return (RetType(getTypedefType typedefReturnType))
+
+primitiveType :: ParsecT [Token] [MemoryCell] IO (ReturnObject) 
 primitiveType = 
     do
         retprimitivetype <- lexicalTypeToken -- ReturnObject
@@ -220,14 +242,14 @@ primitiveType =
 
         return (RetType typeToReturn)
 
-aggregateType :: ParsecT [Token] st IO (ReturnObject)
+aggregateType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 aggregateType = 
     try
     setType
     <|>
     arrayType
 
-setType :: ParsecT [Token] st IO (ReturnObject)
+setType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 setType =
     do
         retlbrace <- leftBraceToken

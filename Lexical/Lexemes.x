@@ -42,6 +42,7 @@ tokens :-
   \@globals                        { \p s -> Globals (getLC p)}
   \@subprograms                    { \p s -> Subprograms (getLC p)}
   \@main                           { \p s -> Main (getLC p)}
+  \@typedefs                       { \p s -> Typedefs (getLC p)}
   
   -- SEPARATORS -------------------------------------------
 
@@ -81,6 +82,7 @@ tokens :-
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
+  "?"                              { \p s -> In (getLC p)}
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -116,10 +118,11 @@ data Token =
 
   -- SECTIONS ---------------------------------------------
   
-  Import (Int, Int)         |
+  Import (Int, Int)          |
   Globals (Int, Int)         |
   Subprograms (Int, Int)     |
   Main (Int, Int)            |
+  Typedefs (Int, Int)        |
 
   -- SEPARATORS -------------------------------------------
 
@@ -151,7 +154,8 @@ data Token =
   And (Int, Int)             |
   Or (Int, Int)              |
   Difference (Int, Int)      |
-  
+  In (Int, Int)          |
+
   -- CONDITIONALS  -----------------------------------------
 
   If (Int, Int)              |
@@ -203,6 +207,7 @@ get_pos (Import p) = p
 get_pos (Globals p) = p
 get_pos (Subprograms p) = p
 get_pos (Main p) = p
+get_pos (Typedefs p) = p
 get_pos (SemiColon p) = p
 get_pos (Assign p) = p
 get_pos (Mod p) = p
@@ -226,6 +231,7 @@ get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
 get_pos (Difference p) = p
+get_pos (In p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
 get_pos (ElseIf p) = p

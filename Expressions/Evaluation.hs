@@ -3,12 +3,31 @@ module Expressions.Evaluation where
 import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
+import Types.Types
+import Data.List
 
 -- | Implementation of binary operations
 binary_eval :: Value -- ^ first operand
             -> Token -- ^ operator
             -> Value -- ^ second operand
             -> Value -- ^ result of the operation
+
+removeDuplicates :: (Eq a) => [a] -> [a]
+removeDuplicates list = remDups list []
+
+remDups :: (Eq a) => [a] -> [a] -> [a]
+remDups [] _ = []
+remDups (x:xs) list2
+    | (x `elem` list2) = remDups xs list2
+    | otherwise = x : remDups xs (x:list2)
+
+subList :: Eq a => [a] -> [a] -> Bool
+subList [] [] = True
+subList _ []    = False
+subList [] _    = True
+subList (x:xs) (y:ys) 
+    | x == y    = subList xs ys   
+    | otherwise = subList (x:xs) ys
 
 
 --  OPERATORS WITH NUMERIC RESULT --------------------------------------------------------------------------------------
@@ -18,6 +37,12 @@ binary_eval (ConsNatInt x) (Plus _) (ConsNatDouble y) = ConsNatDouble ((fromInte
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatInt y) = ConsNatDouble (x + (fromIntegral y))
 binary_eval (ConsNatDouble x) (Plus _) (ConsNatDouble y) = ConsNatDouble (x + y)
 binary_eval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
+binary_eval (ConsNatSet type1 x) (Plus _) (ConsNatSet type2 y)  
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (removeDuplicates (x ++ y))
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (removeDuplicates (x ++ y))
+        | otherwise = error ("ERROR : You can't unite a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
+
 binary_eval _ (Plus p) _ = error ("ERROR at " ++ show(p) ++ ": the + operator expects two numbers.")
 
 -- Operator - (binary)
@@ -25,6 +50,12 @@ binary_eval (ConsNatInt x) (Minus _) (ConsNatInt y) = ConsNatInt (x - y)
 binary_eval (ConsNatInt x) (Minus _) (ConsNatDouble y) = ConsNatDouble ((fromIntegral x) - y)
 binary_eval (ConsNatDouble x) (Minus _) (ConsNatInt y) = ConsNatDouble (x - (fromIntegral y))
 binary_eval (ConsNatDouble x) (Minus _) (ConsNatDouble y) = ConsNatDouble (x - y)
+binary_eval (ConsNatSet type1 x) (Minus _) (ConsNatSet type2 y)
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (remDups x y)
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (remDups x y)
+        | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
+
 binary_eval _ (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the binary - operator expects two numbers.")
 
 -- Operator %
@@ -57,9 +88,22 @@ binary_eval (ConsNatInt x) (Times p) (ConsNatInt y) = ConsNatInt(x*y)
 binary_eval (ConsNatDouble x) (Times p) (ConsNatInt y) = ConsNatDouble(x*fromIntegral(y))
 binary_eval (ConsNatInt x) (Times p) (ConsNatDouble y) = ConsNatDouble(fromIntegral(x)*y)
 binary_eval (ConsNatDouble x) (Times p) (ConsNatDouble y) = ConsNatDouble(x*y)
+binary_eval (ConsNatSet type1 x) (Times _) (ConsNatSet type2 y)
+        | checkCompatibleTypes type1 type2 = ConsNatSet type1 (intersect x y)
+        | checkCompatibleTypes type2 type1 = ConsNatSet type2 (intersect x y)
+        | otherwise = error ("ERROR : You can't intersect a set of " ++ show(type1) ++ " with a set of " ++
+                             show(type2))
 binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator expects two numbers.")
 
 --  OPERATORS WITH BOOLEAN RESULT --------------------------------------------------------------------------------------
+
+
+-- Operator ?
+-- binary_eval (ConsNatSet type1 x) (In _) (ConsNatSet type2 y)  
+--     | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
+--     | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
+--     | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+--                             show(type2))
 
 -- Operator &&
 binary_eval (ConsNatBool x) (And p) (ConsNatBool y) = ConsNatBool (x && y)
@@ -76,6 +120,11 @@ binary_eval (ConsNatInt x) (LessThan p) (ConsNatDouble y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
 binary_eval (ConsNatDouble x) (LessThan p) (ConsNatInt y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatSet type1 x) (LessThan _) (ConsNatSet type2 y)  
+    | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
+    | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
+    | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+                            show(type2))
 binary_eval _ (LessThan p) _ = error ("ERROR at " ++ show(p) ++ ": the < operator expects two numbers.")
 
 -- Operator >

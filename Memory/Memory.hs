@@ -2,6 +2,7 @@ module Memory.Memory where
 
 import Lexical.Lexemes
 import Types.Types
+import Types.Typedef
 import TypeValue.TypeValue
 
 data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
@@ -9,13 +10,20 @@ data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name
 data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure String [Parameter] deriving (Show, Eq)
-data MemoryCell = Variable Variable | Subprogram Subprogram {-| Typedef Typedef-} deriving (Show, Eq)
+
+data MemoryCell = 
+    Variable Variable | 
+    Subprogram Subprogram |
+    Typedef Typedef deriving (Show, Eq)
 
 -- functions to access important fields
 getId (Variable (ConstructVariable x _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
+getId (Typedef (ConsTypedef x _)) = x
+
+getMemoryCellType (Typedef x) = x  
 
 setValue::MemoryCell -> Value -> MemoryCell
 setValue (Variable (ConstructVariable name v1 isGlobal)) v2
