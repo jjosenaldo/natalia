@@ -1,0 +1,6 @@
+@main{
+    string str1 = "lpcp";
+    string str2 = "eh";
+    string str3 = "top";
+    string str4 = str1 + str2 + str3;
+}

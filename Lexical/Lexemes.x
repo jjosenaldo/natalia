@@ -47,6 +47,7 @@ tokens :-
 
   -- statement separator
   ";"                              { \p s -> SemiColon (getLC p)}
+  ","                              { \p s -> Comma (getLC p)}
 
   -- LITERALS  ---------------------------------------------
   
@@ -54,6 +55,7 @@ tokens :-
   $digit+                          { \p s -> Int (read s) (getLC p)}
   "True"                           { \p s -> Bool (read s) (getLC p) }
   "False"                          { \p s -> Bool (read s) (getLC p)}
+  \" ([.\n]#\")* \"                { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -123,6 +125,7 @@ data Token =
 
   -- statement separator
   SemiColon (Int, Int)       |
+  Comma (Int, Int)           |
   
   -- OPERATORS  --------------------------------------------
 
@@ -175,7 +178,8 @@ data Token =
 
   Int Integer (Int, Int)         |
   Double Double (Int, Int)       |
-  Bool Bool (Int, Int)        
+  String String (Int, Int)       |
+  Bool Bool (Int, Int)
 
   ----------------------------------------------------------
 
@@ -232,7 +236,9 @@ get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
 get_pos (Bool _ p) = p
- 
+get_pos (Comma p) = p
+get_pos (String _ p) = p
+
 getLC (AlexPn _ l c) = (l, c) 
 
 getTokens fn = unsafePerformIO (getTokensAux fn)

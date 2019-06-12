@@ -3,8 +3,23 @@ module Types.Types where
 import Lexical.Lexemes
 
 --                                                                              name
-data Type = NatInt | NatBool | NatString | NatDouble | NatSet Type | NatStruct String [(String, Type)] deriving (Show, Eq)
-data Value = ConsNatInt Integer | ConsNatBool Bool | ConsNatString String | ConsNatDouble Double | ConsNatSet Type [Value] | ConsNatStruct String [(String, Value)] deriving (Show, Eq)
+data Type = 
+    NatGenType |
+    NatInt | 
+    NatBool | 
+    NatString | 
+    NatDouble | 
+    NatSet Type | 
+    NatStruct String [(String, Type)] |
+    NatArray Type deriving (Show, Eq)
+data Value = 
+    ConsNatGenType |
+    ConsNatInt Integer | 
+    ConsNatBool Bool | 
+    ConsNatString String | 
+    ConsNatDouble Double | 
+    ConsNatSet Type [Value] | 
+    ConsNatStruct String [(String, Value)] deriving (Show, Eq)
 
 getTypeFromValue::Value -> Type
 getTypeFromValue (ConsNatInt _) = NatInt 
@@ -17,6 +32,7 @@ getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map
 checkCompatibleTypes :: Type 
                      -> Type
                      -> Bool
+checkCompatibleTypes NatGenType _ = True
 checkCompatibleTypes NatInt NatInt = True
 checkCompatibleTypes NatDouble NatInt = True
 checkCompatibleTypes NatDouble NatDouble = True
@@ -26,8 +42,10 @@ checkCompatibleTypes (NatStruct str1 l1) (NatStruct str2 l2) = str1 == str2
 checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
 checkCompatibleTypes _ _ = False
 
+getTypeFromTypeToken :: Token -> Type
 getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt
+    | str == "string" = NatString
     | str == "double" = NatDouble
     | str == "bool" = NatBool
     | otherwise = error ("Not supported type: " ++ str)

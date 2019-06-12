@@ -8,7 +8,12 @@ import System.IO.Unsafe
 import Memory.Memory
 
 
-data ReturnObject = RetToken Token | RetValue Value | RetMemoryCell MemoryCell deriving (Eq, Show)
+data ReturnObject = 
+    RetToken Token | 
+    RetValue Value | 
+    RetType Type | 
+    RetNothing |
+    RetMemoryCell MemoryCell deriving (Eq, Show)
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
@@ -17,6 +22,10 @@ getRetToken _ = error "Invalid conversion from ReturnObject to RetToken"
 getRetValue::ReturnObject -> Value
 getRetValue (RetValue v) = v
 getRetValue _ = error "Invalid conversion from ReturnObject to RetValue"
+
+getRetType::ReturnObject -> Type
+getRetType (RetType ttype) = ttype
+getRetType _ = error "Invalid conversion from ReturnObject to RetType"
 
 getRetMemoryCell::ReturnObject -> MemoryCell
 getRetMemoryCell (RetMemoryCell var) = var
@@ -34,12 +43,22 @@ leftBraceToken = tokenPrim show update_pos get_token where
     get_token (LBrace p) = Just (RetToken (LBrace p))
     get_token _       = Nothing
 
-
 -- terminal: block closing character
 rightBraceToken :: ParsecT [Token] st IO (ReturnObject)
 rightBraceToken = tokenPrim show update_pos get_token where
     get_token (RBrace p) = Just (RetToken (RBrace p))
     get_token _       = Nothing
+    
+leftBracketToken :: ParsecT [Token] st IO (ReturnObject)
+leftBracketToken = tokenPrim show update_pos get_token where
+    get_token (LBracket p) = Just (RetToken (LBracket p))
+    get_token _       = Nothing
+
+rightBracketToken :: ParsecT [Token] st IO (ReturnObject)
+rightBracketToken = tokenPrim show update_pos get_token where
+    get_token (RBracket p) = Just (RetToken (RBracket p))
+    get_token _       = Nothing
+
 
 -- Left parenthesis
 left_paren_token :: ParsecT [Token] st IO (Token)
@@ -106,8 +125,8 @@ mod_token = tokenPrim show update_pos get_token where
 
 
 -- terminal: name of the *int* type %TODO: update comment
-typeToken :: ParsecT [Token] st IO (ReturnObject)
-typeToken = tokenPrim show update_pos get_token where
+primitiveTypeToken :: ParsecT [Token] st IO (ReturnObject)
+primitiveTypeToken = tokenPrim show update_pos get_token where
     get_token (Type x p) = Just (RetToken (Type x p))
     get_token _        = Nothing 
 
@@ -128,6 +147,11 @@ int_token :: ParsecT [Token] st IO (ReturnObject)
 int_token = tokenPrim show update_pos get_token where
     get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
+
+stringToken :: ParsecT [Token] st IO (ReturnObject)
+stringToken = tokenPrim show update_pos get_token where
+    get_token (String x _) = Just (RetValue (ConsNatString x))
+    get_token _            = Nothing
 
 -- literal of type double
 double_token :: ParsecT [Token] st IO (ReturnObject)
@@ -160,7 +184,7 @@ orToken :: ParsecT [Token] st IO (ReturnObject)
 orToken = tokenPrim show update_pos get_token where
     get_token (Or p) = Just (RetToken (Or p))
     get_token _         = Nothing
-    
+
 
 -- terminal: command terminator
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
@@ -173,7 +197,51 @@ negationToken = tokenPrim show update_pos get_token where
     get_token (Negation p)  = Just (RetToken (Negation p))
     get_token _             = Nothing
 
+commaToken :: ParsecT [Token] st IO (ReturnObject)
+commaToken = tokenPrim show update_pos get_token where
+    get_token (Comma p)  = Just (RetToken (Comma p))
+    get_token _             = Nothing
 
+
+
+setType :: ParsecT [Token] st IO (ReturnObject)
+setType =
+    do
+        retlbrace <- leftBraceToken
+        rettype <- typeToken
+        retrbrace <- rightBraceToken
+
+        let ttype = getRetType rettype -- Type
+        let return_type = RetType (NatSet ttype)
+
+        return (return_type)
+
+arrayType :: ParsecT [Token] st IO (ReturnObject)
+arrayType = 
+    do
+        retlbracket <- leftBracketToken
+        rettype <- typeToken
+        retrbracket <- rightBracketToken
+
+        let ttype = getRetType rettype -- Type
+        let return_type = RetType (NatArray ttype) -- ReturnObject
+
+        return(return_type)
+
+typeToken :: ParsecT [Token] st IO (ReturnObject)
+typeToken = 
+    try
+    (do
+        retprimitivetype <- primitiveTypeToken -- ReturnObject
+        let primitivetype = getRetToken retprimitivetype -- Token 
+        let typeToReturn = getTypeFromTypeToken primitivetype -- Type
+
+        return (RetType typeToReturn)
+    )
+    <|>
+    arrayType
+    <|>
+    setType
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
