@@ -244,7 +244,10 @@ primitiveType =
 
 aggregateType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 aggregateType = 
+    try
     setType
+    <|>
+    arrayType
 
 setType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 setType =
@@ -258,6 +261,17 @@ setType =
 
         return (return_type)
 
+arrayType :: ParsecT [Token] st IO (ReturnObject)
+arrayType =
+    do
+        lbrack <- leftBracketToken
+        rettype <- generalType
+        rbrack <- rightBracketToken
+        
+        let innerType = getRetType rettype -- Type
+        let returnType = RetType (NatArray innerType)
+
+        return (returnType)
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos

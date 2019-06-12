@@ -2,7 +2,7 @@
 	int n1 = fromString(read());
 	int m1 = fromString(read());
 
-	int mat1[][] = makeArray(n1, makeArray(m1, 0));
+	[[int]] mat1 = makeArray(n1, makeArray(m1, 0));
 
 	for(int i = 0; i < n1; i++){
 		for(int j = 0; j < m1; j++){
@@ -13,7 +13,7 @@
 	int n2 = fromString(read());
 	int m2 = fromString(read());
 	
-	int mat2[][] = makeArray(n2, makeArray(m2, 0));
+	[[int]] mat2 = makeArray(n2, makeArray(m2, 0));
 
 	for(int i = 0; i < n2; i++){
 		for(int i = 0; i < m2; i++){
