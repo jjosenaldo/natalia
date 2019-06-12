@@ -3,4 +3,17 @@
     {double} setDouble2 = {1,2.0,3};
     {int} setInt = {1,2,3};
     {{string}} setsetstring = {{"oi"},{"tudo"}, {"bem", "com",  "vc?"}};
+
+    {double} setDouble3 = {1,2,3,4} + setDouble2;
+    {double} setDouble4 = setDouble3 - {1,2};
+    {double} setDouble5 = setDouble3 * {1,2, 12, 23};
+
+    bool is = {1} < setDouble5;
+    bool is2 = {1,2,3} < setDouble5;
+    bool is3 = {{"oi"}} < setsetstring;
+    {double} s1 = {1};
+    {int} s2 = {1};
+    bool s3 = s2 < s1;
+
 }
+

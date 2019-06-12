@@ -187,6 +187,11 @@ orToken = tokenPrim show update_pos get_token where
     get_token (Or p) = Just (RetToken (Or p))
     get_token _         = Nothing
 
+-- operator ?
+inToken :: ParsecT [Token] st IO (ReturnObject)
+inToken = tokenPrim show update_pos get_token where
+    get_token (In p) = Just (RetToken (In p))
+    get_token _         = Nothing
 
 -- terminal: command terminator
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
