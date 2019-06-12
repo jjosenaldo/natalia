@@ -1,12 +1,15 @@
 module Expressions.GeneralExpressions where
 
+-- natalia's modules
 import Expressions.Evaluation
 import Expressions.Operations
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import Types.Types
+import TypeValue.TypeValue
 
+-- Haskell modules
 import Text.Parsec
 import Control.Monad.IO.Class
 

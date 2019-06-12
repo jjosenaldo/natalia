@@ -1,12 +1,15 @@
 module Lexical.Tokens where
 
+-- natalia's modules
 import Lexical.Lexemes
+import Memory.Memory
+import TypeValue.TypeValue
+import Types.Types
+
+-- External modules
 import Text.Parsec
 import Control.Monad.IO.Class
-import Types.Types
 import System.IO.Unsafe
-import Memory.Memory
-
 
 data ReturnObject = 
     RetToken Token | 
@@ -91,12 +94,12 @@ greater_than_token = tokenPrim show update_pos get_token where
 less_equals_token :: ParsecT [Token] st IO (ReturnObject)
 less_equals_token = tokenPrim show update_pos get_token where
     get_token (LessEquals p)  = Just (RetToken (LessEquals p))
-    get_token _             = Nothing
-    
+    get_token _ = Nothing
+
 greater_equals_token :: ParsecT [Token] st IO (ReturnObject)
 greater_equals_token = tokenPrim show update_pos get_token where
     get_token (GreaterEquals p)  = Just (RetToken (GreaterEquals p))
-    get_token _             = Nothing
+    get_token _ = Nothing   
 
 minus_token :: ParsecT [Token] st IO (ReturnObject)
 minus_token = tokenPrim show update_pos get_token where
@@ -159,11 +162,10 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
--- literal of type boolean
 bool_token :: ParsecT [Token] st IO (ReturnObject)
 bool_token = tokenPrim show update_pos get_token where
     get_token (Bool x p) = Just (RetValue (ConsNatBool x))
-    get_token _       = Nothing
+    get_token _ = Nothing   
 
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show update_pos get_token where
@@ -173,7 +175,7 @@ equalsToken = tokenPrim show update_pos get_token where
 differenceToken :: ParsecT [Token] st IO (ReturnObject)
 differenceToken = tokenPrim show update_pos get_token where
     get_token (Difference p) = Just (RetToken (Difference p))
-    get_token _            = Nothing
+    get_token _ = Nothing
 
 andToken :: ParsecT [Token] st IO (ReturnObject)
 andToken = tokenPrim show update_pos get_token where
@@ -200,21 +202,7 @@ negationToken = tokenPrim show update_pos get_token where
 commaToken :: ParsecT [Token] st IO (ReturnObject)
 commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
-    get_token _             = Nothing
-
-
-
-setType :: ParsecT [Token] st IO (ReturnObject)
-setType =
-    do
-        retlbrace <- leftBraceToken
-        rettype <- typeToken
-        retrbrace <- rightBraceToken
-
-        let ttype = getRetType rettype -- Type
-        let return_type = RetType (NatSet ttype)
-
-        return (return_type)
+    get_token _ = Nothing   
 
 arrayType :: ParsecT [Token] st IO (ReturnObject)
 arrayType = 
@@ -240,8 +228,6 @@ typeToken =
     )
     <|>
     arrayType
-    <|>
-    setType
 
 -- TODO
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
