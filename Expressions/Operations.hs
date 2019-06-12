@@ -20,7 +20,7 @@ group5OpToken = less_than_token    <|>
                 greater_equals_token <|>
                 equalsToken <|>
                 differenceToken <|>
-                subsetToken
+                inToken 
 group6OpToken = equalsToken
 group7OpToken = andToken
 group8OpToken = orToken

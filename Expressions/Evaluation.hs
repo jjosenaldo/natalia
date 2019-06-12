@@ -99,11 +99,11 @@ binary_eval _ (Times p) _ = error ("ERROR at " ++ show(p) ++ ": the * operator e
 
 
 -- Operator ?
-binary_eval (ConsNatSet type1 x) (Subset _) (ConsNatSet type2 y)  
-    | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
-    | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
-    | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
-                            show(type2))
+-- binary_eval (ConsNatSet type1 x) (In _) (ConsNatSet type2 y)  
+--     | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
+--     | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
+--     | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+--                             show(type2))
 
 -- Operator &&
 binary_eval (ConsNatBool x) (And p) (ConsNatBool y) = ConsNatBool (x && y)
@@ -120,6 +120,11 @@ binary_eval (ConsNatInt x) (LessThan p) (ConsNatDouble y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
 binary_eval (ConsNatDouble x) (LessThan p) (ConsNatInt y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
+binary_eval (ConsNatSet type1 x) (LessThan _) (ConsNatSet type2 y)  
+    | checkCompatibleTypes type1 type2 = ConsNatBool (subList x y)
+    | checkCompatibleTypes type2 type1 = ConsNatBool (subList x y)
+    | otherwise = error ("ERROR : You can't operator a set of " ++ show(type1) ++ " with a set of " ++
+                            show(type2))
 binary_eval _ (LessThan p) _ = error ("ERROR at " ++ show(p) ++ ": the < operator expects two numbers.")
 
 -- Operator >
