@@ -1,11 +1,14 @@
 module Main (main) where
 
+-- natalia's modules
 import Blocks.Blocks
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import Statements.Statements
+import TypeValue.TypeValue
 
+-- Haskell's modules
 import Control.Monad.IO.Class
 import System.Environment
 import System.IO.Unsafe
@@ -14,11 +17,7 @@ import Text.Parsec
 -- the entire program
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
-            retTypedefBlock <- typedefsBlock
-            a <- mainToken
-            b <- leftBraceToken
-            c <- statements
-            d <- rightBraceToken
+            retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
             eof
             return ()
 
@@ -36,7 +35,7 @@ main = do
     else
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
-                    Right ans -> print ans
+                    Right ans -> return ()
                 }
 
 
