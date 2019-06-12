@@ -10,6 +10,25 @@ data Type =
     NatStruct String [(String, Type)]       |
     NatArray Type deriving (Show, Eq)
 
+-- SPOILER DA BRANCH TYPEDEF 
+-- MemoryCell = ... | Typedef Typedef
+-- Typedef    = Def String Type
+-- Def "SetDeInteiros" (ConsNatSet NatInt)
+--
+{- 
+@typedef{
+    rational_t {
+        int num;
+        int den;
+    }
+    setDeInteiros {int}
+
+}
+@main{
+    rational_t rat = setDeInteiros{num = 1, den = 2};
+}
+-}
+
 data Value = 
     ConsNatGenType                          |
     ConsNatInt Integer                      | 

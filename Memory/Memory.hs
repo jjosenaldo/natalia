@@ -9,7 +9,7 @@ data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name
 data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure String [Parameter] deriving (Show, Eq)
-data MemoryCell = Variable Variable | Subprogram Subprogram deriving (Show, Eq)
+data MemoryCell = Variable Variable | Subprogram Subprogram {-| Typedef Typedef-} deriving (Show, Eq)
 
 -- functions to access important fields
 getId (Variable (ConstructVariable x _ _)) = x
@@ -77,3 +77,7 @@ memory_delete name (v:m) =
         if (isVariable v) then m
         else error ("ERROR you can't delete a subprogram")
     else (v : (memory_delete name m))
+
+setValueArray :: Value -> [Value] -> Value
+setValueArray arr [] val = val
+setValueArray arr (h:list) val = setValueArray (arrayAccess arr h) list val

@@ -22,6 +22,7 @@ expGroup9 =
     try
     (do
         -- this group contains only expression of attribution
+        var
         l <- lValue -- RetMemoryCell
         op <- group9OpToken
         r <- expGroup9
@@ -180,9 +181,46 @@ expGroup1 =
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 expGroup0 = expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
 
+editArray :: MemoryCell -> [Value] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+editArray arr list =
+    try
+    (do
+        retlbracket <- leftBracketToken
+        exprRetVal <- expression
+        retrbracket <- rightBracketToken
+        let exprVal = getRetValue exprRetVal
+        if (checkCompatibleTypes NatInt (getTypeFromValue exprVal)) then 
+            do
+                newarr <- editArray arr ([list]++[exprVal]
+                return (newarr)
+    )
+    <|>
+    (do
+        assignRetToken <- assignToken
+        exprRetVal <- expression
+        let exprVal = getRetVal exprRetVal
+        updateState(memory_update (setValueArray arr list exprVal))
+        return (exprVal)
+    )
+
+
+
 -- Assignment of a value to a variable
 var_attribution :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-var_attribution = do
+var_attribution = 
+    try
+    -- arrayAccess (arrayAcess v 1) 2
+    -- when the attribution is of type arr[p1][p2] = expr
+    (do
+        mem <- getState
+        nameRetToken <- id_token -- RetToken
+        let name = get_id_name (getRetToken nameRetToken) -- "arr"
+        let var = memory_get name mem
+        res <- editArray var [] -- RetValue
+        return (res))
+    <|>
+    -- when the attribution is 'simple': a = expr
+    (do
     a <- id_token -- RetToken
     b <- assignToken -- RetToken
     expr_val <- expression -- RetValue
@@ -200,7 +238,7 @@ var_attribution = do
             -- optional: print symbols_table content
             s <- getState
             --liftIO (print s)
-            return (expr_val)
+            return (expr_val))
 
 -- Parenthesized expression
 exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
@@ -213,12 +251,9 @@ exp_parenthesized =
 
         -- Expression that consists of a local variable
 
-
-
-localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-localVariable = 
-    try
-    (do
+memoryAccess :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+memoryAccess =
+    (do -- array variable
         mem <- getState
         id <- id_token -- RetToken
         if (memory_has_name (get_id_name (getRetToken id)) mem) then 
@@ -229,8 +264,10 @@ localVariable =
                 return res
 
         else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not accessible"))
-    <|>
-    (do
+
+localVariable :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+localVariable = 
+    (do -- simple variable
         mem <- getState
         id <- id_token
         let name = name
@@ -246,8 +283,13 @@ getChainedAccess var =
         retlbracket <- leftBracketToken
         exprRetVal <- expression
         retrbracket <- rightBracketToken
-        res <- getChainedAccess (arrayAccess var (getRetValue exprRetVal))
-        return res)
+        let exprVal = getRetValue exprRetVal
+        if (checkCompatibleTypes NatInt (getTypeFromValue exprVal)) then 
+            do 
+                res <- getChainedAccess (arrayAccess var (getRetValue exprRetVal))
+                return res
+        else error ("ERROR value inside [] operator has to be an integer")
+        )
     <|>
     (return (RetValue var))
 
