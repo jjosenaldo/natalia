@@ -22,7 +22,9 @@ var_initialization = do
     else 
         do
             ass <- assignToken
+            --liftIO(print(show(getRetToken(name))))
             expr_value <- expression -- RetValue Value
+            --liftIO(print(show(getRetValue(expr_value))))
             let expr_type = getTypeFromValue (getRetValue expr_value)
             
             if (not (checkCompatibleTypes var_type expr_type)) then error ("ERROR at " ++ show(get_pos (getRetToken name))  ++ ": type mismatch in the initialization of a variable. expected: " ++ show(var_type) ++", got: " ++ show(expr_type))

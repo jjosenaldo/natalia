@@ -236,7 +236,12 @@ negationToken = tokenPrim show update_pos get_token where
 commaToken :: ParsecT [Token] st IO (ReturnObject)
 commaToken = tokenPrim show update_pos get_token where
     get_token (Comma p)  = Just (RetToken (Comma p))
-    get_token _ = Nothing   
+    get_token _ = Nothing
+    
+dotToken :: ParsecT [Token] st IO (ReturnObject)
+dotToken = tokenPrim show update_pos get_token where
+    get_token (Dot p)  = Just (RetToken (Dot p))
+    get_token _ = Nothing
 
 generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 generalType = 

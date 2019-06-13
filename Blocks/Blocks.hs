@@ -18,15 +18,9 @@ predefinedBlocks currentBlocks =
     try
     (do
         retPredefinedBlock <- predefinedBlock currentBlocks
-        let valueCurrentBlocks = getIntFromNatInt (getRetValue retPredefinedBlock)
-
-        if(valueCurrentBlocks .&. 1 == 1) then
-            do
-                return ()
-        else
-            do
-                retPredefinedBlocks <- predefinedBlocks (ConsNatInt valueCurrentBlocks)
-                return ()
+        let res = getRetValue retPredefinedBlock
+        retPredefinedBlocks <- predefinedBlocks (ConsNatInt (getIntFromNatInt res))
+        return ()
     )
     <|>
     (do
@@ -40,16 +34,16 @@ predefinedBlocks currentBlocks =
 predefinedBlock :: Value -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
 predefinedBlock currentBlocks =
     try
-    (do
-        retCurrentBlock <- mainBlock
-        let valueCurrentBlocks = getIntFromNatInt currentBlocks
+    -- (do
+    --     retCurrentBlock <- mainBlock
+    --     let valueCurrentBlocks = getIntFromNatInt currentBlocks
 
-        if valueCurrentBlocks .&. 1 == 1 then error ("You can't have more than one @main block!")
-        else 
-            do
-                let natInt = ConsNatInt (valueCurrentBlocks .|. 1) 
-                return (RetValue natInt))
-    <|>
+    --     if valueCurrentBlocks .&. 1 == 1 then error ("You can't have more than one @main block!")
+    --     else 
+    --         do
+    --             let natInt = ConsNatInt (valueCurrentBlocks .|. 1) 
+    --             return (RetValue natInt))
+    -- <|>
     (do
         retCurrentBlock <- typedefsBlock
         let valueCurrentBlocks = getIntFromNatInt currentBlocks
