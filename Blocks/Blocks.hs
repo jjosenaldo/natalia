@@ -53,7 +53,7 @@ predefinedBlock currentBlocks =
     (do
         retCurrentBlock <- typedefsBlock
         let valueCurrentBlocks = getIntFromNatInt currentBlocks
-        --liftIO(print(show(valueCurrentBlocks)))
+        
 
         if valueCurrentBlocks .&. 2 == 2 then error ("You can't have more than one @typedefs block!")
         else 
@@ -161,42 +161,29 @@ structTypeDef =
         retStructName <- id_token -- RetToken
         let structName = get_id_name (getRetToken retStructName) -- String 
         retLeftBrace <- leftBraceToken -- RetToken
-        retStructInits <- structInits
+        retStructInits <- structInits []-- RetStructStructure 
         retRightBrace <- rightBraceToken -- RetToken
-
-        let structInits = getRetStructStructure retStructInits -- [(Type, String)]
-        updateState (memory_insert (Typedef (StructDef structName structInits)  ))
-
+        
+        let allStructInits = getRetStructStructure retStructInits -- [(Type, String)]
+        updateState (memory_insert (Typedef (StructDef structName allStructInits)  ))
+        
         return (RetNothing)
 
-structInits :: ParsecT [Token] [MemoryCell] IO (ReturnObject)        
-structInits = 
+structInits :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)        
+structInits inits = 
     try
     (do
-        retFirstInit <- structInit [] -- RetStructStructure
-        retAllInits <- remainingStructInits (getRetStructStructure retFirstInit)
-        let allInits = getRetStructStructure retAllInits
+        init <- structInit -- RetStructStructure
+        let actualInit = getRetStructStructure init -- [(Type, String)]
+        retAllInits <- structInits (inits ++ actualInit) -- RetStructStructure
+        let allInits = getRetStructStructure retAllInits -- [(Type, String)]
         return (RetStructStructure allInits))
     <|>
     (do
-        return (RetNothing))
+        return (RetStructStructure inits))
 
-remainingStructInits :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
-remainingStructInits inits = 
-    try
-    (do
-        retComma <- commaToken
-        retCurrentInits <- structInit inits -- RetStructStructure
-        let currentInits = getRetStructStructure retCurrentInits -- [(Type, String)]
-        result <- remainingStructInits currentInits -- RetStructStructure
-        
-        return(result))
-    <|>
-    (do
-        return (RetStructStructure inits ))
-
-structInit :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
-structInit inList = 
+structInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+structInit  = 
     do
         retType <- generalType
         retId <- id_token
