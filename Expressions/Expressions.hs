@@ -281,8 +281,8 @@ structFieldRead =
 
         return (RetValue value)
 
--- structRemainingFields :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
--- structRemainingFields 
+structRemainingFields :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+structRemainingFields 
 
 
 -- ARRAYS --------------------------------------------------------------------------------------------------------------------------------

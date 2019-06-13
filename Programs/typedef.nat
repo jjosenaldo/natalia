@@ -3,6 +3,12 @@
         int num;
         int den;
     },
+    #recursive structs don't work...
+    node {
+        node l;
+        node r;
+        int val;
+    },
     signal {
         int sig;
         rational_t num;
