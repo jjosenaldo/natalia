@@ -193,17 +193,17 @@ structValue =
         let structDefStructure = getMemoryCellType typedefStructStructyre -- StructDef String [(Type, String)]
         let structure = getStructStructure structDefStructure -- [(Type, String)]
 
-        retValueList <- structValueList structure -- RetValueList 
+        retStructValues <- structValues structure -- RetStructValues 
         retRightBrace <- rightBraceToken
 
-        return (    RetValue ( ConsNatStruct (get_id_name id) (getRetValueList retValueList))         )
+        return (    RetValue ( ConsNatStruct (get_id_name id) (getRetStructValues retStructValues))         )
 
-structValueList :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
-structValueList [] = 
+structValues :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+structValues [] = 
     do 
-        return (RetValueList [])
+        return (RetStructValues [])
 
-structValueList (field:fields) = 
+structValues (field:fields) = 
     do
         retValue <- expression
         let expressionValue = getRetValue retValue -- Value
@@ -213,13 +213,13 @@ structValueList (field:fields) =
         if (not (checkCompatibleTypes expectedType typeOfExpression)) then error ("ERROR: type mismatch in the initialization of a struct field. Expected: " ++ show(expectedType) ++", got: " ++ show(typeOfExpression))
         else
             do
-                allValues <- remainingStructValues [expressionValue] fields
-                return (RetValueList(getRetValueList allValues))
+                allValues <- remainingStructValues [(snd field, expressionValue)] fields
+                return (RetStructValues(getRetStructValues allValues))
 
-remainingStructValues :: [Value] -> [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+remainingStructValues :: [(String, Value)] -> [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
 remainingStructValues inValueList [] = 
     do
-        return (RetValueList inValueList)
+        return (RetStructValues inValueList)
 
 remainingStructValues inValueList (field:fields) = 
     do
@@ -232,8 +232,8 @@ remainingStructValues inValueList (field:fields) =
         if (not (checkCompatibleTypes expectedType typeOfExpression)) then error ("ERROR: type mismatch in the initialization of a struct field. Expected: " ++ show(expectedType) ++", got: " ++ show(typeOfExpression))
         else
             do
-                allValues <- remainingStructValues (inValueList ++ [expressionValue]) fields
-                return (RetValueList (getRetValueList allValues))
+                allValues <- remainingStructValues (inValueList ++ [(snd field, expressionValue)]) fields
+                return (RetStructValues (getRetStructValues allValues))
 
 editArray :: MemoryCell -> [Value] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
 editArray arr list =
