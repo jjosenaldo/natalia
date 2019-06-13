@@ -17,7 +17,9 @@ data ReturnObject =
     RetValue Value | 
     RetType Type | 
     RetNothing |
-    RetMemoryCell MemoryCell deriving (Eq, Show)
+    RetMemoryCell MemoryCell |
+    RetStructStructure [(Type, String)] |
+    RetStructValues [(String, Value)] deriving (Eq, Show)
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
@@ -33,7 +35,15 @@ getRetType _ = error "Invalid conversion from ReturnObject to RetType"
 
 getRetMemoryCell::ReturnObject -> MemoryCell
 getRetMemoryCell (RetMemoryCell var) = var
-getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetValue"
+getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetMemoryCell"
+
+getRetStructStructure :: ReturnObject -> [(Type, String)]
+getRetStructStructure (RetStructStructure x) = x
+getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetStructStructure"
+
+getRetStructValues :: ReturnObject -> [(String, Value)]
+getRetStructValues (RetStructValues x) = x
+getRetStructValues _ = error "Invalid conversion from ReturnObject to RetStructValues"
 
 -- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (ReturnObject)
@@ -231,7 +241,6 @@ commaToken = tokenPrim show update_pos get_token where
 generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 generalType = 
     try typedefType <|> primitiveType <|> aggregateType
-
 
 typedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 typedefType = 

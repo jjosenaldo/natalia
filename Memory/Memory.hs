@@ -5,7 +5,9 @@ import Types.Types
 import Types.Typedef
 import TypeValue.TypeValue
 
-data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
+data Variable = 
+    ConstructVariable String Value Bool | 
+    ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name
@@ -22,6 +24,7 @@ getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 getId (Typedef (ConsTypedef x _)) = x
+getId (Typedef (StructDef x _)) = x
 
 getMemoryCellType (Typedef x) = x  
 

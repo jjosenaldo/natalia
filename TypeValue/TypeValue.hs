@@ -7,27 +7,8 @@ data Type =
     NatString                               | 
     NatDouble                               | 
     NatSet Type                             | 
-    NatStruct String [(String, Type)]       |
+    NatStruct String                        |
     NatArray Type deriving (Show, Eq)
-
--- SPOILER DA BRANCH TYPEDEF 
--- MemoryCell = ... | Typedef Typedef
--- Typedef    = Def String Type
--- Def "SetDeInteiros" (ConsNatSet NatInt)
---
-{- 
-@typedef{
-    rational_t {
-        int num;
-        int den;
-    }
-    setDeInteiros {int}
-
-}
-@main{
-    rational_t rat = setDeInteiros{num = 1, den = 2};
-}
--}
 
 data Value = 
     ConsNatGenType                          |
@@ -50,7 +31,7 @@ getTypeFromValue (ConsNatBool _) = NatBool
 getTypeFromValue (ConsNatString _) = NatString 
 getTypeFromValue (ConsNatDouble _) = NatDouble 
 getTypeFromValue (ConsNatSet tp _) = NatSet tp
-getTypeFromValue (ConsNatStruct str l) = NatStruct str (zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
+getTypeFromValue (ConsNatStruct str l) = NatStruct str --(zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
 getTypeFromValue (ConsNatArray tp _) = NatArray tp
 
 arrayAccess :: Value -> Value -> Value

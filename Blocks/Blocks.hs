@@ -53,7 +53,7 @@ predefinedBlock currentBlocks =
     (do
         retCurrentBlock <- typedefsBlock
         let valueCurrentBlocks = getIntFromNatInt currentBlocks
-        --liftIO(print(show(valueCurrentBlocks)))
+        
 
         if valueCurrentBlocks .&. 2 == 2 then error ("You can't have more than one @typedefs block!")
         else 
@@ -143,7 +143,7 @@ remainingTypeDefs =
         return (RetNothing))
 
 typeDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)        
-typeDef = typeAliasDef -- <|> structTypeDef
+typeDef = try typeAliasDef <|> structTypeDef
 
 typeAliasDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 typeAliasDef = 
@@ -154,3 +154,41 @@ typeAliasDef =
         let typeRead = getRetType rettype -- Type
         updateState (memory_insert (Typedef (ConsTypedef typedefname typeRead)) )
         return (RetNothing)
+
+structTypeDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)        
+structTypeDef = 
+    do
+        retStructName <- id_token -- RetToken
+        let structName = get_id_name (getRetToken retStructName) -- String 
+        retLeftBrace <- leftBraceToken -- RetToken
+        retStructInits <- structInits []-- RetStructStructure 
+        retRightBrace <- rightBraceToken -- RetToken
+        let allStructInits = getRetStructStructure retStructInits -- [(Type, String)]
+        updateState (memory_insert (Typedef (StructDef structName allStructInits)  ))
+        
+        return (RetNothing)
+
+structInits :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)        
+structInits inits = 
+    try
+    (do
+        init <- structInit -- RetStructStructure
+        let actualInit = getRetStructStructure init -- [(Type, String)]
+        retAllInits <- structInits (inits ++ actualInit) -- RetStructStructure
+        let allInits = getRetStructStructure retAllInits -- [(Type, String)]
+        return (RetStructStructure allInits))
+    <|>
+    (do
+        return (RetStructStructure inits))
+
+structInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+structInit  = 
+    do
+        retType <- generalType
+        retId <- id_token
+        retSemicolon <- semiColonToken
+        
+        let actualType = getRetType retType 
+        let actualName = get_id_name (getRetToken retId)
+
+        return ( RetStructStructure [ (actualType, actualName)  ]  )

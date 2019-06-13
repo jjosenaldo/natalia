@@ -1,14 +1,15 @@
-@typedefs{
-    si {int},
-    sii {{int}},
-    siii {{{int}}},
-    ssstring {{{string}}}
+@typedefs {
+    rational_t {
+        int num;
+        int den;
+    }
 }
 
 @main{
     int a = 1;
-
-    si jah = {1};
-    {int} jah2 = {1,2,3};
-    bool res = jah < jah2;
+    rational_t meio = rational_t{1,2};
+    rational_t zero = rational_t{0,2};
+    #rational_t trollTres = rational_t{0,2,4};
+    #rational_t trollUm = rational_t{0};
+    rational_t diffType = rational_t{0, 0.0};
 }
