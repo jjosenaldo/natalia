@@ -4,3 +4,7 @@
         int den;
     }
 }
+
+@main{
+    int a = 1;
+}

@@ -163,7 +163,6 @@ structTypeDef =
         retLeftBrace <- leftBraceToken -- RetToken
         retStructInits <- structInits []-- RetStructStructure 
         retRightBrace <- rightBraceToken -- RetToken
-        
         let allStructInits = getRetStructStructure retStructInits -- [(Type, String)]
         updateState (memory_insert (Typedef (StructDef structName allStructInits)  ))
         

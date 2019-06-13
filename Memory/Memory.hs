@@ -24,6 +24,7 @@ getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _)) = x
 getId (Subprogram (ConstructProcedure x _)) = x
 getId (Typedef (ConsTypedef x _)) = x
+getId (Typedef (StructDef x _)) = x
 
 getMemoryCellType (Typedef x) = x  
 
