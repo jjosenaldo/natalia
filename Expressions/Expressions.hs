@@ -195,6 +195,8 @@ expGroup0 =
     int_token
     <|> 
     double_token 
+    <|>
+    nullToken
     <|> 
     stringToken 
     <|> 
@@ -207,6 +209,7 @@ expGroup0 =
 structValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 structValue =
     do
+        memory <- getState -- [MemoryCell]
         retId <- id_token -- RetToken 
         -- liftIO(print(show(getRetToken retId)))
         -- liftIO(print("structValue"))
@@ -214,14 +217,13 @@ structValue =
 
 
         let id = getRetToken retId -- Id
-        memory <- getState -- [MemoryCell]
-        let typedefStructStructyre = memory_get (get_id_name id) (get_pos id) memory -- Typedef (StructDef String [(Type, String)])
-        let structDefStructure = getMemoryCellType typedefStructStructyre -- StructDef String [(Type, String)]
+        let typedefStructStructure = memory_get (get_id_name id) (get_pos id) memory -- Typedef (StructDef String [(Type, String)])
+        let structDefStructure = getMemoryCellType typedefStructStructure -- StructDef String [(Type, String)]
         let structure = getStructStructure structDefStructure -- [(Type, String)]
-        --liftIO(print(show(structure)))
-
+        
         retStructValues <- structValues structure -- RetStructValues 
         retRightBrace <- rightBraceToken
+        liftIO(print(">>retstructvalues" ++ show(retStructValues)))
 
         return (    RetValue ( ConsNatStruct (get_id_name id) (getRetStructValues retStructValues))         )
 
@@ -233,7 +235,6 @@ structValues [] =
 structValues (field:fields) = 
     do
         retValue <- expression
-        --liftIO(print(show(retValue)))
         let expressionValue = getRetValue retValue -- Value
         let typeOfExpression = getTypeFromValue expressionValue
         let expectedType = fst field
@@ -276,13 +277,14 @@ structFieldRead =
         retField <- id_token
         state <- getState
         let id = (get_id_name.getRetToken) retId
-        let values = getStructValues (getValue (memory_get id (get_pos(getRetToken retId)) state))
+        let pos = get_pos (getRetToken retId)
+        let values = getStructValues (getValue (memory_get id pos state) pos)
         let value = getStructFieldValue (  (get_id_name.getRetToken) retField  ) values -- Value
 
         return (RetValue value)
 
-structRemainingFields :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-structRemainingFields 
+--structRemainingFields :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+--structRemainingFields 
 
 
 -- ARRAYS --------------------------------------------------------------------------------------------------------------------------------
@@ -331,9 +333,9 @@ var_attribution =
     b <- assignToken -- RetToken
     expr_val <- expression -- RetValue
     s <- getState -- [MemoryCell]
-    
-    let var = memory_get (get_id_name (getRetToken a)) (get_pos (getRetToken a)) s --MemoryCell
-    let var_type = getTypeFromValue (getValue var)
+    let pos = get_pos (getRetToken a)
+    let var = memory_get (get_id_name (getRetToken a)) pos s --MemoryCell
+    let var_type = getTypeFromValue (getValue var pos)
     let expr_type = getTypeFromValue (getRetValue expr_val)
     if (not (checkCompatibleTypes var_type expr_type)) then error ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
     else
@@ -366,7 +368,8 @@ memoryAccess =
             do 
                 let pos = get_pos (getRetToken id)
                 let name = (get_id_name (getRetToken id))
-                res <- getChainedAccess (getValue (memory_get name pos mem))
+                --liftIO(print(">>>getValue de: " ++ show(memory_get name pos mem)))
+                res <- getChainedAccess (getValue (memory_get name pos mem) pos)
                 return res
 
         else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not accessible"))
@@ -380,7 +383,7 @@ localVariable =
         liftIO(print(id))
         let name = (get_id_name.getRetToken) id
         let pos = get_pos (getRetToken id)
-        if (memory_has_name name mem) then do return (RetValue (getValue (memory_get name pos mem)))
+        if (memory_has_name name mem) then do return (RetValue (getValue (memory_get name pos mem) pos))
         else error ("ERROR " ++ name ++ " is not accessible")
 
 getChainedAccess :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)

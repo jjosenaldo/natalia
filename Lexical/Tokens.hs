@@ -180,6 +180,11 @@ int_token = tokenPrim show update_pos get_token where
     get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
 
+nullToken :: ParsecT [Token] st IO (ReturnObject)
+nullToken = tokenPrim show update_pos get_token where
+    get_token (Null _)  = Just (RetValue (ConsNatNull))
+    get_token _         = Nothing
+
 stringToken :: ParsecT [Token] st IO (ReturnObject)
 stringToken = tokenPrim show update_pos get_token where
     get_token (String x _) = Just (RetValue (ConsNatString x))
@@ -245,10 +250,10 @@ dotToken = tokenPrim show update_pos get_token where
 
 generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 generalType = 
-    try typedefType <|> primitiveType <|> aggregateType
+    try preDefinedTypedefType <|> try primitiveType <|> try aggregateType
 
-typedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-typedefType = 
+preDefinedTypedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+preDefinedTypedefType = 
     do
         retIdToken <- id_token -- RetToken
         let actualIdToken = getRetToken retIdToken -- Id
