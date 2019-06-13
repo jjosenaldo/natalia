@@ -18,6 +18,7 @@ import Text.Parsec
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
             retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
+            retMainBlock <- mainBlock
             eof
             return ()
 

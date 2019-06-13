@@ -2,14 +2,40 @@
     rational_t {
         int num;
         int den;
-    }
+    },
+    #recursive structs don't work...
+    node {
+        node l;
+        node r;
+        int val;
+    },
+    signal {
+        int sig;
+        rational_t num;
+    },
+    ssi {{int}}
 }
 
 @main{
-    int a = 1;
-    rational_t meio = rational_t{1,2};
-    rational_t zero = rational_t{0,2};
+    #int a = 1;
+    rational_t r = rational_t{1,1};
+    signal s = signal{1, r};
+    rational_t j = s.num;
+    #int k = s.num.num;
+
+
+
+    #rational_t meio = rational_t{1,2};
+    #rational_t meio2 = meio;
+    #int c = 3;
+    
+    #int d = meio.num;
+    #int e = 1;
+    #signal mySignal = signal{3, meio};
+
+    #rational_t zero = rational_t{0,2};
     #rational_t trollTres = rational_t{0,2,4};
     #rational_t trollUm = rational_t{0};
-    rational_t diffType = rational_t{0, 0.0};
+    #rational_t diffType = rational_t{0, 0};
+    #ssi b = {};
 }

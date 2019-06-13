@@ -34,6 +34,15 @@ getTypeFromValue (ConsNatSet tp _) = NatSet tp
 getTypeFromValue (ConsNatStruct str l) = NatStruct str --(zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
 getTypeFromValue (ConsNatArray tp _) = NatArray tp
 
+getStructValues :: Value -> [(String, Value)]
+getStructValues (ConsNatStruct _ x) = x
+
+getStructFieldValue :: String -> [(String, Value)] -> Value
+getStructFieldValue id [] = error ("ERROR: " ++ id ++ " is not a field.")
+getStructFieldValue id (x:xs) 
+    | id == fst x = snd x
+    | otherwise = getStructFieldValue id xs
+
 arrayAccess :: Value -> Value -> Value
 arrayAccess (ConsNatArray _ v) (ConsNatInt x) = v!!(fromIntegral x)
 arrayAccess v _ = error("ERROR Operator [] can only be used to access array positions, given: " ++ show(getTypeFromValue v))

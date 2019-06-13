@@ -83,6 +83,7 @@ tokens :-
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
   "?"                              { \p s -> In (getLC p)}
+  \.                               { \p s -> Dot (getLC p)}
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -98,7 +99,7 @@ tokens :-
   -- NAMES ------------------------------------------------
 
   -- filename
-  [$alpha\_$digit]+   \.  [a-z]+   { \p s -> Filename s (getLC p)}
+  --[$alpha\_$digit]+   \.  [a-z]+   { \p s -> Filename s (getLC p)}
 
   -- identifier
   $alpha [$alpha $digit \_ \']*    { \p s -> Id s (getLC p)}
@@ -154,7 +155,8 @@ data Token =
   And (Int, Int)             |
   Or (Int, Int)              |
   Difference (Int, Int)      |
-  In (Int, Int)          |
+  In (Int, Int)              |
+  Dot (Int, Int)             |
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -176,7 +178,7 @@ data Token =
   Id String (Int, Int)       |
 
   -- file name
-  Filename String (Int, Int) |
+  --Filename String (Int, Int) |
 
   -- LITERALS  ---------------------------------------------
 
@@ -238,12 +240,13 @@ get_pos (ElseIf p) = p
 get_pos (Type _ p) = p
 get_pos (Loop _ p) = p
 get_pos (Id _ p) = p
-get_pos (Filename _ p) = p
+-- get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
 get_pos (Double _ p) = p
 get_pos (Bool _ p) = p
 get_pos (Comma p) = p
 get_pos (String _ p) = p
+get_pos (Dot p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 
