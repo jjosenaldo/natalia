@@ -36,7 +36,7 @@ data Value =
     ConsNatString String                    | 
     ConsNatDouble Double                    | 
     ConsNatSet Type [Value]                 | 
-    ConsNatStruct String [(String, Value)]  |
+    ConsNatStruct String [Value]            |
     ConsNatArray Type [Value] deriving (Show, Eq)
 
 

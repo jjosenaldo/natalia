@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import Types.Types
+import Types.Typedef
 import TypeValue.TypeValue
 
 -- Haskell's modules
@@ -178,7 +179,61 @@ expGroup1 =
         return (a))
 
 expGroup0 :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-expGroup0 = memoryAccess <|> expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
+expGroup0 = structValue <|> memoryAccess <|> expSet <|> expArray <|> bool_token <|> int_token <|> double_token <|> stringToken <|> localVariable <|> exp_parenthesized 
+
+structValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+structValue =
+    do
+        retId <- id_token -- RetToken 
+        retLeftBrace <- leftBraceToken
+
+        let id = getRetToken retId -- Id
+        memory <- getState -- [MemoryCell]
+        let typedefStructStructyre = memory_get (get_id_name id) (get_pos id) memory -- Typedef (StructDef String [(Type, String)])
+        let structDefStructure = getMemoryCellType typedefStructStructyre -- StructDef String [(Type, String)]
+        let structure = getStructStructure structDefStructure -- [(Type, String)]
+
+        retValueList <- structValueList structure -- RetValueList 
+        retRightBrace <- rightBraceToken
+
+        return (    RetValue ( ConsNatStruct (get_id_name id) (getRetValueList retValueList))         )
+
+structValueList :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+structValueList [] = 
+    do 
+        return (RetValueList [])
+
+structValueList (field:fields) = 
+    do
+        retValue <- expression
+        let expressionValue = getRetValue retValue -- Value
+        let typeOfExpression = getTypeFromValue expressionValue
+        let expectedType = fst field
+
+        if (not (checkCompatibleTypes expectedType typeOfExpression)) then error ("ERROR: type mismatch in the initialization of a struct field. Expected: " ++ show(expectedType) ++", got: " ++ show(typeOfExpression))
+        else
+            do
+                allValues <- remainingStructValues [expressionValue] fields
+                return (RetValueList(getRetValueList allValues))
+
+remainingStructValues :: [Value] -> [(Type, String)] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+remainingStructValues inValueList [] = 
+    do
+        return (RetValueList inValueList)
+
+remainingStructValues inValueList (field:fields) = 
+    do
+        retComma <- commaToken
+        retValue <- expression
+        let expressionValue = getRetValue retValue -- Value
+        let typeOfExpression = getTypeFromValue expressionValue
+        let expectedType = fst field
+
+        if (not (checkCompatibleTypes expectedType typeOfExpression)) then error ("ERROR: type mismatch in the initialization of a struct field. Expected: " ++ show(expectedType) ++", got: " ++ show(typeOfExpression))
+        else
+            do
+                allValues <- remainingStructValues (inValueList ++ [expressionValue]) fields
+                return (RetValueList (getRetValueList allValues))
 
 editArray :: MemoryCell -> [Value] -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
 editArray arr list =

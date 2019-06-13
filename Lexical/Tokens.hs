@@ -18,7 +18,8 @@ data ReturnObject =
     RetType Type | 
     RetNothing |
     RetMemoryCell MemoryCell |
-    RetStructStructure [(Type, String)] deriving (Eq, Show)
+    RetStructStructure [(Type, String)] |
+    RetValueList [Value] deriving (Eq, Show)
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
@@ -38,7 +39,11 @@ getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetMemoryCel
 
 getRetStructStructure :: ReturnObject -> [(Type, String)]
 getRetStructStructure (RetStructStructure x) = x
-getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetVaRetStructStructurelue"
+getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetStructStructure"
+
+getRetValueList :: ReturnObject -> [Value]
+getRetValueList (RetValueList x) = x
+getRetValueList _ = error "Invalid conversion from ReturnObject to RetValueList"
 
 -- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (ReturnObject)

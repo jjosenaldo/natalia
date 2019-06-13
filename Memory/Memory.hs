@@ -5,7 +5,9 @@ import Types.Types
 import Types.Typedef
 import TypeValue.TypeValue
 
-data Variable = ConstructVariable String Value Bool | ConstructConstantVariable String Value Bool deriving (Show, Eq)
+data Variable = 
+    ConstructVariable String Value Bool | 
+    ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
 --                                  id                return                     name
