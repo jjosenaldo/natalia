@@ -155,34 +155,46 @@ structTypeDef =
         retStructName <- id_token -- RetToken
         let structName = get_id_name (getRetToken retStructName) -- String 
         retLeftBrace <- leftBraceToken -- RetToken
-        retStructInits <- structInits []-- RetStructStructure 
+        retStructInits <- structInits structName []-- RetStructStructure 
         retRightBrace <- rightBraceToken -- RetToken
         let allStructInits = getRetStructStructure retStructInits -- [(Type, String)]
         updateState (memory_insert (Typedef (StructDef structName allStructInits)  ))
         
         return (RetNothing)
 
-structInits :: [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)        
-structInits inits = 
+structInits :: String -> [(Type, String)] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)        
+structInits structName inits = 
     try
     (do
-        init <- structInit -- RetStructStructure
+        init <- structInit structName -- RetStructStructure
         let actualInit = getRetStructStructure init -- [(Type, String)]
-        retAllInits <- structInits (inits ++ actualInit) -- RetStructStructure
+        retAllInits <- structInits structName (inits ++ actualInit) -- RetStructStructure
         let allInits = getRetStructStructure retAllInits -- [(Type, String)]
         return (RetStructStructure allInits))
     <|>
     (do
         return (RetStructStructure inits))
 
-structInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-structInit  = 
-    do
+structInit :: String -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+structInit structName = 
+    try 
+    (do -- when type of field is recursive
+        retFieldType <- id_token
+        retFieldName <- id_token
+        retSemiColon <- semiColonToken
+        let fieldType = get_id_name (getRetToken retFieldType)
+        let fieldName = get_id_name (getRetToken retFieldName)
+        if fieldType == structName then 
+            do 
+                return (RetStructStructure [(NatStruct structName, fieldName)])
+        else fail ("ERROR type " ++ fieldType ++ " at "++ show(get_pos(getRetToken retFieldType)) ++" is not defined"))
+    <|>
+    (do -- when type of field is not recursive
         retType <- generalType
         retId <- id_token
-        retSemicolon <- semiColonToken
+        retSemiColon <- semiColonToken
         
         let actualType = getRetType retType 
         let actualName = get_id_name (getRetToken retId)
 
-        return ( RetStructStructure [ (actualType, actualName)  ]  )
+        return ( RetStructStructure [ (actualType, actualName)  ]  ))

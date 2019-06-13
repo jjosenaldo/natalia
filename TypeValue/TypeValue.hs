@@ -8,7 +8,8 @@ data Type =
     NatDouble                               | 
     NatSet Type                             | 
     NatStruct String                        |
-    NatArray Type deriving (Show, Eq)
+    NatArray Type                           |
+    NatNull deriving (Show, Eq)
 
 data Value = 
     ConsNatGenType                          |
@@ -18,7 +19,8 @@ data Value =
     ConsNatDouble Double                    | 
     ConsNatSet Type [Value]                 | 
     ConsNatStruct String [(String, Value)]  |
-    ConsNatArray Type [Value] deriving (Show, Eq)
+    ConsNatArray Type [Value]               |
+    ConsNatNull deriving (Show, Eq)
 
 
 
@@ -26,13 +28,14 @@ getIntFromNatInt (ConsNatInt x) = x
 getIntFromNatInt v = error ("Trying to fetch Int from " ++ (show (getTypeFromValue v)))
 
 getTypeFromValue::Value -> Type
-getTypeFromValue (ConsNatInt _) = NatInt 
-getTypeFromValue (ConsNatBool _) = NatBool 
-getTypeFromValue (ConsNatString _) = NatString 
-getTypeFromValue (ConsNatDouble _) = NatDouble 
-getTypeFromValue (ConsNatSet tp _) = NatSet tp
-getTypeFromValue (ConsNatStruct str l) = NatStruct str --(zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
-getTypeFromValue (ConsNatArray tp _) = NatArray tp
+getTypeFromValue (ConsNatInt _)         = NatInt 
+getTypeFromValue (ConsNatBool _)        = NatBool 
+getTypeFromValue (ConsNatString _)      = NatString 
+getTypeFromValue (ConsNatDouble _)      = NatDouble 
+getTypeFromValue (ConsNatSet tp _)      = NatSet tp
+getTypeFromValue (ConsNatStruct str l)  = NatStruct str --(zip (fst (unzip l)) (map getTypeFromValue (snd (unzip l))))
+getTypeFromValue (ConsNatArray tp _)    = NatArray tp
+getTypeFromValue (ConsNatNull)       = NatNull
 
 getStructValues :: Value -> [(String, Value)]
 getStructValues (ConsNatStruct _ x) = x

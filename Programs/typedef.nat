@@ -1,13 +1,12 @@
 @typedefs {
-    rational_t {
-        int num;
-        int den;
-    },
-    #recursive structs don't work...
     node {
         node l;
         node r;
         int val;
+    },
+    rational_t {
+        int num;
+        int den;
     },
     signal {
         int sig;
@@ -18,12 +17,12 @@
 
 @main{
     #int a = 1;
-    rational_t r = rational_t{1,1};
-    signal s = signal{1, r};
-    rational_t j = s.num;
+    #rational_t r = rational_t{1,1};
+    #signal s = signal{1, r};
+    #rational_t j = s.num;
     #int k = s.num.num;
 
-
+    node n = node{Null, Null, 1};
 
     #rational_t meio = rational_t{1,2};
     #rational_t meio2 = meio;
