@@ -117,6 +117,18 @@ getBinOperatorReturnType (CONSTokenBinOperator (GreaterEquals p)) NatDouble NatD
 getBinOperatorReturnType (CONSTokenBinOperator (GreaterEquals p)) _ _ = 
     error ("ERROR at " ++ show(p) ++ ": the operator >= expects two " ++ (getNameOfType NatDouble) ++ " or two " ++ (getNameOfType (NatSet NatGenType)))
 
+getBinOperatorReturnType (CONSTokenBinOperator (And p)) NatBool NatBool = NatBool
+getBinOperatorReturnType (CONSTokenBinOperator (And p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator && expects two " ++ (getNameOfType NatBool) )
+
+getBinOperatorReturnType (CONSTokenBinOperator (Or p)) NatBool NatBool = NatBool
+getBinOperatorReturnType (CONSTokenBinOperator (Or p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator && expects two " ++ (getNameOfType NatBool) )
+
+getBinOperatorReturnType (CONSTokenBinOperator (Equals p)) _ _ = NatBool
+
+getBinOperatorReturnType (CONSTokenBinOperator (Different p)) _ _ = NatBool
+
 getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatInt NatInt = NatDouble
 getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatDouble NatInt = NatDouble
 getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatInt NatDouble = NatDouble
@@ -132,6 +144,17 @@ getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatInt = NatDo
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatDouble = NatDouble
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) _ = 
     error ("ERROR at " ++ show(p) ++ ": the first arg of the operator * must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) NatBool = NatBool
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator && must be a " ++ (getNameOfType NatBool))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Equals p)) _ = NatGenType
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Different p)) _ = NatGenType
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) NatBool = NatBool
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator || must be a " ++ (getNameOfType NatBool))    
 
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatInt = NatDouble
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatDouble = NatDouble

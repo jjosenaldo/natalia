@@ -30,16 +30,16 @@ _expGroup0 expectedType =
     try (_boolTokenExpression expectedType)
     <|> 
     try (_intTokenExpression expectedType)
-    <|>
-    try (_doubleTokenExpression expectedType)
-    <|>
-    try (_nullTokenExpression expectedType)
-    <|>
-    try (_stringTokenExpression expectedType)
-    <|>
-    try (_localVarExpression expectedType)
-    <|>
-    _expParenthesized expectedType
+    -- <|>
+    -- try (_doubleTokenExpression expectedType)
+    -- <|>
+    -- try (_nullTokenExpression expectedType)
+    -- <|>
+    -- try (_stringTokenExpression expectedType)
+    -- <|>
+    -- try (_localVarExpression expectedType)
+    -- <|>
+    -- _expParenthesized expectedType
 
 -- | Throws a type error.
 throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
@@ -107,7 +107,7 @@ _expGroup1 expectedType =
     _expGroup0 expectedType
 
 _group1OpExpression :: Type -> ParsecT [Token] st IO(ReturnObject)
-_group1OpExpression expectedType = _negationExpression expectedType <|> _unMinusExpression expectedType
+_group1OpExpression expectedType = try (_negationExpression expectedType) <|> _unMinusExpression expectedType
 
 _negationExpression = _generalUnExpression _negationTokenOp
 _unMinusExpression = _generalUnExpression _unMinusTokenOp
@@ -232,12 +232,12 @@ _expoTokenOp = _generalBinOperatorParser expoToken
 
 _expGroup5 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup5 expectedType =
-    (do
+    do
         retLeftExpr <- _expGroup4 expectedType
+        liftIO(print(show(retLeftExpr)))
+        liftIO(print(show(expectedType)))
         retExprResult <- _evalRemainingGroup5 (getRetExpression retLeftExpr)
-        return (retExprResult))
-    <|>
-    _expGroup4 expectedType
+        return (retExprResult)
 
 _evalRemainingGroup5 :: Expression -> ParsecT [Token] st IO(ReturnObject)
 _evalRemainingGroup5 leftExpr =
@@ -250,7 +250,7 @@ _evalRemainingGroup5 leftExpr =
         -- Reads the second operation if it is of the correct type
         let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
 
-        retExprRight <- _expGroup4 expectedType
+        retExprRight <- _expGroup0 expectedType
 
         let exprRight = getRetExpression retExprRight -- Expression (right)
 
