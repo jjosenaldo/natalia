@@ -8,6 +8,10 @@ data UnOperation =
     CONSTokenUnOperation Token
     deriving (Eq, Show)
 
+data BinOperator =
+    CONSTokenBinOperator Token 
+    deriving (Eq, Show)
+
 data Id = 
     CONSTokenId Token -- Id
     deriving (Eq, Show)
@@ -15,7 +19,8 @@ data Id =
 data Expression = 
     CONSValue Value Type | -- literals
     CONSId Id Type |
-    CONSUnOperation UnOperation Expression Type 
+    CONSUnOperation UnOperation Expression Type |
+    CONSBinOperator BinOperator Expression Expression Type 
     deriving (Eq, Show)
 
 getSyntacticalUnitPos :: Expression -> (Int, Int)
@@ -25,6 +30,7 @@ getTypeOfExpression :: Expression -> Type
 getTypeOfExpression (CONSValue _ x) = x
 getTypeOfExpression (CONSId _ x) = x
 getTypeOfExpression (CONSUnOperation _ _ x) = x
+getTypeOfExpression (CONSBinOperator _ _ _ x) = x
 
 -- TODO: this function should search in the memory for the local variable.
 -- | Returns the type of a local variable.
@@ -50,3 +56,35 @@ getUnOperationReturnType (CONSTokenUnOperation (Minus p)) NatInt =
 getUnOperationReturnType (CONSTokenUnOperation (Minus p)) other = 
     error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a " ++  (getNameOfType NatDouble) ++ " or a " ++ (getNameOfType NatInt) ++ " but you passed a " ++ (getNameOfType other))
 
+getBinOperatorReturnType :: BinOperator -> Type -> Type -> Type 
+getBinOperatorReturnType (CONSTokenBinOperator (Times p)) NatInt NatInt = NatInt
+getBinOperatorReturnType (CONSTokenBinOperator (Times p)) NatDouble NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Times p)) NatInt NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Times p)) NatDouble NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Times p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator * expects two " ++ (getNameOfType NatDouble))
+
+getBinOperatorReturnType (CONSTokenBinOperator (Div p)) NatInt NatInt = NatInt
+getBinOperatorReturnType (CONSTokenBinOperator (Div p)) NatDouble NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Div p)) NatInt NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Div p)) NatDouble NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Div p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator / expects two " ++ (getNameOfType NatDouble))
+
+getBinOperatorReturnType (CONSTokenBinOperator (Mod p)) NatInt NatInt = 
+    error ("ERROR at " ++ show(p) ++ ": the operator % expects two " ++ (getNameOfType NatInt))
+
+getBinOperatorExpectedSecondType :: BinOperator -> Type -> Type
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator * must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator / must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) NatInt = NatInt
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator % must be a " ++ (getNameOfType NatInt))

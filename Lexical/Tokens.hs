@@ -22,12 +22,17 @@ data ReturnObject =
     RetStructStructure [(Type, String)] |
     RetExpression Expression |
     RetUnOperation UnOperation |
+    RetBinOperator BinOperator |
     RetStructValues [(String, Value)] deriving (Eq, Show)
 
 
 getRetUnOperation :: ReturnObject -> UnOperation
 getRetUnOperation (RetUnOperation x) = x
 getRetUnOperation _ = error "Invalid conversion from ReturnObject to RetUnOperation"
+
+getRetBinOperator :: ReturnObject -> BinOperator
+getRetBinOperator (RetBinOperator x) = x
+getRetBinOperator _ = error "Invalid conversion from ReturnObject to RetBinOperator"
 
 getRetExpression :: ReturnObject -> Expression
 getRetExpression (RetExpression x) = x
@@ -147,8 +152,8 @@ minusToken = tokenPrim show update_pos get_token where
     get_token (Minus p) = Just (RetToken (Minus p))
     get_token _       = Nothing
 
-times_token :: ParsecT [Token] st IO (ReturnObject)
-times_token = tokenPrim show update_pos get_token where
+timesToken :: ParsecT [Token] st IO (ReturnObject)
+timesToken = tokenPrim show update_pos get_token where
     get_token (Times p) = Just (RetToken (Times p))
     get_token _       = Nothing
 
@@ -157,13 +162,13 @@ expo_token = tokenPrim show update_pos get_token where
     get_token (Expo p) = Just (RetToken (Expo p))
     get_token _       = Nothing
 
-div_token :: ParsecT [Token] st IO (ReturnObject)
-div_token = tokenPrim show update_pos get_token where
+divToken :: ParsecT [Token] st IO (ReturnObject)
+divToken = tokenPrim show update_pos get_token where
     get_token (Div p) = Just (RetToken (Div p))
     get_token _       = Nothing
 
-mod_token :: ParsecT [Token] st IO (ReturnObject)
-mod_token = tokenPrim show update_pos get_token where
+modToken :: ParsecT [Token] st IO (ReturnObject)
+modToken = tokenPrim show update_pos get_token where
     get_token (Mod p) = Just (RetToken (Mod p))
     get_token _       = Nothing
 
