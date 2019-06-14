@@ -247,6 +247,7 @@ _evalRemainingGroup5 leftExpr =
 
         -- Reads the second operation if it is of the correct type
         let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
+
         retExprRight <- _expGroup4 expectedType
 
         let exprRight = getRetExpression retExprRight -- Expression (right)
