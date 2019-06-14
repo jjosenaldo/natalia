@@ -14,7 +14,7 @@ import Control.Monad.IO.Class -- liftIO
 -- import System.IO.Unsafe
 
 _expression :: Type -> ParsecT [Token] st IO (ReturnObject)
-_expression expectedType = _expGroup1 expectedType -- TODO: change for expGroup9
+_expression = _expGroup2 -- TODO: eventually this should be changed to expGroup9
 
 -- GROUP 0 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ _expParenthesized expectedType =
 
 -- GROUP 1 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
--- This group contains only operations !, unary -, reference access (&) and value access (*)         
+-- This group contains only the operations !, unary -, reference access (&) and value access (*)         
 -- TODO: operators of reference access (&), value access (*)
 _expGroup1 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup1 expectedType = 
@@ -120,6 +120,26 @@ _unMinusTokenOp = _generalUnOperatorParser minusToken
 
 -- GROUP 2 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
+-- This group contains only the binary operations *, / and %.
+-- _expGroup2 :: Type -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+-- _expGroup2 expectedType =
+--     (do
+        
+--         l <- expGroup1
+--         result <- evalRemainingGroup2 (l)
+--         return (result))
+
+-- _evalRemainingGroup2 :: ReturnObject -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
+-- _evalRemainingGroup2 l =
+--     try
+--     (do
+--         op <- group2OpToken -- RetToken
+--         r <- expGroup1
+--         result <- evalRemainingGroup2 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+--         return (result))
+--     <|>
+--     (do
+--         return (l))
 
 
 
