@@ -45,7 +45,7 @@ _statementList stmts =
         return (RetStatementList stmts))
     
 _statement :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-_statement = try _varInit <|> _varAssignment
+_statement = try _varInit <|> try _varAssignment <|> _print
 
 _varInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _varInit = 
@@ -88,3 +88,15 @@ _varAssignment =
         let actualExpression = getRetExpression retExpression -- Expression
 
         return (RetStatement (CONSStatementVarAssign (CONSVarAssign id actualExpression)))
+
+_print :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+_print = 
+    do
+        retPrint <- printToken
+        retLeftParen <- leftParenToken
+        retExpr <- _expression NatGenType
+        retRightParen <- rightParenToken
+
+        let actualExpr = getRetExpression retExpr -- Expression
+        
+        return (RetStatement (CONSStatementPrint (CONSPrint actualExpr)))

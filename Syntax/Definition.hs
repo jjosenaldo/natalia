@@ -11,7 +11,12 @@ data FunctionBody =
 
 data Statement = 
     CONSStatementVarInit VarInit |
-    CONSStatementVarAssign VarAssign 
+    CONSStatementVarAssign VarAssign |
+    CONSStatementPrint Print 
+    deriving (Eq, Show)
+
+data Print = 
+    CONSPrint Expression
     deriving (Eq, Show)
 
 data VarInit = 

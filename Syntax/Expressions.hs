@@ -175,7 +175,7 @@ _modTokenOp = _generalBinOperatorParser modToken
 -- GROUP 9 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 _expGroup9 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup9 expectedType = _expLocalVarAssignment expectedType <|> _expGroup2 expectedType -- TODO: this should contain _expGroup8 
+_expGroup9 expectedType = try (_expLocalVarAssignment expectedType) <|> _expGroup2 expectedType -- TODO: this should contain _expGroup8 
 
 _expLocalVarAssignment expectedType = 
     do 

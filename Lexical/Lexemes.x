@@ -11,6 +11,9 @@ $digit = [0-9]
 $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
+  -- COMMANDS ---------------------------------------------
+  
+  print                            { \p s -> Print (getLC p)}
 
   -- TYPES  ------------------------------------------------
 
@@ -99,11 +102,9 @@ tokens :-
 
   -- NAMES ------------------------------------------------
 
-  -- filename
-  --[$alpha\_$digit]+   \.  [a-z]+   { \p s -> Filename s (getLC p)}
-
   -- identifier
   $alpha [$alpha $digit \_ \']*    { \p s -> Id s (getLC p)}
+
 
 {
 -- The token type:
@@ -187,7 +188,11 @@ data Token =
   Double Double (Int, Int)       |
   String String (Int, Int)       |
   Bool Bool (Int, Int)           |
-  Null (Int, Int)
+  Null (Int, Int)                |
+
+  -- COMMANDS ---------------------------------------------
+
+  Print (Int, Int)
 
   ----------------------------------------------------------
 

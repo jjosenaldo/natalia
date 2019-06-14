@@ -107,6 +107,11 @@ globalsToken = tokenPrim show update_pos get_token where
     get_token (Globals p) = Just (RetToken (Globals p))
     get_token _       = Nothing
 
+printToken :: ParsecT [Token] st IO (ReturnObject)
+printToken = tokenPrim show update_pos get_token where
+    get_token (Print p) = Just (RetToken (Print p))
+    get_token _       = Nothing
+
 -- Block opening character
 leftBraceToken :: ParsecT [Token] st IO (ReturnObject)
 leftBraceToken = tokenPrim show update_pos get_token where
