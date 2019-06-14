@@ -149,7 +149,7 @@ _evalRemainingGroup2 leftExpr =
 
         let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
 
-        let currentResult = CONSBinOperator op leftExpr exprRight returnType -- Expression
+        let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
 
         retFinalResult <- _evalRemainingGroup2 currentResult 
         let finalResult = getRetExpression retFinalResult -- Expression
@@ -203,8 +203,8 @@ _generalUnExpression generalUnOperator expectedType =
     do 
         -- Parses a unary operator
         retOp <- generalUnOperator
-        let op = getRetUnOperation retOp -- UnOperation
-        let typeExpectedByTheOperator = getUnOperationExpectedType op -- Type
+        let op = getRetUnOperator retOp -- UnOperation
+        let typeExpectedByTheOperator = getUnOperatorExpectedType op -- Type
 
         -- Parses an expression of the type expected by the operator
         retExpr <- _expression typeExpectedByTheOperator
@@ -212,7 +212,7 @@ _generalUnExpression generalUnOperator expectedType =
         let exprType = getTypeOfExpression expr -- Type
 
         -- Type of the expression read
-        let actualType = getUnOperationReturnType op exprType
+        let actualType = getUnOperatorReturnType op exprType
 
         -- This is not necessary: the expression already is of the correct type
         {-if not (checkCompatibleTypes expectedType actualType) then do
@@ -231,8 +231,8 @@ _generalUnOperatorParser unOperatorToken =
     do 
         retOp <- unOperatorToken
         let tok = getRetToken retOp -- Token
-        let op = CONSTokenUnOperation tok -- UnOperation
-        return (RetUnOperation op)
+        let op = CONSTokenUnOperator tok -- UnOperation
+        return (RetUnOperator op)
 
 -- | Builds a parser for a binary operator.
 _generalBinOperatorParser :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser that parses the token for a binary operator 

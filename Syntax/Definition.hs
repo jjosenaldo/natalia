@@ -4,8 +4,8 @@ module Syntax.Definition where
 import Lexical.Lexemes
 import TypeValue.TypeValue
 
-data UnOperation = 
-    CONSTokenUnOperation Token
+data UnOperator = 
+    CONSTokenUnOperator Token
     deriving (Eq, Show)
 
 data BinOperator =
@@ -19,8 +19,8 @@ data Id =
 data Expression = 
     CONSValue Value Type | -- literals
     CONSId Id Type |
-    CONSUnOperation UnOperation Expression Type |
-    CONSBinOperator BinOperator Expression Expression Type 
+    CONSUnOperation UnOperator Expression Type |
+    CONSBinOperation BinOperator Expression Expression Type 
     deriving (Eq, Show)
 
 getSyntacticalUnitPos :: Expression -> (Int, Int)
@@ -30,7 +30,7 @@ getTypeOfExpression :: Expression -> Type
 getTypeOfExpression (CONSValue _ x) = x
 getTypeOfExpression (CONSId _ x) = x
 getTypeOfExpression (CONSUnOperation _ _ x) = x
-getTypeOfExpression (CONSBinOperator _ _ _ x) = x
+getTypeOfExpression (CONSBinOperation _ _ _ x) = x
 
 -- TODO: this function should search in the memory for the local variable.
 -- | Returns the type of a local variable.
@@ -39,21 +39,21 @@ getTypeOfLocalVar :: String -- ^ the name of the local variable
 getTypeOfLocalVar idName = NatInt
 
 
-getUnOperationExpectedType :: UnOperation -> Type 
-getUnOperationExpectedType (CONSTokenUnOperation (Negation p)) = NatBool 
-getUnOperationExpectedType (CONSTokenUnOperation (Minus p)) = NatDouble 
+getUnOperatorExpectedType :: UnOperator -> Type 
+getUnOperatorExpectedType (CONSTokenUnOperator (Negation p)) = NatBool 
+getUnOperatorExpectedType (CONSTokenUnOperator (Minus p)) = NatDouble 
 
-getUnOperationReturnType :: UnOperation -> Type -> Type
-getUnOperationReturnType (CONSTokenUnOperation (Negation p)) NatBool = 
+getUnOperatorReturnType :: UnOperator -> Type -> Type
+getUnOperatorReturnType (CONSTokenUnOperator (Negation p)) NatBool = 
     NatBool
-getUnOperationReturnType (CONSTokenUnOperation (Negation p)) other = 
+getUnOperatorReturnType (CONSTokenUnOperator (Negation p)) other = 
     error ("ERROR at " ++ show(p) ++ ": the ! operator expects a " ++  (getNameOfType NatBool) ++ " but you passed a " ++ (getNameOfType other))
 
-getUnOperationReturnType (CONSTokenUnOperation (Minus p)) NatDouble = 
+getUnOperatorReturnType (CONSTokenUnOperator (Minus p)) NatDouble = 
     NatDouble
-getUnOperationReturnType (CONSTokenUnOperation (Minus p)) NatInt = 
+getUnOperatorReturnType (CONSTokenUnOperator (Minus p)) NatInt = 
     NatInt
-getUnOperationReturnType (CONSTokenUnOperation (Minus p)) other = 
+getUnOperatorReturnType (CONSTokenUnOperator (Minus p)) other = 
     error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a " ++  (getNameOfType NatDouble) ++ " or a " ++ (getNameOfType NatInt) ++ " but you passed a " ++ (getNameOfType other))
 
 getBinOperatorReturnType :: BinOperator -> Type -> Type -> Type 

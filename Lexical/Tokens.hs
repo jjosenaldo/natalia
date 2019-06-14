@@ -21,14 +21,14 @@ data ReturnObject =
     RetMemoryCell MemoryCell |
     RetStructStructure [(Type, String)] |
     RetExpression Expression |
-    RetUnOperation UnOperation |
+    RetUnOperator UnOperator |
     RetBinOperator BinOperator |
     RetStructValues [(String, Value)] deriving (Eq, Show)
 
 
-getRetUnOperation :: ReturnObject -> UnOperation
-getRetUnOperation (RetUnOperation x) = x
-getRetUnOperation _ = error "Invalid conversion from ReturnObject to RetUnOperation"
+getRetUnOperator :: ReturnObject -> UnOperator
+getRetUnOperator (RetUnOperator x) = x
+getRetUnOperator _ = error "Invalid conversion from ReturnObject to RetUnOperator"
 
 getRetBinOperator :: ReturnObject -> BinOperator
 getRetBinOperator (RetBinOperator x) = x
