@@ -34,8 +34,8 @@ _expGroup0 =
     _nullTokenExpression
     <|>
     _stringTokenExpression
-    -- <|>
-    -- _varIdExpression
+    <|>
+    _varIdExpression
     -- <|>
     -- _expParenthesized
 
@@ -74,3 +74,9 @@ _stringTokenExpression =
 
         return (RetExpression (CONSValue string))
 
+_varIdExpression =
+    do 
+        retId <- idToken
+        let id = CONSToken (getRetToken retId) -- Id
+        return (RetExpression (CONSId id))
+    

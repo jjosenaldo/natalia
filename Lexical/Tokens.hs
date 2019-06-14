@@ -169,8 +169,8 @@ lexicalTypeToken = tokenPrim show update_pos get_token where
     get_token _        = Nothing 
 
 -- Identifier (of a variable/function/procedure/etc)
-id_token :: ParsecT [Token] st IO (ReturnObject)
-id_token = tokenPrim show update_pos get_token where
+idToken :: ParsecT [Token] st IO (ReturnObject)
+idToken = tokenPrim show update_pos get_token where
     get_token (Id x p) = Just (RetToken (Id x p))
     get_token _      = Nothing
 
@@ -261,7 +261,7 @@ generalType =
 preDefinedTypedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 preDefinedTypedefType = 
     do
-        retIdToken <- id_token -- RetToken
+        retIdToken <- idToken -- RetToken
         let actualIdToken = getRetToken retIdToken -- Id
         memory <- getState
         let pos = get_pos actualIdToken -- (Int, Int)

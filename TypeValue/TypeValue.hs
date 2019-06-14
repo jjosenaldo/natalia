@@ -22,8 +22,6 @@ data Value =
     ConsNatArray Type [Value]               |
     ConsNatNull deriving (Show, Eq)
 
-
-
 -- TODO: improve this...
 getPosValue :: Value -> (Int, Int)
 getPosValue x = (0,0)
