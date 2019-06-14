@@ -121,8 +121,8 @@ rightParenToken = tokenPrim show update_pos get_token where
     get_token (RParen p) = Just (RetToken (RParen p))
     get_token _       = Nothing
 
-plus_token :: ParsecT [Token] st IO (ReturnObject)
-plus_token = tokenPrim show update_pos get_token where
+plusToken :: ParsecT [Token] st IO (ReturnObject)
+plusToken = tokenPrim show update_pos get_token where
     get_token (Plus p) = Just (RetToken (Plus p))
     get_token _       = Nothing
 
@@ -157,8 +157,8 @@ timesToken = tokenPrim show update_pos get_token where
     get_token (Times p) = Just (RetToken (Times p))
     get_token _       = Nothing
 
-expo_token :: ParsecT [Token] st IO (ReturnObject)
-expo_token = tokenPrim show update_pos get_token where
+expoToken :: ParsecT [Token] st IO (ReturnObject)
+expoToken = tokenPrim show update_pos get_token where
     get_token (Expo p) = Just (RetToken (Expo p))
     get_token _       = Nothing
 
@@ -223,9 +223,9 @@ equalsToken = tokenPrim show update_pos get_token where
     get_token (Equals p) = Just (RetToken (Equals p))
     get_token _            = Nothing
 
-differenceToken :: ParsecT [Token] st IO (ReturnObject)
-differenceToken = tokenPrim show update_pos get_token where
-    get_token (Difference p) = Just (RetToken (Difference p))
+differentToken :: ParsecT [Token] st IO (ReturnObject)
+differentToken = tokenPrim show update_pos get_token where
+    get_token (Different p) = Just (RetToken (Different p))
     get_token _ = Nothing
 
 andToken :: ParsecT [Token] st IO (ReturnObject)

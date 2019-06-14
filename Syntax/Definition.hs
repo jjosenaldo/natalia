@@ -71,6 +71,28 @@ getBinOperatorReturnType (CONSTokenBinOperator (Div p)) NatDouble NatDouble = Na
 getBinOperatorReturnType (CONSTokenBinOperator (Div p)) _ _ = 
     error ("ERROR at " ++ show(p) ++ ": the operator / expects two " ++ (getNameOfType NatDouble))
 
+getBinOperatorReturnType (CONSTokenBinOperator (Minus p)) NatInt NatInt = NatInt
+getBinOperatorReturnType (CONSTokenBinOperator (Minus p)) NatDouble NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Minus p)) NatInt NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Minus p)) NatDouble NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Minus p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator - expects two " ++ (getNameOfType NatInt))
+
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) NatInt NatInt = NatInt
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) NatDouble NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) NatInt NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) NatDouble NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) NatString NatString = NatString
+getBinOperatorReturnType (CONSTokenBinOperator (Plus p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator + expects two " ++ (getNameOfType NatInt) ++ " or " ++ (getNameOfType NatString))
+
+getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatInt NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatDouble NatInt = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatInt NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) NatDouble NatDouble = NatDouble
+getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator ^ expects two " ++ (getNameOfType NatDouble))
+
 getBinOperatorReturnType (CONSTokenBinOperator (Mod p)) NatInt NatInt = 
     error ("ERROR at " ++ show(p) ++ ": the operator % expects two " ++ (getNameOfType NatInt))
 
@@ -79,6 +101,17 @@ getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatInt = NatDo
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatDouble = NatDouble
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) _ = 
     error ("ERROR at " ++ show(p) ++ ": the first arg of the operator * must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatString = NatString
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) _ =
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator + must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble)++" or a " ++ (getNameOfType NatString))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) _ =
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator - must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble))
 
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatInt = NatDouble
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatDouble = NatDouble
