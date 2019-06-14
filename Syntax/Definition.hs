@@ -5,8 +5,8 @@ import Lexical.Lexemes
 import Memory.Memory
 import TypeValue.TypeValue
 
-data FunctionBody = 
-    CONSFunctionBody [Statement]
+data Block = 
+    CONSBlock [Statement]
     deriving (Eq, Show)
 
 data Statement = 

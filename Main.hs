@@ -69,6 +69,6 @@ main = do
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
                     Right ans -> do
-                                    let res = getRetFunctionBody ans -- FunctionBody
+                                    let res = getRetBlock ans -- Block
                                     print(res)
                 }

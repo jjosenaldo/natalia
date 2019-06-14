@@ -15,8 +15,8 @@ import System.IO.Unsafe
 
 data ReturnObject = 
     RetBinOperator BinOperator |
+    RetBlock Block |
     RetExpression Expression |
-    RetFunctionBody FunctionBody |
     RetMemoryCell MemoryCell |
     RetNothing |
     RetStatement Statement | 
@@ -43,9 +43,9 @@ getRetStatement :: ReturnObject -> Statement
 getRetStatement (RetStatement x) = x
 getRetStatement _ = error "Invalid conversion from ReturnObject to Statement"
 
-getRetFunctionBody :: ReturnObject -> FunctionBody
-getRetFunctionBody (RetFunctionBody x) = x
-getRetFunctionBody _ = error "Invalid conversion from ReturnObject to FunctionBody"
+getRetBlock :: ReturnObject -> Block
+getRetBlock (RetBlock x) = x
+getRetBlock _ = error "Invalid conversion from ReturnObject to Block"
 
 getRetUnOperator :: ReturnObject -> UnOperator
 getRetUnOperator (RetUnOperator x) = x

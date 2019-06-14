@@ -16,36 +16,42 @@ import Control.Monad.IO.Class -- liftIO
 subprogramBodyParser :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 subprogramBodyParser = 
     do 
-        retFunctionBody <- functionBodyParser
-        return (retFunctionBody) 
+        retBlock <- _block
+        return (retBlock) 
 
-functionBodyParser :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-functionBodyParser = 
+_block :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+_block = 
     do 
         retLeftBrace <- leftBraceToken
+        liftIO(print("left: " ++ show(get_pos (getRetToken retLeftBrace))))
         retStatementList <- _statementList []
         retRightBrace <- rightBraceToken
+        liftIO(print("right: " ++ show(get_pos (getRetToken retRightBrace))))
 
         let statementList = getRetStatementList retStatementList -- [Statement]
 
-        return (RetFunctionBody (CONSFunctionBody statementList))
+
+        return (RetBlock (CONSBlock statementList))
 
 _statementList :: [Statement] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _statementList stmts = 
     try
     (do 
+        liftIO(print("I'm trying to get a statement"))
         retStatement <- _statement
         let actualStatement = getRetStatement retStatement -- Statement
         retSemicolon <- semiColonToken
 
+        liftIO(print("I've managed to read a statement: " ++ show(actualStatement)))
         retRemainingStatements <- _statementList (  stmts ++ [actualStatement]  )
         return (retRemainingStatements))
     <|>
     (do
+        liftIO(print("I've got no more statements to read"))
         return (RetStatementList stmts))
     
 _statement :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-_statement = try _varInit <|> try _varAssignment <|> _print
+_statement = try _varInit <|> try _varAssignment <|> try _print <|> _block
 
 _varInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _varInit = 
@@ -100,3 +106,16 @@ _print =
         let actualExpr = getRetExpression retExpr -- Expression
         
         return (RetStatement (CONSStatementPrint (CONSPrint actualExpr)))
+
+-- _if :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+-- _if = 
+--     do 
+--         retIf <- ifToken
+--         retLeftParen <- leftParenToken
+--         retExp <- _expression NatBool
+--         retRightParen <- rightParenToken
+        
+
+
+
+--         retElseStatements <- _statementList
