@@ -43,7 +43,11 @@ _expGroup0 expectedType =
     -- <|>
     -- _expParenthesized expectedType
 
-
+-- | A general parser for literals that type-checks things.
+_generalLiteralTokenExpression :: Type -- ^ the expected type
+                               -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
+                               -> Type -- ^ the type of the literal that will be parsed parsed 
+                               -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser with type-checking for the literal
 _generalLiteralTokenExpression expectedType literalToken actualType = 
     do 
         retLiteral <- literalToken
@@ -62,35 +66,6 @@ _doubleTokenExpression expectedType = _generalLiteralTokenExpression expectedTyp
 _stringTokenExpression expectedType = _generalLiteralTokenExpression expectedType stringToken NatString
 _nullTokenExpression expectedType = _generalLiteralTokenExpression expectedType nullToken NatNull
 
-
-
--- _intTokenExpression expectedType = 
---     do 
---         retInt <- intToken
---         let int = getRetValue retInt 
-
---         return (RetExpression (CONSValue int))
-
--- _doubleTokenExpression expectedType = 
---     do 
---         retDouble <- doubleToken
---         let double = getRetValue retDouble 
-
---         return (RetExpression (CONSValue double))
-
--- _nullTokenExpression expectedType = 
---     do 
---         retNull <- nullToken
---         let null = getRetValue retNull
-
---         return (RetExpression (CONSValue null))
-
--- _stringTokenExpression expectedType = 
---     do 
---         retString <- stringToken
---         let string = getRetValue retString 
-
---         return (RetExpression (CONSValue string))
 
 -- _varIdExpression expectedType =
 --     do 
