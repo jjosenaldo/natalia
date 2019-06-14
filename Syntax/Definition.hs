@@ -12,7 +12,8 @@ data Block =
 data Statement = 
     CONSStatementVarInit VarInit |
     CONSStatementVarAssign VarAssign |
-    CONSStatementPrint Print 
+    CONSStatementPrint Print |
+    CONSStatementBlock Block
     deriving (Eq, Show)
 
 data Print = 
@@ -54,6 +55,9 @@ getTypeOfExpression (CONSValue _ x) = x
 getTypeOfExpression (CONSId _ x) = x
 getTypeOfExpression (CONSUnOperation _ _ x) = x
 getTypeOfExpression (CONSBinOperation _ _ _ x) = x
+
+getBlockStatements :: Block -> [Statement]
+getBlockStatements (CONSBlock x) = x
 
 -- TODO: this function should search in the memory for the local variable.
 -- | Returns the type of a local variable.

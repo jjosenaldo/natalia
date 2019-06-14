@@ -23,10 +23,8 @@ _block :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _block = 
     do 
         retLeftBrace <- leftBraceToken
-        liftIO(print("left: " ++ show(get_pos (getRetToken retLeftBrace))))
         retStatementList <- _statementList []
         retRightBrace <- rightBraceToken
-        liftIO(print("right: " ++ show(get_pos (getRetToken retRightBrace))))
 
         let statementList = getRetStatementList retStatementList -- [Statement]
 
@@ -37,21 +35,27 @@ _statementList :: [Statement] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _statementList stmts = 
     try
     (do 
-        liftIO(print("I'm trying to get a statement"))
         retStatement <- _statement
         let actualStatement = getRetStatement retStatement -- Statement
         retSemicolon <- semiColonToken
 
-        liftIO(print("I've managed to read a statement: " ++ show(actualStatement)))
         retRemainingStatements <- _statementList (  stmts ++ [actualStatement]  )
         return (retRemainingStatements))
     <|>
+    try
     (do
-        liftIO(print("I've got no more statements to read"))
+        retBlock <- _block
+        let actualBlock = getRetBlock retBlock -- Block
+        let statementThatEnclosesTheBlock = CONSStatementBlock actualBlock -- Statement
+        retRemainingStatements <- _statementList (  stmts ++ [statementThatEnclosesTheBlock]  )
+        return (retRemainingStatements))
+    <|>
+    (do
+        --liftIO(print("I've got no more statements to read"))
         return (RetStatementList stmts))
     
 _statement :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-_statement = try _varInit <|> try _varAssignment <|> try _print <|> _block
+_statement = try _varInit <|> try _varAssignment <|> _print
 
 _varInit :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 _varInit = 
