@@ -10,12 +10,12 @@ data Variable =
     ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
---                                  id                return                     name
-data Subprogram = ConstructFunction String [Parameter] Type | ConstructProcedure String [Parameter] deriving (Show, Eq)
+--                                  id                  body   return                    name                body
+data Subprogram = ConstructFunction String [Parameter] [Token] Type | ConstructProcedure String [Parameter] [Token] deriving (Show, Eq)
 
 data MemoryCell = 
-    Variable Variable | 
-    Subprogram Subprogram |
+    Variable Variable       | 
+    Subprogram Subprogram   |
     Typedef Typedef deriving (Show, Eq)
 
 -- functions to access important fields

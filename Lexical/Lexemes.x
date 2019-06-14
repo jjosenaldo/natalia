@@ -47,8 +47,9 @@ tokens :-
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  ";"                              { \p s -> SemiColon (getLC p)}
-  ","                              { \p s -> Comma (getLC p)}
+  ";"                               { \p s -> SemiColon (getLC p)}
+  ","                               { \p s -> Comma (getLC p)}
+  ":"                               { \p s -> Colon (getLC p)}
 
   -- LITERALS  ---------------------------------------------
   
@@ -57,7 +58,7 @@ tokens :-
   "True"                            { \p s -> Bool (read s) (getLC p) }
   "False"                           { \p s -> Bool (read s) (getLC p)}
   \" ([.\n]#\")* \"                 { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
-  "Null"                         { \p s -> Null (getLC p)}
+  "Null"                            { \p s -> Null (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -97,6 +98,10 @@ tokens :-
   while                            { \p s -> Loop s (getLC p)}
   for                              { \p s -> Loop s (getLC p)}
 
+  -- SUBPROGRAMS -------------------------------------------
+  "func"                            {\p s -> Func (getLC p)}
+  "proc"                            {\p s -> Proc (getLC p)}
+
   -- NAMES ------------------------------------------------
 
   -- filename
@@ -129,8 +134,9 @@ data Token =
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  SemiColon (Int, Int)       |
-  Comma (Int, Int)           |
+  SemiColon (Int, Int)        |
+  Comma (Int, Int)            |
+  Colon (Int, Int)            |
   
   -- OPERATORS  --------------------------------------------
 
@@ -173,7 +179,11 @@ data Token =
 
   Loop String (Int, Int)     |
 
-  -- NAMES ------------------------------------------------
+  -- SUBPROGRAMS -------------------------------------------
+  Func (Int, Int)
+  Proc (Int, Int)
+
+  -- NAMES -------------------------------------------------
 
   -- identifier
   Id String (Int, Int)       |

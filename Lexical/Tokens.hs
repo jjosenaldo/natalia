@@ -45,6 +45,16 @@ getRetStructValues :: ReturnObject -> [(String, Value)]
 getRetStructValues (RetStructValues x) = x
 getRetStructValues _ = error "Invalid conversion from ReturnObject to RetStructValues"
 
+procToken :: ParsecT [Token] st IO (ReturnObject)
+procToken = tokenPrim show update_pos get_token where
+    get_token (Proc p)  = Just (RetToken (Proc p))
+    get_token _         = Nothing
+
+funcToken :: ParsecT [Token] st IO (ReturnObject)
+funcToken = tokenPrim show update_pos get_token where
+    get_token (Func p)  = Just (RetToken (Func p))
+    get_token _         = Nothing
+
 -- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (ReturnObject)
 mainToken = tokenPrim show update_pos get_token where
@@ -93,15 +103,15 @@ rightBracketToken = tokenPrim show update_pos get_token where
 
 
 -- Left parenthesis
-left_paren_token :: ParsecT [Token] st IO (Token)
-left_paren_token = tokenPrim show update_pos get_token where
-    get_token (LParen p) = Just (LParen p)
+leftParenToken :: ParsecT [Token] st IO (ReturnObject)
+leftParenToken = tokenPrim show update_pos get_token where
+    get_token (LParen p) = Just (RetToken (LParen p))
     get_token _       = Nothing
 
 -- Right parenthesis
-right_paren_token :: ParsecT [Token] st IO (Token)
-right_paren_token = tokenPrim show update_pos get_token where
-    get_token (RParen p) = Just (RParen p)
+rightParenToken :: ParsecT [Token] st IO (ReturnObject)
+rightParenToken = tokenPrim show update_pos get_token where
+    get_token (RParen p) = Just (RetToken (RParen p))
     get_token _       = Nothing
 
 plus_token :: ParsecT [Token] st IO (ReturnObject)
@@ -231,6 +241,11 @@ inToken = tokenPrim show update_pos get_token where
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
 semiColonToken = tokenPrim show update_pos get_token where
     get_token (SemiColon p) = Just (RetToken (SemiColon p))
+    get_token _         = Nothing
+
+colonToken :: ParsecT [Token] st IO (ReturnObject)
+colonToken = tokenPrim show update_pos get_token where
+    get_token (Colon p) = Just (RetToken (Colon p))
     get_token _         = Nothing
 
 negationToken :: ParsecT [Token] st IO (ReturnObject)
