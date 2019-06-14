@@ -223,9 +223,9 @@ evaluateExpression (CONSUnOperation (CONSTokenUnOperator unOp) (exp) _) (cell) =
      cell)
 evaluateExpression (CONSBinOperation (CONSTokenBinOperator binOp) (exp1) (exp2) _) (cell) =
     ((binary_eval
-        (fst (evaluateExpression (exp1) (cell)))     -- recursion (get value of exp1)
+        (fst (evaluateExpression (exp1) (cell)))    -- recursion (get value of exp1)
         (binOp)                                     -- binary operator 
-        (fst (evaluateExpression (exp2) (cell)))), -- recursion (get value of exp2)
+        (fst (evaluateExpression (exp2) (cell)))),  -- recursion (get value of exp2)
       cell)
 
  
