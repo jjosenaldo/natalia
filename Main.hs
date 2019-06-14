@@ -61,7 +61,7 @@ expressionParser =
         return (RetExpression actualExpression)
 
 parser :: [Token] -> IO (Either ParseError (ReturnObject))
-parser tokens = runParserT expressionParser [] "Error message" tokens
+parser tokens = runParserT expressionParser [] "Syntactical error:" tokens
 
 main :: IO ()
 main = do

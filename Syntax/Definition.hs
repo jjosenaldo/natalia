@@ -5,8 +5,8 @@ import Lexical.Lexemes
 import TypeValue.TypeValue
 
 data Expression = 
-    CONSValue Value -- Bool x p
+    CONSValue Value -- literals
     deriving (Eq, Show)
 
 getSyntacticalUnitPos :: Expression -> (Int, Int)
-getSyntacticalUnitPos (CONSValue x) = getPosValue x -- CONSExpression Token
+getSyntacticalUnitPos (CONSValue x) = getPosValue x 

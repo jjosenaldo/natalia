@@ -181,8 +181,8 @@ assignToken = tokenPrim show update_pos get_token where
     get_token _      = Nothing
 
 -- terminal: literal of type int
-int_token :: ParsecT [Token] st IO (ReturnObject)
-int_token = tokenPrim show update_pos get_token where
+intToken :: ParsecT [Token] st IO (ReturnObject)
+intToken = tokenPrim show update_pos get_token where
     get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
 
@@ -197,8 +197,8 @@ stringToken = tokenPrim show update_pos get_token where
     get_token _            = Nothing
 
 -- literal of type double
-double_token :: ParsecT [Token] st IO (ReturnObject)
-double_token = tokenPrim show update_pos get_token where
+doubleToken :: ParsecT [Token] st IO (ReturnObject)
+doubleToken = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 

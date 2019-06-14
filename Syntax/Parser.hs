@@ -3,7 +3,15 @@ module Syntax.Parser where
 -- natalia's modules
 import Syntax.Definition
 import Lexical.Tokens
+import Lexical.Lexemes
 
+-- Haskell's modules
+import Text.Parsec
+-- import Control.Monad.IO.Class
+-- import System.Environment
+-- import System.IO.Unsafe
+
+_expression :: ParsecT [Token] st IO (ReturnObject)
 _expression = _expGroup0 -- TODO: change for expGroup9
 
 _expGroup0 = 
@@ -18,14 +26,14 @@ _expGroup0 =
     -- _expArray
     -- <|>
     _boolTokenExpression
-    -- <|> -- TODO: implement this
-    -- _intTokenExpression
-    -- <|>
-    -- _doubleTokenExpression
-    -- <|>
-    -- _nullTokenExpression
-    -- <|>
-    -- _stringTokenExpression
+    <|> 
+    _intTokenExpression
+    <|>
+    _doubleTokenExpression
+    <|>
+    _nullTokenExpression
+    <|>
+    _stringTokenExpression
     -- <|>
     -- _varIdExpression
     -- <|>
@@ -34,6 +42,35 @@ _expGroup0 =
 _boolTokenExpression = 
     do 
         retBool <- boolToken
-        let bool = getRetValue retBool -- Bool
+        let bool = getRetValue retBool 
 
         return (RetExpression (CONSValue bool))
+
+_intTokenExpression = 
+    do 
+        retInt <- intToken
+        let int = getRetValue retInt 
+
+        return (RetExpression (CONSValue int))
+
+_doubleTokenExpression = 
+    do 
+        retDouble <- doubleToken
+        let double = getRetValue retDouble 
+
+        return (RetExpression (CONSValue double))
+
+_nullTokenExpression = 
+    do 
+        retNull <- nullToken
+        let null = getRetValue retNull
+
+        return (RetExpression (CONSValue null))
+
+_stringTokenExpression = 
+    do 
+        retString <- stringToken
+        let string = getRetValue retString 
+
+        return (RetExpression (CONSValue string))
+
