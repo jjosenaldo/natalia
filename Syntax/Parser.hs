@@ -51,29 +51,12 @@ throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
 throwTypeError pos expectedType actualType =  
     do 
         error ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
-
--- | Builds a parser for literals that type-checks things.
-_generalLiteralTokenExpression :: Type -- ^ the expected type
-                               -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
-                               -> Type -- ^ the type of the literal that will be parsed parsed 
-                               -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser with type-checking for the literal
-_generalLiteralTokenExpression expectedType literalToken actualType = 
-    do 
-        retLiteral <- literalToken
-        let literal = getRetValue retLiteral -- Value
-        
-        if not (checkCompatibleTypes expectedType actualType ) then do 
-            err <- throwTypeError (getPosValue literal) expectedType actualType
-            return (RetNothing)
-        else
-            do 
-                return (RetExpression ((CONSValue literal) actualType))
                 
-_boolTokenExpression expectedType = _generalLiteralTokenExpression expectedType boolToken NatBool
-_intTokenExpression expectedType = _generalLiteralTokenExpression expectedType intToken NatInt
-_doubleTokenExpression expectedType = _generalLiteralTokenExpression expectedType doubleToken NatDouble
-_stringTokenExpression expectedType = _generalLiteralTokenExpression expectedType stringToken NatString
-_nullTokenExpression expectedType = _generalLiteralTokenExpression expectedType nullToken NatNull
+_boolTokenExpression = _generalLiteralTokenExpression NatBool boolToken 
+_intTokenExpression = _generalLiteralTokenExpression NatInt intToken 
+_doubleTokenExpression = _generalLiteralTokenExpression NatDouble doubleToken 
+_stringTokenExpression = _generalLiteralTokenExpression NatString stringToken  
+_nullTokenExpression = _generalLiteralTokenExpression NatNull nullToken 
 
 _localVarExpression :: Type -> ParsecT [Token] st IO (ReturnObject)
 _localVarExpression expectedType = 
@@ -128,42 +111,85 @@ _expGroup1 expectedType =
 _group1OpExpression :: Type -> ParsecT [Token] st IO(ReturnObject)
 _group1OpExpression expectedType = _negationExpression expectedType <|> _unMinusExpression expectedType
 
--- | Build a parser for an unary expression.
-_generalUnExpression :: Type -- ^ the expected type
-                     -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser for an unary operation
-                     -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
-_generalUnExpression expectedType generalUnOperation = 
+_negationExpression = _generalUnExpression _negationTokenOp
+_unMinusExpression = _generalUnExpression _unMinusTokenOp
+
+_negationTokenOp = _generalUnOperatorParser negationToken 
+_unMinusTokenOp = _generalUnOperatorParser minusToken 
+
+
+-- GROUP 2 EXPRESSIONS --------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- PARSER BUILDERS ------------------------------------------------------------------------------------------------------------
+
+-- | Builds a parser for literals that type-checks things.
+_generalLiteralTokenExpression :: Type -- ^ the type of the literal that will be parsed
+                               -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
+                               -> Type -- ^  the expected type
+                               -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser with type-checking for the literal
+_generalLiteralTokenExpression  actualType literalToken  expectedType = 
     do 
-        retOp <- generalUnOperation
+        -- Parses a literal
+        retLiteral <- literalToken
+        let literal = getRetValue retLiteral -- Value
+        
+        -- Checks if the type of the literal read matches with the type of the expected 
+        if not (checkCompatibleTypes expectedType actualType ) then do 
+            err <- throwTypeError (getPosValue literal) expectedType actualType
+            return (RetNothing)
+        else
+            do 
+                return (RetExpression ((CONSValue literal) actualType))
+
+-- | Builds a parser for an unary expression.
+_generalUnExpression :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser for an unary operation
+                     -> Type -- ^ the expected type
+                     -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
+_generalUnExpression generalUnOperator expectedType = 
+    do 
+        -- Parses a unary operator
+        retOp <- generalUnOperator
         let op = getRetUnOperation retOp -- UnOperation
-        retExpr <- _expression expectedType
+        let typeExpectedByTheOperator = getUnOperationExpectedType op -- Type
+
+        -- Parses an expression of the type expected by the operator
+        retExpr <- _expression typeExpectedByTheOperator
         let expr = getRetExpression retExpr -- Expression
         let exprType = getTypeOfExpression expr -- Type
+
+        -- Type of the expression read
         let actualType = getUnOperationReturnType op exprType
 
-        if not (checkCompatibleTypes expectedType actualType) then do
+        -- This is not necessary: the expression already is of the correct type
+        {-if not (checkCompatibleTypes expectedType actualType) then do
             err <- throwTypeError (getSyntacticalUnitPos expr) expectedType actualType
             return (RetNothing)
         else
             do 
-                return (RetExpression ((CONSUnOperation op expr) actualType) )
+                return (RetExpression ((CONSUnOperation op expr) actualType) )-}
+        return (RetExpression ((CONSUnOperation op expr) actualType) )
 
-_negationExpression expectedType = _generalUnExpression expectedType _negationTokenOp
-_unMinusExpression expectedType = _generalUnExpression expectedType _unMinusTokenOp
+-- | Builds a parser for an unary operator.
+_generalUnOperatorParser :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser that parses the token for an unary operation
+                          -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
 
-
-_negationTokenOp = 
+_generalUnOperatorParser unOperatorToken = 
     do 
-        retNeg <- negationToken
-        let tok = getRetToken retNeg -- Token
+        retOp <- unOperatorToken
+        let tok = getRetToken retOp -- Token
         let op = CONSTokenUnOperation tok -- UnOperation
         return (RetUnOperation op)
-
-_unMinusTokenOp = 
-    do 
-        retMinus <- minusToken
-        let tok = getRetToken retMinus -- Token
-        let op = CONSTokenUnOperation tok -- UnOperation
-        return (RetUnOperation op)
-
--- GROUP 2 EXPRESSIONS --------------------------------------------------------------------------------------------------------

@@ -32,6 +32,11 @@ getTypeOfLocalVar :: String -- ^ the name of the local variable
                   -> Type -- ^ the type of the local variable
 getTypeOfLocalVar idName = NatInt
 
+
+getUnOperationExpectedType :: UnOperation -> Type 
+getUnOperationExpectedType (CONSTokenUnOperation (Negation p)) = NatBool 
+getUnOperationExpectedType (CONSTokenUnOperation (Minus p)) = NatDouble 
+
 getUnOperationReturnType :: UnOperation -> Type -> Type
 getUnOperationReturnType (CONSTokenUnOperation (Negation p)) NatBool = 
     NatBool
@@ -43,5 +48,5 @@ getUnOperationReturnType (CONSTokenUnOperation (Minus p)) NatDouble =
 getUnOperationReturnType (CONSTokenUnOperation (Minus p)) NatInt = 
     NatInt
 getUnOperationReturnType (CONSTokenUnOperation (Minus p)) other = 
-    error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a " ++  (getNameOfType NatDouble) ++ "or a " ++ (getNameOfType NatInt) ++ " but you passed a " ++ (getNameOfType other))
+    error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a " ++  (getNameOfType NatDouble) ++ " or a " ++ (getNameOfType NatInt) ++ " but you passed a " ++ (getNameOfType other))
 

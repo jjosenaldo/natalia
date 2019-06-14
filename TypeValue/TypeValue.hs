@@ -32,6 +32,7 @@ getNameOfType (NatSet t) =  "{" ++ (getNameOfType t) ++ "}"
 getNameOfType (NatStruct t) = t
 getNameOfType (NatArray t) = "[" ++ (getNameOfType t) ++ "]"
 getNameOfType NatNull = "Null"
+getNameOfType NatGenType = "NatGenType"
 
 
 -- TODO: improve this...
