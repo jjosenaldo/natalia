@@ -14,9 +14,9 @@ group1OpToken = negationToken <|> minusToken
 group2OpToken = times_token <|> div_token <|> mod_token
 group3OpToken = plusToken <|> minusToken
 group4OpToken = expoToken 
-group5OpToken = less_than_token    <|> 
+group5OpToken = lessThanToken    <|> 
                 greater_than_token <|> 
-                less_equals_token  <|>
+                lessEqualsToken  <|>
                 greater_equals_token <|>
                 equalsToken <|>
                 differentToken <|>

@@ -127,8 +127,8 @@ plusToken = tokenPrim show update_pos get_token where
     get_token _       = Nothing
 
 
-less_than_token :: ParsecT [Token] st IO (ReturnObject)
-less_than_token = tokenPrim show update_pos get_token where
+lessThanToken :: ParsecT [Token] st IO (ReturnObject)
+lessThanToken = tokenPrim show update_pos get_token where
     get_token (LessThan p)  = Just (RetToken (LessThan p))
     get_token _             = Nothing
 
@@ -137,8 +137,8 @@ greater_than_token = tokenPrim show update_pos get_token where
     get_token (GreaterThan p)  = Just (RetToken (GreaterThan p))
     get_token _             = Nothing
 
-less_equals_token :: ParsecT [Token] st IO (ReturnObject)
-less_equals_token = tokenPrim show update_pos get_token where
+lessEqualsToken :: ParsecT [Token] st IO (ReturnObject)
+lessEqualsToken = tokenPrim show update_pos get_token where
     get_token (LessEquals p)  = Just (RetToken (LessEquals p))
     get_token _ = Nothing
 

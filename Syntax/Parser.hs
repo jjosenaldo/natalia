@@ -265,9 +265,9 @@ _evalRemainingGroup5 leftExpr =
 
 _group5OpToken = _ltTokenOp <|> _gtTokenOp <|> _lteTokenOp <|> _gteTokenOp 
 
-_ltTokenOp = _generalBinOperatorParser less_than_token
+_ltTokenOp = _generalBinOperatorParser lessThanToken
 _gtTokenOp = _generalBinOperatorParser greater_than_token
-_lteTokenOp = _generalBinOperatorParser less_equals_token 
+_lteTokenOp = _generalBinOperatorParser lessEqualsToken 
 _gteTokenOp = _generalBinOperatorParser greater_equals_token
 
 -- GROUP 6 EXPRESSIONS --------------------------------------------------------------------------------------------------------
