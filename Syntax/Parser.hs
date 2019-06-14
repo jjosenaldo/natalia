@@ -38,8 +38,8 @@ _expGroup0 expectedType =
     _nullTokenExpression expectedType
     <|>
     _stringTokenExpression expectedType
-    -- <|>
-    -- _varIdExpression expectedType
+    <|>
+    _localVarExpression expectedType
     <|>
     _expParenthesized expectedType
 
@@ -75,12 +75,21 @@ _doubleTokenExpression expectedType = _generalLiteralTokenExpression expectedTyp
 _stringTokenExpression expectedType = _generalLiteralTokenExpression expectedType stringToken NatString
 _nullTokenExpression expectedType = _generalLiteralTokenExpression expectedType nullToken NatNull
 
+_localVarExpression :: Type -> ParsecT [Token] st IO (ReturnObject)
+_localVarExpression expectedType = 
+    do 
+        retId <- idToken
+        let idAsToken = getRetToken retId -- Token, with constructor Id x p
+        let idName = get_id_name idAsToken -- String
+        let actualType = getTypeOfLocalVar idName -- Type 
+        let pos = get_pos idAsToken
 
--- _varIdExpression expectedType =
---     do 
---         retId <- idToken
---         let id = CONSTokenId (getRetToken retId) -- Id
---         return (RetExpression (CONSId id))
+        if not (checkCompatibleTypes expectedType actualType ) then do 
+            err <- throwTypeError pos expectedType actualType
+            return (RetNothing)
+        else
+            do 
+                return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))
     
 _expParenthesized :: Type -> ParsecT [Token] st IO (ReturnObject)
 _expParenthesized expectedType = 
