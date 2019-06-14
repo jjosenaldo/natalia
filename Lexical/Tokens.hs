@@ -21,7 +21,13 @@ data ReturnObject =
     RetMemoryCell MemoryCell |
     RetStructStructure [(Type, String)] |
     RetExpression Expression |
+    RetUnOperation UnOperation |
     RetStructValues [(String, Value)] deriving (Eq, Show)
+
+
+getRetUnOperation :: ReturnObject -> UnOperation
+getRetUnOperation (RetUnOperation x) = x
+getRetUnOperation _ = error "Invalid conversion from ReturnObject to RetUnOperation"
 
 getRetExpression :: ReturnObject -> Expression
 getRetExpression (RetExpression x) = x
@@ -136,8 +142,8 @@ greater_equals_token = tokenPrim show update_pos get_token where
     get_token (GreaterEquals p)  = Just (RetToken (GreaterEquals p))
     get_token _ = Nothing   
 
-minus_token :: ParsecT [Token] st IO (ReturnObject)
-minus_token = tokenPrim show update_pos get_token where
+minusToken :: ParsecT [Token] st IO (ReturnObject)
+minusToken = tokenPrim show update_pos get_token where
     get_token (Minus p) = Just (RetToken (Minus p))
     get_token _       = Nothing
 

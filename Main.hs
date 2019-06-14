@@ -45,6 +45,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Syntax.Definition
 import Syntax.Parser
+import TypeValue.TypeValue
 
 -- Haskell's modules
 import Control.Monad.IO.Class
@@ -55,7 +56,7 @@ import Text.Parsec
 expressionParser :: ParsecT [Token] st IO (ReturnObject)
 expressionParser = 
     do
-        retExpression <- _expression
+        retExpression <- _expression NatDouble
         let actualExpression = getRetExpression retExpression
         eof
         return (RetExpression actualExpression)
