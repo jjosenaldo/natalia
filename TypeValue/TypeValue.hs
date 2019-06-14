@@ -24,6 +24,10 @@ data Value =
 
 
 
+-- TODO: improve this...
+getPosValue :: Value -> (Int, Int)
+getPosValue x = (0,0)
+
 getIntFromNatInt (ConsNatInt x) = x
 getIntFromNatInt v = error ("Trying to fetch Int from " ++ (show (getTypeFromValue v)))
 

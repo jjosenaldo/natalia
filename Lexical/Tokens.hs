@@ -2,12 +2,13 @@ module Lexical.Tokens where
 
 -- natalia's modules
 import Lexical.Lexemes
+import Syntax.Definition
 import Memory.Memory
 import TypeValue.TypeValue
 import Types.Typedef
 import Types.Types
 
--- External modules
+-- Haskell modules
 import Text.Parsec
 import Control.Monad.IO.Class
 import System.IO.Unsafe
@@ -19,7 +20,12 @@ data ReturnObject =
     RetNothing |
     RetMemoryCell MemoryCell |
     RetStructStructure [(Type, String)] |
+    RetExpression Expression |
     RetStructValues [(String, Value)] deriving (Eq, Show)
+
+getRetExpression :: ReturnObject -> Expression
+getRetExpression (RetExpression x) = x
+getRetExpression _ = error "Invalid conversion from ReturnObject to RetExpression"
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
@@ -196,10 +202,10 @@ double_token = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
-bool_token :: ParsecT [Token] st IO (ReturnObject)
-bool_token = tokenPrim show update_pos get_token where
+boolToken :: ParsecT [Token] st IO (ReturnObject)
+boolToken = tokenPrim show update_pos get_token where
     get_token (Bool x p) = Just (RetValue (ConsNatBool x))
-    get_token _ = Nothing   
+    get_token _ = Nothing     
 
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show update_pos get_token where
