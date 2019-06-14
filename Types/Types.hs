@@ -6,7 +6,8 @@ import TypeValue.TypeValue
 checkCompatibleTypes :: Type 
                      -> Type
                      -> Bool
-checkCompatibleTypes _ NatGenType = True
+checkCompatibleTypes _ NatGenType = True -- this doesn't make sense. I hope it will be removed in the future
+checkCompatibleTypes NatGenType _  = True
 checkCompatibleTypes NatInt NatInt = True
 checkCompatibleTypes NatDouble NatInt = True
 checkCompatibleTypes NatDouble NatDouble = True

@@ -45,6 +45,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Syntax.Definition
 import Syntax.Parser
+import TypeValue.TypeValue
 
 -- Haskell's modules
 import Control.Monad.IO.Class
@@ -55,13 +56,13 @@ import Text.Parsec
 expressionParser :: ParsecT [Token] st IO (ReturnObject)
 expressionParser = 
     do
-        retExpression <- _expression
+        retExpression <- _expression NatInt
         let actualExpression = getRetExpression retExpression
         eof
         return (RetExpression actualExpression)
 
 parser :: [Token] -> IO (Either ParseError (ReturnObject))
-parser tokens = runParserT expressionParser [] "Error message" tokens
+parser tokens = runParserT expressionParser [] "Syntactical error:" tokens
 
 main :: IO ()
 main = do

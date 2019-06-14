@@ -21,7 +21,18 @@ data ReturnObject =
     RetMemoryCell MemoryCell |
     RetStructStructure [(Type, String)] |
     RetExpression Expression |
+    RetUnOperator UnOperator |
+    RetBinOperator BinOperator |
     RetStructValues [(String, Value)] deriving (Eq, Show)
+
+
+getRetUnOperator :: ReturnObject -> UnOperator
+getRetUnOperator (RetUnOperator x) = x
+getRetUnOperator _ = error "Invalid conversion from ReturnObject to RetUnOperator"
+
+getRetBinOperator :: ReturnObject -> BinOperator
+getRetBinOperator (RetBinOperator x) = x
+getRetBinOperator _ = error "Invalid conversion from ReturnObject to RetBinOperator"
 
 getRetExpression :: ReturnObject -> Expression
 getRetExpression (RetExpression x) = x
@@ -99,15 +110,15 @@ rightBracketToken = tokenPrim show update_pos get_token where
 
 
 -- Left parenthesis
-left_paren_token :: ParsecT [Token] st IO (Token)
-left_paren_token = tokenPrim show update_pos get_token where
-    get_token (LParen p) = Just (LParen p)
+leftParenToken :: ParsecT [Token] st IO (ReturnObject)
+leftParenToken = tokenPrim show update_pos get_token where
+    get_token (LParen p) = Just (RetToken (LParen p))
     get_token _       = Nothing
 
 -- Right parenthesis
-right_paren_token :: ParsecT [Token] st IO (Token)
-right_paren_token = tokenPrim show update_pos get_token where
-    get_token (RParen p) = Just (RParen p)
+rightParenToken :: ParsecT [Token] st IO (ReturnObject)
+rightParenToken = tokenPrim show update_pos get_token where
+    get_token (RParen p) = Just (RetToken (RParen p))
     get_token _       = Nothing
 
 plus_token :: ParsecT [Token] st IO (ReturnObject)
@@ -136,13 +147,13 @@ greater_equals_token = tokenPrim show update_pos get_token where
     get_token (GreaterEquals p)  = Just (RetToken (GreaterEquals p))
     get_token _ = Nothing   
 
-minus_token :: ParsecT [Token] st IO (ReturnObject)
-minus_token = tokenPrim show update_pos get_token where
+minusToken :: ParsecT [Token] st IO (ReturnObject)
+minusToken = tokenPrim show update_pos get_token where
     get_token (Minus p) = Just (RetToken (Minus p))
     get_token _       = Nothing
 
-times_token :: ParsecT [Token] st IO (ReturnObject)
-times_token = tokenPrim show update_pos get_token where
+timesToken :: ParsecT [Token] st IO (ReturnObject)
+timesToken = tokenPrim show update_pos get_token where
     get_token (Times p) = Just (RetToken (Times p))
     get_token _       = Nothing
 
@@ -151,13 +162,13 @@ expo_token = tokenPrim show update_pos get_token where
     get_token (Expo p) = Just (RetToken (Expo p))
     get_token _       = Nothing
 
-div_token :: ParsecT [Token] st IO (ReturnObject)
-div_token = tokenPrim show update_pos get_token where
+divToken :: ParsecT [Token] st IO (ReturnObject)
+divToken = tokenPrim show update_pos get_token where
     get_token (Div p) = Just (RetToken (Div p))
     get_token _       = Nothing
 
-mod_token :: ParsecT [Token] st IO (ReturnObject)
-mod_token = tokenPrim show update_pos get_token where
+modToken :: ParsecT [Token] st IO (ReturnObject)
+modToken = tokenPrim show update_pos get_token where
     get_token (Mod p) = Just (RetToken (Mod p))
     get_token _       = Nothing
 
@@ -169,8 +180,8 @@ lexicalTypeToken = tokenPrim show update_pos get_token where
     get_token _        = Nothing 
 
 -- Identifier (of a variable/function/procedure/etc)
-id_token :: ParsecT [Token] st IO (ReturnObject)
-id_token = tokenPrim show update_pos get_token where
+idToken :: ParsecT [Token] st IO (ReturnObject)
+idToken = tokenPrim show update_pos get_token where
     get_token (Id x p) = Just (RetToken (Id x p))
     get_token _      = Nothing
 
@@ -181,8 +192,8 @@ assignToken = tokenPrim show update_pos get_token where
     get_token _      = Nothing
 
 -- terminal: literal of type int
-int_token :: ParsecT [Token] st IO (ReturnObject)
-int_token = tokenPrim show update_pos get_token where
+intToken :: ParsecT [Token] st IO (ReturnObject)
+intToken = tokenPrim show update_pos get_token where
     get_token (Int x _) = Just (RetValue (ConsNatInt x))
     get_token _       = Nothing
 
@@ -197,8 +208,8 @@ stringToken = tokenPrim show update_pos get_token where
     get_token _            = Nothing
 
 -- literal of type double
-double_token :: ParsecT [Token] st IO (ReturnObject)
-double_token = tokenPrim show update_pos get_token where
+doubleToken :: ParsecT [Token] st IO (ReturnObject)
+doubleToken = tokenPrim show update_pos get_token where
     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
     get_token _       = Nothing
 
@@ -261,7 +272,7 @@ generalType =
 preDefinedTypedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 preDefinedTypedefType = 
     do
-        retIdToken <- id_token -- RetToken
+        retIdToken <- idToken -- RetToken
         let actualIdToken = getRetToken retIdToken -- Id
         memory <- getState
         let pos = get_pos actualIdToken -- (Int, Int)
