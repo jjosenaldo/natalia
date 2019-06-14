@@ -52,7 +52,7 @@ throwTypeError pos expectedType actualType =
     do 
         error ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
 
--- | A general parser for literals that type-checks things.
+-- | Builds a parser for literals that type-checks things.
 _generalLiteralTokenExpression :: Type -- ^ the expected type
                                -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
                                -> Type -- ^ the type of the literal that will be parsed parsed 
@@ -114,7 +114,7 @@ _expParenthesized expectedType =
 -- GROUP 1 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 -- This group contains only operations !, unary -, reference access (&) and value access (*)         
--- TODO: reference access, value access
+-- TODO: operators of reference access (&), value access (*)
 _expGroup1 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup1 expectedType = 
     try
@@ -126,23 +126,31 @@ _expGroup1 expectedType =
     _expGroup0 expectedType
 
 _group1OpExpression :: Type -> ParsecT [Token] st IO(ReturnObject)
-_group1OpExpression expectedType = _negationExpression expectedType -- <|> _minusExpression expectedType
+_group1OpExpression expectedType = _negationExpression expectedType <|> _unMinusExpression expectedType
 
-_negationExpression :: Type -> ParsecT [Token] st IO(ReturnObject)
-_negationExpression expectedType = 
+-- | Build a parser for an unary expression.
+_generalUnExpression :: Type -- ^ the expected type
+                     -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser for an unary operation
+                     -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
+_generalUnExpression expectedType generalUnOperation = 
     do 
-        retNeg <- _negationTokenOp
-        let neg = getRetUnOperation retNeg -- UnOperation
+        retOp <- generalUnOperation
+        let op = getRetUnOperation retOp -- UnOperation
         retExpr <- _expression expectedType
         let expr = getRetExpression retExpr -- Expression
         let exprType = getTypeOfExpression expr -- Type
-        let actualType = getUnOperationReturnType neg exprType
+        let actualType = getUnOperationReturnType op exprType
 
-        if not (checkCompatibleTypes expectedType actualType) then
-            error ("ERROR at " ++ show(getSyntacticalUnitPos expr) ++ ": you're trying to pass a " ++ show(actualType) ++ " when a " ++ show(expectedType) ++ " is expected!")
+        if not (checkCompatibleTypes expectedType actualType) then do
+            err <- throwTypeError (getSyntacticalUnitPos expr) expectedType actualType
+            return (RetNothing)
         else
             do 
-                return (RetExpression ((CONSUnOperation neg expr) actualType) )
+                return (RetExpression ((CONSUnOperation op expr) actualType) )
+
+_negationExpression expectedType = _generalUnExpression expectedType _negationTokenOp
+_unMinusExpression expectedType = _generalUnExpression expectedType _unMinusTokenOp
+
 
 _negationTokenOp = 
     do 
@@ -151,11 +159,11 @@ _negationTokenOp =
         let op = CONSTokenUnOperation tok -- UnOperation
         return (RetUnOperation op)
 
--- _minusTokenOp = 
---     do 
---         retMinus <- minusToken
---         let tok = getRetToken retMinus -- Token
---         let op = CONSTokenUnOperation tok -- UnOperation
---         return (RetUnOperation op)
+_unMinusTokenOp = 
+    do 
+        retMinus <- minusToken
+        let tok = getRetToken retMinus -- Token
+        let op = CONSTokenUnOperation tok -- UnOperation
+        return (RetUnOperation op)
 
 -- GROUP 2 EXPRESSIONS --------------------------------------------------------------------------------------------------------

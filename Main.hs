@@ -56,7 +56,7 @@ import Text.Parsec
 expressionParser :: ParsecT [Token] st IO (ReturnObject)
 expressionParser = 
     do
-        retExpression <- _expression NatString
+        retExpression <- _expression NatInt
         let actualExpression = getRetExpression retExpression
         eof
         return (RetExpression actualExpression)
