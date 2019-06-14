@@ -185,3 +185,47 @@ unary_eval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operato
 
 unary_eval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
 unary_eval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
+
+data UnOperator = 
+    CONSTokenUnOperator Token
+    deriving (Eq, Show)
+
+data BinOperator =
+    CONSTokenBinOperator Token 
+    deriving (Eq, Show)
+
+data Id = 
+    CONSTokenId Token -- Id
+    deriving (Eq, Show)
+
+data Expression = 
+    CONSValue Value Type | -- literals
+    CONSId Id Type |
+    CONSUnOperation UnOperator Expression Type |
+    CONSBinOperation BinOperator Expression Expression Type 
+    deriving (Eq, Show)
+
+
+evaluateExpression :: Expression -> [MemoryCell] -> (Value, [MemoryCell])
+evaluateExpression (CONSValue x _) (cell) =  (x, cell) 
+evaluateExpression (CONSId (CONSTokenId id) _) (cell) = 
+    (getValue   -- get the value
+        (memory_get           -- get the memory cell  
+            (get_id_name id)  -- attribute of memory_get - get the name of token (String) 
+            (get_pos id)      -- attribute of memory_get - get the position of token (int, int)
+             cell )           -- attribute of memory_get - the memory cell
+        (get_pos id),   -- attribute of getValue - the position cell of token
+    cell) 
+evaluateExpression (CONSUnOperation (CONSTokenUnOperator unOp) (exp) _) (cell) = 
+    ((unary_eval 
+        (unOp)
+        (fst (evaluateExpression (exp) (cell)))), -- recursion ( get the value)
+     cell)
+evaluateExpression (CONSBinOperation (CONSTokenBinOperator binOp) (exp1) (exp2) _) (cell) =
+    ((binary_eval
+        (fst (evaluateExpression (exp1) (cell)))     -- recursion (get value of exp1)
+        (binOp)                                     -- binary operator 
+        (fst (evaluateExpression (exp2) (cell)))), -- recursion (get value of exp2)
+      cell)
+
+ 
