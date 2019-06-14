@@ -105,15 +105,15 @@ rightBracketToken = tokenPrim show update_pos get_token where
 
 
 -- Left parenthesis
-leftParenToken :: ParsecT [Token] st IO (Token)
+leftParenToken :: ParsecT [Token] st IO (ReturnObject)
 leftParenToken = tokenPrim show update_pos get_token where
-    get_token (LParen p) = Just (LParen p)
+    get_token (LParen p) = Just (RetToken (LParen p))
     get_token _       = Nothing
 
 -- Right parenthesis
-rightParenToken :: ParsecT [Token] st IO (Token)
+rightParenToken :: ParsecT [Token] st IO (ReturnObject)
 rightParenToken = tokenPrim show update_pos get_token where
-    get_token (RParen p) = Just (RParen p)
+    get_token (RParen p) = Just (RetToken (RParen p))
     get_token _       = Nothing
 
 plus_token :: ParsecT [Token] st IO (ReturnObject)

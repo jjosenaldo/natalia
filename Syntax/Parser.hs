@@ -40,8 +40,17 @@ _expGroup0 expectedType =
     _stringTokenExpression expectedType
     -- <|>
     -- _varIdExpression expectedType
-    -- <|>
-    -- _expParenthesized expectedType
+    <|>
+    _expParenthesized expectedType
+
+-- | Throws a type error.
+throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
+               -> Type -- ^ the expected type
+               -> Type -- ^ the actual type
+               -> ParsecT [Token] st IO (ReturnObject) -- ^ the error thrown
+throwTypeError pos expectedType actualType =  
+    do 
+        error ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
 
 -- | A general parser for literals that type-checks things.
 _generalLiteralTokenExpression :: Type -- ^ the expected type
@@ -53,9 +62,9 @@ _generalLiteralTokenExpression expectedType literalToken actualType =
         retLiteral <- literalToken
         let literal = getRetValue retLiteral -- Value
         
-        if not (checkCompatibleTypes expectedType actualType ) then 
-            error ("ERROR at " ++ show(getPosValue literal) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
-
+        if not (checkCompatibleTypes expectedType actualType ) then do 
+            err <- throwTypeError (getPosValue literal) expectedType actualType
+            return (RetNothing)
         else
             do 
                 return (RetExpression ((CONSValue literal) actualType))
@@ -73,13 +82,25 @@ _nullTokenExpression expectedType = _generalLiteralTokenExpression expectedType 
 --         let id = CONSTokenId (getRetToken retId) -- Id
 --         return (RetExpression (CONSId id))
     
--- _expParenthesized expectedType = 
---     do 
---         retLParen <- leftParenToken
---         retExpression <- _expression
---         retRParen <- rightParenToken
+_expParenthesized :: Type -> ParsecT [Token] st IO (ReturnObject)
+_expParenthesized expectedType = 
+    do 
+        retLParen <- leftParenToken
+        retExpression <- _expression expectedType
+        retRParen <- rightParenToken
 
---         return (RetExpression (getRetExpression retExpression))
+        let exp = getRetExpression retExpression -- Expression
+        let actualType = getTypeOfExpression exp -- Type
+        let lparenToken = getRetToken retLParen -- Token
+        let pos = get_pos lparenToken -- (Int, Int)
+        
+
+        if not (checkCompatibleTypes expectedType actualType ) then do 
+            err <- throwTypeError pos expectedType actualType
+            return (RetNothing)
+        else
+            do 
+                return (RetExpression exp)
 
 -- GROUP 1 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
