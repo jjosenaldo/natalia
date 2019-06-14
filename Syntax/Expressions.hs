@@ -1,4 +1,4 @@
-module Syntax.Parser where
+module Syntax.Expressions where
 
 -- natalia's modules
 import Syntax.Definition
@@ -10,6 +10,15 @@ import TypeValue.TypeValue
 -- Haskell's modules
 import Text.Parsec
 import Control.Monad.IO.Class -- liftIO
+
+expressionParser :: ParsecT [Token] st IO (ReturnObject)
+expressionParser = 
+    do
+        retExpression <- _expression NatInt
+        let actualExpression = getRetExpression retExpression
+        eof
+        return (RetExpression actualExpression)
+
 
 _expression :: Type -> ParsecT [Token] st IO (ReturnObject)
 _expression = _expGroup9 -- TODO: eventually this should be changed to expGroup9

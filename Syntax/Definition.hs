@@ -2,7 +2,25 @@ module Syntax.Definition where
 
 -- natalia's modules
 import Lexical.Lexemes
+import Memory.Memory
 import TypeValue.TypeValue
+
+data FunctionBody = 
+    CONSFunctionBody [Statement]
+    deriving (Eq, Show)
+
+data Statement = 
+    CONSStatementVarInit VarInit |
+    CONSStatementVarAssign VarAssign 
+    deriving (Eq, Show)
+
+data VarInit = 
+    CONSVarInit Type Id Expression
+    deriving (Eq, Show)
+
+data VarAssign = 
+    CONSVarAssign Id Expression
+    deriving (Eq, Show)
 
 data UnOperator = 
     CONSTokenUnOperator Token

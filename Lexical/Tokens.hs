@@ -14,17 +14,38 @@ import Control.Monad.IO.Class
 import System.IO.Unsafe
 
 data ReturnObject = 
-    RetToken Token | 
-    RetValue Value | 
-    RetType Type | 
-    RetNothing |
-    RetMemoryCell MemoryCell |
-    RetStructStructure [(Type, String)] |
-    RetExpression Expression |
-    RetUnOperator UnOperator |
     RetBinOperator BinOperator |
-    RetStructValues [(String, Value)] deriving (Eq, Show)
+    RetExpression Expression |
+    RetFunctionBody FunctionBody |
+    RetMemoryCell MemoryCell |
+    RetNothing |
+    RetStatement Statement | 
+    RetStatementList [Statement] | 
+    RetStructStructure [(Type, String)] |
+    RetStructValues [(String, Value)] |
+    RetToken Token | 
+    RetType Type | 
+    RetValue Value | 
+    RetVarInit VarInit |
+    RetUnOperator UnOperator 
+    deriving (Eq, Show)
 
+
+getRetStatementList :: ReturnObject -> [Statement]
+getRetStatementList (RetStatementList x) = x
+getRetStatementList _ = error "Invalid conversion from ReturnObject to StatementList"
+
+getRetVarInit :: ReturnObject -> VarInit
+getRetVarInit (RetVarInit x) = x
+getRetVarInit _ = error "Invalid conversion from ReturnObject to VarInit"
+
+getRetStatement :: ReturnObject -> Statement
+getRetStatement (RetStatement x) = x
+getRetStatement _ = error "Invalid conversion from ReturnObject to Statement"
+
+getRetFunctionBody :: ReturnObject -> FunctionBody
+getRetFunctionBody (RetFunctionBody x) = x
+getRetFunctionBody _ = error "Invalid conversion from ReturnObject to FunctionBody"
 
 getRetUnOperator :: ReturnObject -> UnOperator
 getRetUnOperator (RetUnOperator x) = x

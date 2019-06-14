@@ -1,5 +1,7 @@
 module Main (main) where
 
+-------------------------------------------------  SEMANTICS  ---------------------------------------------------------
+
 -- -- natalia's modules
 -- import Blocks.Blocks
 -- import Lexical.Lexemes
@@ -39,12 +41,12 @@ module Main (main) where
 --                     Right ans -> return ()
 --                 }
 
-
+-------------------------------------------------  SYNTACTICS  ---------------------------------------------------------
 -- natalia's modules
 import Lexical.Lexemes
 import Lexical.Tokens
 import Syntax.Definition
-import Syntax.Parser
+import Syntax.SubprogramBody
 import TypeValue.TypeValue
 
 -- Haskell's modules
@@ -53,16 +55,9 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
-expressionParser :: ParsecT [Token] st IO (ReturnObject)
-expressionParser = 
-    do
-        retExpression <- _expression NatInt
-        let actualExpression = getRetExpression retExpression
-        eof
-        return (RetExpression actualExpression)
 
 parser :: [Token] -> IO (Either ParseError (ReturnObject))
-parser tokens = runParserT expressionParser [] "Syntactical error:" tokens
+parser tokens = runParserT subprogramBodyParser [] "Syntactical error:" tokens
 
 main :: IO ()
 main = do
@@ -74,6 +69,6 @@ main = do
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
                     Right ans -> do
-                                    let res = getRetExpression ans
+                                    let res = getRetFunctionBody ans -- FunctionBody
                                     print(res)
                 }
