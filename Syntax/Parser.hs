@@ -10,11 +10,9 @@ import TypeValue.TypeValue
 -- Haskell's modules
 import Text.Parsec
 import Control.Monad.IO.Class -- liftIO
--- import System.Environment
--- import System.IO.Unsafe
 
 _expression :: Type -> ParsecT [Token] st IO (ReturnObject)
-_expression = _expGroup2 -- TODO: eventually this should be changed to expGroup9
+_expression = _expGroup9 -- TODO: eventually this should be changed to expGroup9
 
 -- GROUP 0 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
@@ -127,7 +125,6 @@ _expGroup2 expectedType =
         retLeftExpr <- _expGroup1 expectedType
         let leftExpr = getRetExpression retLeftExpr -- Expression
 
-
         retExprResult <- _evalRemainingGroup2 leftExpr
         let exprResult = getRetExpression retExprResult -- Expression (left)
 
@@ -166,13 +163,38 @@ _timesTokenOp = _generalBinOperatorParser timesToken
 _divTokenOp = _generalBinOperatorParser divToken 
 _modTokenOp = _generalBinOperatorParser modToken 
 
+-- GROUP 9 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
+_expGroup9 :: Type -> ParsecT [Token] st IO(ReturnObject)
+_expGroup9 expectedType = _expLocalVarAssignment expectedType <|> _expGroup2 expectedType -- TODO: this should contain _expGroup8 
 
+_expLocalVarAssignment expectedType = 
+    do 
+        retId <- idToken
+        
+        let idName = get_id_name (getRetToken retId) -- String (variable name)
+        let localVariableType = getTypeOfLocalVar idName -- Type 
+        let pos = get_pos (getRetToken retId)
 
+        -- Checks the type of the local variable being assigned
+        if not (checkCompatibleTypes expectedType localVariableType ) then do 
+            err <- throwTypeError pos expectedType localVariableType
+            return (RetNothing)
+        else
+            do 
+                retAssign <- assignToken
 
+                -- Gets the expression -- which is already of a correct type -- whose value will be assigned to the variable
+                retExpr <- _expression localVariableType
+                let expr = getRetExpression retExpr -- Expression
+                
+                {- TODO: the assignment should update the subprogram's internal memory! -} 
+                {- Or... should it? This is just a syntactical description, after all -}
 
+                return (RetExpression expr)
+                
 
-
+-- return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))
 
 -- PARSER BUILDERS ------------------------------------------------------------------------------------------------------------
 
@@ -203,7 +225,7 @@ _generalUnExpression generalUnOperator expectedType =
     do 
         -- Parses a unary operator
         retOp <- generalUnOperator
-        let op = getRetUnOperator retOp -- UnOperation
+        let op = getRetUnOperator retOp -- UnOperator
         let typeExpectedByTheOperator = getUnOperatorExpectedType op -- Type
 
         -- Parses an expression of the type expected by the operator
