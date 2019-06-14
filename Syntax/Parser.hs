@@ -232,10 +232,12 @@ _expoTokenOp = _generalBinOperatorParser expoToken
 
 _expGroup5 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup5 expectedType =
-    do
+    (do
         retLeftExpr <- _expGroup4 expectedType
         retExprResult <- _evalRemainingGroup5 (getRetExpression retLeftExpr)
-        return (retExprResult)
+        return (retExprResult))
+    <|>
+    _expGroup4 expectedType
 
 _evalRemainingGroup5 :: Expression -> ParsecT [Token] st IO(ReturnObject)
 _evalRemainingGroup5 leftExpr =
