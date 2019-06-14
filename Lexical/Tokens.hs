@@ -107,6 +107,21 @@ globalsToken = tokenPrim show update_pos get_token where
     get_token (Globals p) = Just (RetToken (Globals p))
     get_token _       = Nothing
 
+ifToken :: ParsecT [Token] st IO (ReturnObject)
+ifToken = tokenPrim show update_pos get_token where
+    get_token (If p) = Just (RetToken (If p))
+    get_token _      = Nothing
+
+whileToken :: ParsecT [Token] st IO (ReturnObject)
+whileToken = tokenPrim show update_pos get_token where
+    get_token (While p) = Just (RetToken (While p))
+    get_token _      = Nothing
+
+elseToken :: ParsecT [Token] st IO (ReturnObject)
+elseToken = tokenPrim show update_pos get_token where
+    get_token (Else p) = Just (RetToken (Else p))
+    get_token _      = Nothing
+
 printToken :: ParsecT [Token] st IO (ReturnObject)
 printToken = tokenPrim show update_pos get_token where
     get_token (Print p) = Just (RetToken (Print p))

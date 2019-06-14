@@ -10,10 +10,13 @@ data Block =
     deriving (Eq, Show)
 
 data Statement = 
-    CONSStatementVarInit VarInit |
-    CONSStatementVarAssign VarAssign |
-    CONSStatementPrint Print |
-    CONSStatementBlock Block
+    CONSStatementVarInit VarInit                            |
+    CONSStatementVarAssign VarAssign                        |
+    CONSStatementPrint Print                                |
+    CONSStatementBlock Block                                |
+    CONSStatementIf Expression Block                        |
+    CONSStatementIfElse Expression Block Block              |
+    CONSStatementWhile Expression Block
     deriving (Eq, Show)
 
 data Print = 

@@ -50,6 +50,10 @@ _statementList stmts =
         retRemainingStatements <- _statementList (  stmts ++ [statementThatEnclosesTheBlock]  )
         return (retRemainingStatements))
     <|>
+    try (_if stmts)
+    <|>
+    try (_while stmts)
+    <|>
     (do
         --liftIO(print("I've got no more statements to read"))
         return (RetStatementList stmts))
@@ -74,6 +78,7 @@ _varInit =
 
         -- Reads the value being assigned
         retExpression <- _expression actualType
+
         let actualExpression = getRetExpression retExpression -- Expression
 
         -- Constructs the VarInit object
@@ -111,15 +116,55 @@ _print =
         
         return (RetStatement (CONSStatementPrint (CONSPrint actualExpr)))
 
--- _if :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
--- _if = 
---     do 
---         retIf <- ifToken
---         retLeftParen <- leftParenToken
---         retExp <- _expression NatBool
---         retRightParen <- rightParenToken
+_if :: [Statement] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+_if stmts = 
+    try 
+    (do -- if-else
+        retIf <- ifToken
+        retLeftParen <- leftParenToken
+        retExp <- _expression NatBool
+        retRightParen <- rightParenToken
         
+        let ifExp = getRetExpression retExp
 
+        retBlock <- _block
+        let actualBlock = getRetBlock retBlock -- Block
+        
+        retElse <- elseToken
+        retElseBlock <- _block
+        let actualElseBlock = getRetBlock retElseBlock
+        
+        let statementThatEnclosesTheBlock = CONSStatementIfElse ifExp actualBlock actualElseBlock -- Statement
+        
+        retRemainingStatements <- _statementList (  stmts ++ [statementThatEnclosesTheBlock]  )
+        return (retRemainingStatements))
+    <|>
+    (do
+        retIf <- ifToken
+        retLeftParen <- leftParenToken
+        retExp <- _expression NatBool
+        retRightParen <- rightParenToken
+        
+        let ifExp = getRetExpression retExp
 
+        retBlock <- _block
+        let actualBlock = getRetBlock retBlock -- Block
+        let statementThatEnclosesTheBlock = CONSStatementIf ifExp actualBlock -- Statement
+        
+        retRemainingStatements <- _statementList (  stmts ++ [statementThatEnclosesTheBlock]  )
+        return (retRemainingStatements))
 
---         retElseStatements <- _statementList
+_while :: [Statement] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+_while stmts = 
+    do
+        retWhileToken <- whileToken
+        retLParen <- leftParenToken
+        retExp <- _expression NatBool
+        retRParen <- rightParenToken
+
+        retBlock <- _block
+        let exp = getRetExpression retExp
+        let actualBlock = getRetBlock retBlock -- Block
+        let statementThatEnclosesTheBlock = CONSStatementWhile exp actualBlock -- Statement
+        retRemainingStatements <- _statementList (  stmts ++ [statementThatEnclosesTheBlock]  )
+        return (retRemainingStatements)

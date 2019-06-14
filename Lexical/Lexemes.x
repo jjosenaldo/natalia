@@ -97,8 +97,8 @@ tokens :-
 
   -- LOOPS  ------------------------------------------------
 
-  while                            { \p s -> Loop s (getLC p)}
-  for                              { \p s -> Loop s (getLC p)}
+  while                            { \p s -> While (getLC p)}
+  for                              { \p s -> For (getLC p)}
 
   -- NAMES ------------------------------------------------
 
@@ -172,7 +172,8 @@ data Token =
   
   -- LOOPS  ------------------------------------------------
 
-  Loop String (Int, Int)     |
+  While (Int, Int)     |
+  For (Int, Int)       |
 
   -- NAMES ------------------------------------------------
 
@@ -245,7 +246,8 @@ get_pos (If p) = p
 get_pos (Else p) = p
 get_pos (ElseIf p) = p
 get_pos (Type _ p) = p
-get_pos (Loop _ p) = p
+get_pos (While p) = p
+get_pos (For p) = p
 get_pos (Id _ p) = p
 -- get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
