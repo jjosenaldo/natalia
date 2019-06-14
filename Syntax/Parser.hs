@@ -27,17 +27,17 @@ _expGroup0 expectedType =
     -- <|>
     -- _expArray
     -- <|>
-    _boolTokenExpression expectedType
+    try (_boolTokenExpression expectedType)
     <|> 
-    _intTokenExpression expectedType
+    try (_intTokenExpression expectedType)
     <|>
-    _doubleTokenExpression expectedType
+    try (_doubleTokenExpression expectedType)
     <|>
-    _nullTokenExpression expectedType
+    try (_nullTokenExpression expectedType)
     <|>
-    _stringTokenExpression expectedType
+    try (_stringTokenExpression expectedType)
     <|>
-    _localVarExpression expectedType
+    try (_localVarExpression expectedType)
     <|>
     _expParenthesized expectedType
 
@@ -266,7 +266,7 @@ _evalRemainingGroup5 leftExpr =
     (do
         return (RetExpression leftExpr))
 
-_group5OpToken = _ltTokenOp <|> _gtTokenOp <|> _lteTokenOp <|> _gteTokenOp 
+_group5OpToken = try _ltTokenOp <|> try _gtTokenOp <|> try _lteTokenOp <|> _gteTokenOp 
 
 _ltTokenOp = _generalBinOperatorParser lessThanToken
 _gtTokenOp = _generalBinOperatorParser greater_than_token
@@ -396,12 +396,13 @@ _orTokenOp = _generalBinOperatorParser orToken
 -- GROUP 9 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 _expGroup9 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup9 expectedType = _expLocalVarAssignment expectedType <|> _expGroup8 expectedType -- TODO: this should contain _expGroup8 
+_expGroup9 expectedType = try (_expLocalVarAssignment expectedType) <|> _expGroup8 expectedType
 
 _expLocalVarAssignment expectedType = 
     do 
         retId <- idToken
         
+        let id = CONSTokenId (getRetToken retId) -- Id
         let idName = get_id_name (getRetToken retId) -- String (variable name)
         let localVariableType = getTypeOfLocalVar idName -- Type 
         let pos = get_pos (getRetToken retId)
@@ -421,7 +422,7 @@ _expLocalVarAssignment expectedType =
                 {- TODO: the assignment should update the subprogram's internal memory! -} 
                 {- Or... should it? This is just a syntactical description, after all -}
 
-                return (RetExpression expr)
+                return (RetExpression (CONSExprVarAssignment id expr (getTypeOfExpression expr)))
                 
 
 -- return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))

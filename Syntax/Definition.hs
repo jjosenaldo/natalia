@@ -20,7 +20,8 @@ data Expression =
     CONSValue Value Type | -- literals
     CONSId Id Type |
     CONSUnOperation UnOperator Expression Type |
-    CONSBinOperation BinOperator Expression Expression Type 
+    CONSBinOperation BinOperator Expression Expression Type |
+    CONSExprVarAssignment Id Expression Type
     deriving (Eq, Show)
 
 getSyntacticalUnitPos :: Expression -> (Int, Int)
@@ -31,6 +32,7 @@ getTypeOfExpression (CONSValue _ x) = x
 getTypeOfExpression (CONSId _ x) = x
 getTypeOfExpression (CONSUnOperation _ _ x) = x
 getTypeOfExpression (CONSBinOperation _ _ _ x) = x
+getTypeOfExpression (CONSExprVarAssignment _ _ x ) = x
 
 -- TODO: this function should search in the memory for the local variable.
 -- | Returns the type of a local variable.
