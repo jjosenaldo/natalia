@@ -99,14 +99,14 @@ rightBracketToken = tokenPrim show update_pos get_token where
 
 
 -- Left parenthesis
-left_paren_token :: ParsecT [Token] st IO (Token)
-left_paren_token = tokenPrim show update_pos get_token where
+leftParenToken :: ParsecT [Token] st IO (Token)
+leftParenToken = tokenPrim show update_pos get_token where
     get_token (LParen p) = Just (LParen p)
     get_token _       = Nothing
 
 -- Right parenthesis
-right_paren_token :: ParsecT [Token] st IO (Token)
-right_paren_token = tokenPrim show update_pos get_token where
+rightParenToken :: ParsecT [Token] st IO (Token)
+rightParenToken = tokenPrim show update_pos get_token where
     get_token (RParen p) = Just (RParen p)
     get_token _       = Nothing
 
