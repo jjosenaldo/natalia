@@ -223,7 +223,7 @@ typeAliasDef =
         let typedefname = get_id_name (getRetToken rettypedefname) -- String 
         rettype <- generalType -- RetType
         let typeRead = getRetType rettype -- Type
-        updateState (memory_insert (Typedef (ConsTypedef typedefname typeRead)) )
+        updateState (memoryInsert (Typedef (ConsTypedef typedefname typeRead)) )
         return (RetNothing)
 
 structTypeDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)        
@@ -235,7 +235,7 @@ structTypeDef =
         retStructInits <- structInits structName []-- RetStructStructure 
         retRightBrace <- rightBraceToken -- RetToken
         let allStructInits = getRetStructStructure retStructInits -- [(Type, String)]
-        updateState (memory_insert (Typedef (StructDef structName allStructInits)  ))
+        updateState (memoryInsert (Typedef (StructDef structName allStructInits)  ))
         
         return (RetNothing)
 

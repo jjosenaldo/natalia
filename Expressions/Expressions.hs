@@ -28,7 +28,7 @@ expGroup9 =
         r <- expGroup9
         let var = getRetMemoryCell l
         let val = getRetValue r
-        updateState(memory_update (setValue var val))
+        updateState(memoryUpdate (setValue var val))
         return (r))
     <|>
     expGroup8
@@ -47,7 +47,7 @@ evalRemainingGroup8 l =
     (do
         op <- group8OpToken
         r <- expGroup7
-        result <- evalRemainingGroup8 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup8 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -67,7 +67,7 @@ evalRemainingGroup7 l =
     (do
         op <- group7OpToken
         r <- expGroup6
-        result <- evalRemainingGroup7 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup7 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -87,7 +87,7 @@ evalRemainingGroup6 l =
     (do
         op <- group6OpToken
         r <- expGroup5
-        result <- evalRemainingGroup6 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup6 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -107,7 +107,7 @@ evalRemainingGroup5 l =
     (do
         op <- group5OpToken
         r <- expGroup4
-        result <- evalRemainingGroup5 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup5 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -121,7 +121,7 @@ expGroup4 =
             l <- expGroup3 -- RetValue
             op <- group4OpToken -- RetToken Op
             r <- expGroup4 -- RetValue
-            return (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r))))
+            return (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r))))
         <|>
         expGroup3
 
@@ -139,7 +139,7 @@ evalRemainingGroup3 l =
     (do
         op <- group3OpToken
         r <- expGroup2
-        result <- evalRemainingGroup3 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup3 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -159,7 +159,7 @@ evalRemainingGroup2 l =
     (do
         op <- group2OpToken -- RetToken
         r <- expGroup1
-        result <- evalRemainingGroup2 (RetValue (binary_eval (getRetValue l) (getRetToken op) (getRetValue r)))
+        result <- evalRemainingGroup2 (RetValue (binaryEval (getRetValue l) (getRetToken op) (getRetValue r)))
         return (result))
     <|>
     (do
@@ -172,7 +172,7 @@ expGroup1 =
         -- this group contains only operations !, unary -, reference access (&) and value access (*) 
         op <- group1OpToken -- RetToken Op
         a <- expGroup1 -- RetValue
-        return (RetValue (unary_eval (getRetToken op) (getRetValue a))))
+        return (RetValue (unaryEval (getRetToken op) (getRetValue a))))
     <|>
     (do 
         a <- expGroup0
@@ -190,11 +190,11 @@ expGroup0 =
     <|> 
     expArray 
     <|> 
-    bool_token 
+    boolToken 
     <|> 
-    int_token
+    intToken
     <|> 
-    double_token 
+    doubleToken 
     <|>
     nullToken
     <|> 
@@ -202,7 +202,7 @@ expGroup0 =
     <|> 
     localVariable 
     <|> 
-    exp_parenthesized 
+    expParenthesized 
 
 -- STRUCTS -----------------------------------------------------------------------------------------------------------------------------
 
@@ -217,7 +217,7 @@ structValue =
 
 
         let id = getRetToken retId -- Id
-        let typedefStructStructure = memory_get (get_id_name id) (get_pos id) memory -- Typedef (StructDef String [(Type, String)])
+        let typedefStructStructure = memoryGet (get_id_name id) (get_pos id) memory -- Typedef (StructDef String [(Type, String)])
         let structDefStructure = getMemoryCellType typedefStructStructure -- StructDef String [(Type, String)]
         let structure = getStructStructure structDefStructure -- [(Type, String)]
         
@@ -278,7 +278,7 @@ structFieldRead =
         state <- getState
         let id = (get_id_name.getRetToken) retId
         let pos = get_pos (getRetToken retId)
-        let values = getStructValues (getValue (memory_get id pos state) pos)
+        let values = getStructValues (getValue (memoryGet id pos state) pos)
         let value = getStructFieldValue (  (get_id_name.getRetToken) retField  ) values -- Value
 
         return (RetValue value)
@@ -307,7 +307,7 @@ editArray arr list =
         assignRetToken <- assignToken
         exprRetVal <- expression
         let exprVal = getRetValue exprRetVal
-        updateState(memory_update (setValueArray arr list exprVal))
+        updateState(memoryUpdate (setValueArray arr list exprVal))
         return (RetValue exprVal)
     )
 
@@ -322,7 +322,7 @@ var_attribution =
         mem <- getState
         nameRetToken <- id_token -- RetToken
         let name = get_id_name (getRetToken nameRetToken) -- "arr"
-        let var = memory_get name (get_pos (getRetToken nameRetToken)) mem
+        let var = memoryGet name (get_pos (getRetToken nameRetToken)) mem
         res <- editArray var [] -- RetValue
         return (res))
     <|>
@@ -334,14 +334,14 @@ var_attribution =
     expr_val <- expression -- RetValue
     s <- getState -- [MemoryCell]
     let pos = get_pos (getRetToken a)
-    let var = memory_get (get_id_name (getRetToken a)) pos s --MemoryCell
+    let var = memoryGet (get_id_name (getRetToken a)) pos s --MemoryCell
     let var_type = getTypeFromValue (getValue var pos)
     let expr_type = getTypeFromValue (getRetValue expr_val)
     if (not (checkCompatibleTypes var_type expr_type)) then error ("ERROR at " ++ show(get_pos (getRetToken a))  ++ ": type mismatch in the attribution of a value to a variable.")
     else
         do
             let updatedVar = setValue var (getRetValue expr_val)
-            updateState(memory_update updatedVar)
+            updateState(memoryUpdate updatedVar)
             
             -- optional: print symbols_table content
             s <- getState
@@ -349,8 +349,8 @@ var_attribution =
             return (expr_val))
 
 -- Parenthesized expression
-exp_parenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-exp_parenthesized = 
+expParenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+expParenthesized = 
     do
         lparen <- left_paren_token
         expr <- expression
@@ -364,12 +364,12 @@ memoryAccess =
     (do -- array variable
         mem <- getState
         id <- id_token -- RetToken
-        if (memory_has_name (get_id_name (getRetToken id)) mem) then 
+        if (memoryHasName (get_id_name (getRetToken id)) mem) then 
             do 
                 let pos = get_pos (getRetToken id)
                 let name = (get_id_name (getRetToken id))
-                --liftIO(print(">>>getValue de: " ++ show(memory_get name pos mem)))
-                res <- getChainedAccess (getValue (memory_get name pos mem) pos)
+                --liftIO(print(">>>getValue de: " ++ show(memoryGet name pos mem)))
+                res <- getChainedAccess (getValue (memoryGet name pos mem) pos)
                 return res
 
         else error ("ERROR " ++ (get_id_name (getRetToken id)) ++ " is not accessible"))
@@ -383,7 +383,7 @@ localVariable =
         liftIO(print(id))
         let name = (get_id_name.getRetToken) id
         let pos = get_pos (getRetToken id)
-        if (memory_has_name name mem) then do return (RetValue (getValue (memory_get name pos mem) pos))
+        if (memoryHasName name mem) then do return (RetValue (getValue (memoryGet name pos mem) pos))
         else error ("ERROR " ++ name ++ " is not accessible")
 
 getChainedAccess :: Value -> ParsecT [Token] [MemoryCell] IO(ReturnObject)
@@ -505,6 +505,6 @@ lValue =
         mem <- getState -- [MemoryCell]
         name <- id_token -- RetToken Id
         let nameRetToken = getRetToken name -- Token Id
-        let var = memory_get (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
+        let var = memoryGet (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
         if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")
         else do return (RetMemoryCell var)

@@ -11,14 +11,14 @@ import Text.Parsec
 import Control.Monad.IO.Class
 
 -- nonterminal: initialization of an *int* variable
-var_initialization :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
-var_initialization = do
+varInitialization :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
+varInitialization = do
     mem <- getState -- [MemoryCell]
     rettype <- generalType -- RetType Type
     let var_type = getRetType rettype -- Type
     name <- id_token -- RetTOken Id
     
-    if (memory_has_name (get_id_name (getRetToken name)) mem) then error ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
+    if (memoryHasName (get_id_name (getRetToken name)) mem) then error ("ERROR on the initialization of '" ++ (get_id_name (getRetToken name)) ++ "' at " ++ show (get_pos (getRetToken name)) ++ ": variable already exists.")
     else 
         do
             ass <- assignToken
@@ -31,7 +31,7 @@ var_initialization = do
             else
                 do
                     let variableToInsert = Variable (ConstructVariable (get_id_name (getRetToken name)) (getRetValue expr_value) False)
-                    updateState (memory_insert variableToInsert)
+                    updateState (memoryInsert variableToInsert)
                     -- optional: print symbols_table content
                     s <- getState --[MemoryCell]
                     liftIO (print s)
@@ -42,7 +42,7 @@ statement :: ParsecT [Token] [MemoryCell] IO()
 statement = 
     try
     (do
-        a <- var_initialization
+        a <- varInitialization
         return ())
     <|>
     (do

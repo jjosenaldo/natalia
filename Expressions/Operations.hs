@@ -5,19 +5,19 @@ import Lexical.Tokens
 import Text.Parsec
 
 -- Binary operators that are left-associative and have precedence 3
-bin_op_left_3_token = times_token <|> div_token <|> mod_token
+binOpLeft3Token = timesToken <|> divToken <|> modToken
 
 -- Binary operators that are left-associative and have precedence 4
-bin_op_left_4_token = plusToken <|> minusToken
+binOpLeft4Token = plusToken <|> minusToken
 
 group1OpToken = negationToken <|> minusToken
-group2OpToken = times_token <|> div_token <|> mod_token
+group2OpToken = timesToken <|> divToken <|> modToken
 group3OpToken = plusToken <|> minusToken
 group4OpToken = expoToken 
 group5OpToken = lessThanToken    <|> 
-                greater_than_token <|> 
+                greaterThanToken <|> 
                 lessEqualsToken  <|>
-                greater_equals_token <|>
+                greaterEqualsToken <|>
                 equalsToken <|>
                 differentToken <|>
                 inToken 
