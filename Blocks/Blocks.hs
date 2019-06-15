@@ -92,6 +92,7 @@ subprogramsBlock =
     do
         a <- subprogramsToken
         b <- leftBraceToken
+        retNothing <- subprograms
         d <- rightBraceToken
         return ()
 
@@ -111,6 +112,82 @@ typedefsBlock =
         retnothing <- typedefs 
         retrightbrace <- rightBraceToken
         return (RetNothing)
+
+
+subprograms :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+subprograms =
+    try
+    (do
+        subprogramDef <- subprogramDefinition
+        retRemainingSubprogramDef <- remainingSubprogramDefinitions
+        return (RetNothing))
+    <|>
+    (do
+        return (RetNothing))
+
+subprogramDefinition :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+subprogramDefinition = try procDef <|> funcDef
+
+procDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+procDef = 
+    (do
+        procRetToken <- procToken
+        procNameRetToken <- id_token
+        lParenRetToken <- leftParenToken
+        let procName = get_id_name (getRetToken procRetToken)
+        retNothing <- getParamsAndBody procName []
+        return (RetNothing))
+
+getParamsAndBody :: String -> [Parameter] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+getParamsAndBody procName [] =
+    try
+    (do
+        paramTypeRetType <- generalType
+        paramIdRetToken <- id_token
+        let paramId = get_id_name (getRetToken paramIdRetToken)
+        let paramType = getRetType paramTypeRetType
+        retNothing <- getParamsAndBody procName [ConsParameter paramType paramId])
+        return (RetNothing)
+    <|>
+    (do
+        rParenRetToken <- rightParenToken
+        lBraceRetToken <- leftBraceToken
+        retNothing <- getBody procName [] NatNull []
+        return (RetNothing))
+
+getParamsAndBody procName paramList =
+    try
+    (do
+        commaRetToken <- commaToken
+        paramIdRetToken <- id_token
+        let paramId = get_id_name (getRetToken paramIdRetToken)
+        let paramType = getRetType paramTypeRetType
+        retNothing <- getParamsAndBody procName [ConsParameter paramType paramId])
+        return (RetNothing))
+    <|>
+    (do
+        rParenRetToken <- rightParenToken
+        lBraceRetToken <- leftBraceToken
+        retNothing <- getBody procName paramList NatNull []
+        return (RetNothing))
+
+-- receives name of subprogram, list of parameters, return type and list of tokens (the body of the function)
+getBody :: String -> [Parameter] -> Type -> [Token] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+getBody procName paramList retType body =
+    try 
+    (do
+        )
+    <|>
+    (do
+        rBraceRetToken <- rightBraceToken
+        s <- getState
+        if (retType == NatNull) then 
+            do
+                updateState(memory_insert (Subprogram (ConstructProcedure procName paramList body))))
+        else 
+            do
+                updateState(memory_insert (Subprogram (ConstructFunction procName paramList retType body))))
+
 
 typedefs :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 typedefs = 

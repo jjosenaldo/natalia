@@ -50,8 +50,9 @@ tokens :-
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  ";"                              { \p s -> SemiColon (getLC p)}
-  ","                              { \p s -> Comma (getLC p)}
+  ";"                               { \p s -> SemiColon (getLC p)}
+  ","                               { \p s -> Comma (getLC p)}
+  ":"                               { \p s -> Colon (getLC p)}
 
   -- LITERALS  ---------------------------------------------
   
@@ -60,7 +61,7 @@ tokens :-
   "True"                            { \p s -> Bool (read s) (getLC p) }
   "False"                           { \p s -> Bool (read s) (getLC p)}
   \" ([.\n]#\")* \"                 { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
-  "Null"                         { \p s -> Null (getLC p)}
+  "Null"                            { \p s -> Null (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -82,7 +83,7 @@ tokens :-
   "<="                             { \p s -> LessEquals (getLC p)}
   ">="                             { \p s -> GreaterEquals (getLC p)}
   "=="                             { \p s -> Equals (getLC p)}
-  "!="                             { \p s -> Difference (getLC p)}
+  "!="                             { \p s -> Different (getLC p)}
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
@@ -99,6 +100,10 @@ tokens :-
 
   while                            { \p s -> While (getLC p)}
   for                              { \p s -> For (getLC p)}
+
+  -- SUBPROGRAMS -------------------------------------------
+  "func"                            {\p s -> Func (getLC p)}
+  "proc"                            {\p s -> Proc (getLC p)}
 
   -- NAMES ------------------------------------------------
 
@@ -130,8 +135,9 @@ data Token =
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  SemiColon (Int, Int)       |
-  Comma (Int, Int)           |
+  SemiColon (Int, Int)        |
+  Comma (Int, Int)            |
+  Colon (Int, Int)            |
   
   -- OPERATORS  --------------------------------------------
 
@@ -156,7 +162,7 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
-  Difference (Int, Int)      |
+  Different (Int, Int)      |
   In (Int, Int)              |
   Dot (Int, Int)             |
 
@@ -175,7 +181,11 @@ data Token =
   While (Int, Int)     |
   For (Int, Int)       |
 
-  -- NAMES ------------------------------------------------
+  -- SUBPROGRAMS -------------------------------------------
+  Func (Int, Int)      |
+  Proc (Int, Int)      |
+
+  -- NAMES -------------------------------------------------
 
   -- identifier
   Id String (Int, Int)       |
@@ -240,7 +250,7 @@ get_pos (Equals p) = p
 get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
-get_pos (Difference p) = p
+get_pos (Different p) = p
 get_pos (In p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
