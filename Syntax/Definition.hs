@@ -197,3 +197,10 @@ getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) _ =
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) NatInt = NatInt
 getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) _ = 
     error ("ERROR at " ++ show(p) ++ ": the first arg of the operator % must be a " ++ (getNameOfType NatInt))
+
+buildExpressionFromBinaryOperation :: BinOperator -> Expression -> Expression -> Expression
+buildExpressionFromBinaryOperation op exp1 exp2 = 
+    CONSBinOperation op exp1 exp2 (getBinOperatorReturnType op leftType rightType)
+    where
+        leftType = getTypeOfExpression exp1 
+        rightType = getTypeOfExpression exp2
