@@ -113,11 +113,32 @@ rightParenToken = tokenPrim show updatePos get_token where
     get_token (RParen p) = Just  (  RParen p ) 
     get_token _       = Nothing
 
-idToken :: ParsecT [Token] st IO (Token)
-idToken = tokenPrim show updatePos get_token where
-    get_token (Id x p) = Just  (  Id x p ) 
+leftBracketToken :: ParsecT [Token] st IO (Token)
+leftBracketToken = tokenPrim show updatePos get_token where
+    get_token (LBracket p) = Just  (  LBracket p ) 
     get_token _       = Nothing
 
+rightBracketToken :: ParsecT [Token] st IO (Token)
+rightBracketToken = tokenPrim show updatePos get_token where
+    get_token (RBracket p) = Just  (  RBracket p ) 
+    get_token _       = Nothing
+
+assignToken :: ParsecT [Token] st IO (Token)
+assignToken = tokenPrim show updatePos get_token where
+    get_token (Assign p) = Just  (  Assign p ) 
+    get_token _       = Nothing
+
+idToken :: ParsecT [Token] st IO (Token)
+idToken = tokenPrim show updatePos get_token where
+    get_token (Id x p) = Just  ( Id x p ) 
+    get_token _       = Nothing
+
+idTokenAsExp = 
+    do 
+        a <- idToken
+        return $ CONSExpLocalVar NatNothing (get_id_name a) 
+
+    
 
 -- stringToken = tokenPrim show updatePos get_token where
 --     get_token (String x p) = Just  (  CONSLitString x p)
