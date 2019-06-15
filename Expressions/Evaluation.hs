@@ -5,6 +5,7 @@ import Memory.Memory
 import TypeValue.TypeValue
 import Types.Types
 import Data.List
+import Syntax.Definition
 
 -- | Implementation of binary operations
 binary_eval :: Value -- ^ first operand
@@ -186,25 +187,25 @@ unary_eval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operato
 unary_eval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
 unary_eval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
 
-data UnOperator = 
-    CONSTokenUnOperator Token
-    deriving (Eq, Show)
+-- data UnOperator = 
+--     CONSTokenUnOperator Token
+--     deriving (Eq, Show)
 
-data BinOperator =
-    CONSTokenBinOperator Token 
-    deriving (Eq, Show)
+-- data BinOperator =
+--     CONSTokenBinOperator Token 
+--     deriving (Eq, Show)
 
-data Id = 
-    CONSTokenId Token -- Id
-    deriving (Eq, Show)
+-- data Id = 
+--     CONSTokenId Token -- Id
+--     deriving (Eq, Show)
 
-data Expression = 
-    CONSValue Value Type | -- literals
-    CONSId Id Type |
-    CONSUnOperation UnOperator Expression Type |
-    CONSBinOperation BinOperator Expression Expression Type |
-    CONSExprVarAssignment Id Expression Type
-    deriving (Eq, Show)
+-- data Expression = 
+--     CONSValue Value Type | -- literals
+--     CONSId Id Type |
+--     CONSUnOperation UnOperator Expression Type |
+--     CONSBinOperation BinOperator Expression Expression Type |
+--     CONSExprVarAssignment Id Expression Type
+--     deriving (Eq, Show)
 
 evaluateExpression :: Expression -> [MemoryCell] -> (Value, [MemoryCell])
 
@@ -251,4 +252,3 @@ evaluateExpression (CONSExprVarAssignment (CONSTokenId id) (exp) _) (cell) =
         cell
     )
 
-        
