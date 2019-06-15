@@ -80,7 +80,7 @@ tokens :-
   "<="                             { \p s -> LessEquals (getLC p)}
   ">="                             { \p s -> GreaterEquals (getLC p)}
   "=="                             { \p s -> Equals (getLC p)}
-  "!="                             { \p s -> Difference (getLC p)}
+  "!="                             { \p s -> Different (getLC p)}
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
@@ -161,7 +161,7 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
-  Difference (Int, Int)      |
+  Different (Int, Int)      |
   In (Int, Int)              |
   Dot (Int, Int)             |
 
@@ -244,7 +244,7 @@ get_pos (Equals p) = p
 get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
-get_pos (Difference p) = p
+get_pos (Different p) = p
 get_pos (In p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
