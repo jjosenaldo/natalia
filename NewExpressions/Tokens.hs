@@ -17,6 +17,11 @@ doubleToken = tokenPrim show updatePos get_token where
     get_token (Double x p) = Just  (  CONSExpLit NatNothing (Double x p) )
     get_token _       = Nothing
 
+stringToken :: ParsecT [Token] st IO (Exp)
+stringToken = tokenPrim show updatePos get_token where
+    get_token (String x p) = Just  (  CONSExpLit NatNothing (String x p) )
+    get_token _       = Nothing
+
 minusUnToken :: ParsecT [Token] st IO (Exp -> Exp)
 minusUnToken = tokenPrim show updatePos get_token where
     get_token (Minus p) = Just  (  CONSExpUn NatNothing (CONSUnOp (Minus p))   )
@@ -103,6 +108,11 @@ greaterEqualsToken = tokenPrim show updatePos get_token where
     get_token (GreaterEquals p) = Just  (  CONSExpBin NatNothing (CONSBinOp (GreaterEquals p)) )
     get_token _       = Nothing
 
+interrogationToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
+interrogationToken = tokenPrim show updatePos get_token where
+    get_token (Interrogation p) = Just  (  CONSExpBin NatNothing (CONSBinOp (Interrogation p)) )
+    get_token _       = Nothing
+
 equalsToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
 equalsToken = tokenPrim show updatePos get_token where
     get_token (Equals p) = Just  (  CONSExpBin NatNothing (CONSBinOp (Equals p)) )
@@ -162,7 +172,6 @@ commaToken :: ParsecT [Token] st IO (Token)
 commaToken = tokenPrim show updatePos get_token where
     get_token (Comma p) = Just  ( Comma p ) 
     get_token _       = Nothing
-    
 
 -- stringToken = tokenPrim show updatePos get_token where
 --     get_token (String x p) = Just  (  CONSLitString x p)
@@ -178,3 +187,7 @@ commaToken = tokenPrim show updatePos get_token where
 updatePos :: SourcePos -> Token -> [Token] -> SourcePos
 updatePos pos _ (tok:_) = pos -- necessita melhoria
 updatePos pos _ []      = pos  
+
+-- stringn: concat 
+-- subconjuunt
+-- pertence 

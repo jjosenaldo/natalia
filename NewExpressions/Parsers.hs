@@ -18,6 +18,7 @@ table =
         [Infix orToken AssocLeft],
         [Infix lessEqualsToken AssocLeft, Infix greaterEqualsToken AssocLeft, Infix lessThanToken AssocLeft, Infix greaterThanToken AssocLeft, Infix equalsToken AssocLeft, Infix differentToken AssocLeft], 
         [Prefix uppersandToken],
+        [Infix interrogationToken AssocLeft],
         [Prefix minusUnToken],
         [Infix expoToken AssocLeft],
         [Infix timesTokenAsNumOp AssocLeft, Infix divToken AssocLeft, Infix modToken AssocLeft],
@@ -26,7 +27,7 @@ table =
 
 -- Terms of a general expression (i.e., the expressions with the greatest precedence)
 terms = 
-    try funcCall <|> try (parens expr) <|> try structValue <|> try setValue <|> try assign <|> try lvalueAsExpr <|> try intToken <|> try doubleToken <|> boolToken  
+    try funcCall <|> try (parens expr) <|> try structValue <|> try setValue <|> try assign <|> try lvalueAsExpr <|> try intToken <|> try doubleToken <|> boolToken <|> stringToken
     
 funcCall = 
     do 
