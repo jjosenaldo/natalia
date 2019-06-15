@@ -71,6 +71,7 @@ tokens :-
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
   \*                               { \p s -> Times (getLC p)}
+  \&                               { \p s -> Uppersand (getLC p)}
   \/                               { \p s -> Div (getLC p)}
   "+="                             { \p s -> PlusEquals (getLC p)}
   "-="                             { \p s -> MinusEqual (getLC p)}
@@ -162,9 +163,10 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
-  Different (Int, Int)      |
+  Different (Int, Int)       |
   In (Int, Int)              |
   Dot (Int, Int)             |
+  Uppersand (Int, Int)       |
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -266,6 +268,7 @@ get_pos (Bool _ p) = p
 get_pos (Comma p) = p
 get_pos (String _ p) = p
 get_pos (Dot p) = p
+get_pos (Uppersand p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 

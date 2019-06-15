@@ -21,6 +21,11 @@ minusUnToken :: ParsecT [Token] st IO (Exp -> Exp)
 minusUnToken = tokenPrim show updatePos get_token where
     get_token (Minus p) = Just  (  CONSExpUn NatNothing (CONSUnOp (Minus p))   )
     get_token _       = Nothing
+
+uppersandToken :: ParsecT [Token] st IO (Exp -> Exp)
+uppersandToken = tokenPrim show updatePos get_token where
+    get_token (Uppersand p) = Just  (  CONSExpUn NatNothing (CONSUnOp (Uppersand p))   )
+    get_token _       = Nothing
     
 minusBinToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
 minusBinToken = tokenPrim show updatePos get_token where
@@ -32,10 +37,15 @@ plusToken = tokenPrim show updatePos get_token where
     get_token (Plus p) = Just  (  CONSExpBin NatNothing (CONSBinOp (Plus p)) )
     get_token _       = Nothing
 
-timesToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
+timesToken :: ParsecT [Token] st IO (Token)
 timesToken = tokenPrim show updatePos get_token where
-    get_token (Times p) = Just  (  CONSExpBin NatNothing (CONSBinOp (Times p)) )
+    get_token (Times p) = Just  (  Times p )
     get_token _       = Nothing
+
+timesTokenAsNumOp = 
+    do 
+        times <- timesToken
+        return $ CONSExpBin NatNothing (CONSBinOp times)
 
 divToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
 divToken = tokenPrim show updatePos get_token where
@@ -111,6 +121,16 @@ leftParenToken = tokenPrim show updatePos get_token where
 rightParenToken :: ParsecT [Token] st IO (Token)
 rightParenToken = tokenPrim show updatePos get_token where
     get_token (RParen p) = Just  (  RParen p ) 
+    get_token _       = Nothing
+
+leftBraceToken :: ParsecT [Token] st IO (Token)
+leftBraceToken = tokenPrim show updatePos get_token where
+    get_token (LBrace p) = Just  (  LBrace p ) 
+    get_token _       = Nothing
+
+rightBraceToken :: ParsecT [Token] st IO (Token)
+rightBraceToken = tokenPrim show updatePos get_token where
+    get_token (RBrace p) = Just  (  RBrace p ) 
     get_token _       = Nothing
 
 leftBracketToken :: ParsecT [Token] st IO (Token)

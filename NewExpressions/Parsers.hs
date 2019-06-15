@@ -17,16 +17,42 @@ table =
         [Infix andToken AssocLeft],
         [Infix orToken AssocLeft],
         [Infix lessEqualsToken AssocLeft, Infix greaterEqualsToken AssocLeft, Infix lessThanToken AssocLeft, Infix greaterThanToken AssocLeft, Infix equalsToken AssocLeft, Infix differentToken AssocLeft], 
+        [Prefix uppersandToken],
         [Prefix minusUnToken],
         [Infix expoToken AssocLeft],
-        [Infix timesToken AssocLeft, Infix divToken AssocLeft, Infix modToken AssocLeft],
+        [Infix timesTokenAsNumOp AssocLeft, Infix divToken AssocLeft, Infix modToken AssocLeft],
         [Infix plusToken AssocLeft, Infix minusBinToken AssocLeft]
     ]
 
 -- Terms of a general expression (i.e., the expressions with the greatest precedence)
 terms = 
-    try (parens expr) <|> try assign <|> try lvalueAsExpr <|> try intToken <|> try doubleToken <|> boolToken  
+    try funcCall <|> try (parens expr) <|> try structValue <|> try setValue <|> try assign <|> try lvalueAsExpr <|> try intToken <|> try doubleToken <|> boolToken  
     
+funcCall = 
+    do 
+        id <- idToken
+        lp <- leftParenToken
+        exprs <- sepBy expr commaToken
+        rp <- rightParenToken
+        return $ CONSExpFuncCall NatNothing (get_id_name id) exprs 
+
+setValue = 
+    do 
+        lb <- leftBraceToken
+        exprs <- sepBy expr commaToken
+        rb <- rightBraceToken
+        return $ CONSExpSet NatNothing exprs
+
+
+-- Value of a struct, like: rational_t{1, 0}
+structValue = 
+    do 
+        id <- idToken 
+        lb <- leftBraceToken
+        exprs <- sepBy expr commaToken
+        rb <- rightBraceToken
+        return $ CONSExpStruct NatNothing (get_id_name id) exprs
+
 -- Assignment of a value to a variable
 assign = 
     do 
@@ -39,12 +65,12 @@ assign =
 lvalueAsExpr = 
     do 
         lv <- lvalue 
-        return $ CONSExpLValue lv
+        return $ CONSExpLValue NatNothing lv
 
 -- Thing that can be at the left of the = in an assignment
-lvalue = try lvalueArrAccess <|> try lvalueStructAccess <|> lvalueLocalVar
+lvalue = try lvalueArrAccess <|> try lvalueStructAccess <|> try lvalueLocalVar <|> lvalueDerref
 
--- v[a][b][c]
+-- v[a][b][c] = ...
 lvalueArrAccess = 
     do 
         id <- idToken
@@ -60,7 +86,7 @@ arrIndex =
         r <- rightBracketToken
         return e
 
--- node.left = 1
+-- node.left = ...
 lvalueStructAccess = 
     do 
         id <- idToken
@@ -76,11 +102,20 @@ structAccess =
         field <- idToken
         return (get_id_name field)
 
--- Local variable
+-- a = ...
 lvalueLocalVar = 
     do 
         id <- idToken
         return $ CONSLValueId (get_id_name id)
+
+-- ****p = ...
+lvalueDerref = 
+    do 
+        t <- timesToken
+        ts <- many (timesToken)
+        id <- idToken
+
+        return $ CONSLValueDerref (get_id_name id) (length (t:ts))
 
 -- General expression
 expr = buildExpressionParser table terms
@@ -91,8 +126,6 @@ parens x =
         a <- x
         r <- rightParenToken
         return a
-
---exprParser = boolExprParser
 
 parser :: [Token] -> IO (Either ParseError (Exp))
 parser tokens = runParserT expr [] "Syntactical error:" tokens

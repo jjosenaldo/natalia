@@ -10,18 +10,21 @@ data Type =
     deriving (Eq, Show)
 
 data Exp = 
-    CONSExpLit Type Token | 
-    CONSExpBin Type BinOp Exp Exp | 
-    CONSExpUn Type UnOp Exp |
-    CONSExpAssign Type LValue Exp |
-    CONSExpLValue LValue
+    CONSExpLit Type Token | -- literals
+    CONSExpBin Type BinOp Exp Exp | -- binary operations 
+    CONSExpUn Type UnOp Exp | -- unary operations
+    CONSExpAssign Type LValue Exp | -- assignment
+    CONSExpLValue Type LValue | -- lvalues (they are rvalues aswell)
+    CONSExpStruct Type String [Exp] | -- struct_name{foo1, foo2, ...}
+    CONSExpSet Type [Exp] | -- {1,2,3}
+    CONSExpFuncCall Type String [Exp] -- function call 
     deriving (Eq, Show)
 
 data LValue = 
     CONSLValueId String | -- a = 1;
     CONSLValueStruct [String] | -- node.left = 1;
     CONSLValueArray String [Exp] | -- v[1][2][3] = 1;
-    CONSLValueDerref String   -- *ptr = 1;
+    CONSLValueDerref String Int   -- *ptr = 1;
     deriving (Eq, Show)
 
 data BinOp = 
