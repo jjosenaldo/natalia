@@ -5,20 +5,11 @@ import Lexical.Lexemes
 
 -- Haskell modules
 
--- soon...
--- data Expression = 
---     CONSExpAssign AssignExp | 
---     CONSExpOrExp 
---     deriving (Eq, Show)
-
--- data AssignExp = 
---     CONSAssignExp LValueExp Expression
-
--- data 
 
 data Exp = 
     CONSNumExp NumExp |
-    CONSBoolExp BoolExp 
+    CONSBoolExp BoolExp |
+    CONSLocalVarExp Token
     deriving (Eq, Show)
 
 data NumExp = 

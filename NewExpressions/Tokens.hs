@@ -7,17 +7,6 @@ import NewExpressions.Grammar
 -- Haskell modules
 import Text.Parsec
 
--- plusToken = tokenPrim show updatePos get_token where
---     get_token (Plus p) = Just (  BinOperation (Plus p)   )
---     get_token _       = Nothing
-
--- timesToken = tokenPrim show updatePos get_token where
---     get_token (Times p) = Just (  BinOperation (Times p)   )
---     get_token _       = Nothing
-
--- intToken = tokenPrim show updatePos get_token where
---     get_token (Int x p) = Just  (  CONSLitInt x p )
---     get_token _       = Nothing
 intToken :: ParsecT [Token] st IO (NumExp)
 intToken = tokenPrim show updatePos get_token where
     get_token (Int x p) = Just  (  CONSNumExpLit (Int x p) )
@@ -97,6 +86,11 @@ leftParenToken = tokenPrim show updatePos get_token where
 rightParenToken :: ParsecT [Token] st IO (Token)
 rightParenToken = tokenPrim show updatePos get_token where
     get_token (RParen p) = Just  (  RParen p ) 
+    get_token _       = Nothing
+
+idToken :: ParsecT [Token] st IO (Token)
+idToken = tokenPrim show updatePos get_token where
+    get_token (Id x p) = Just  (  Id x p ) 
     get_token _       = Nothing
 
 
