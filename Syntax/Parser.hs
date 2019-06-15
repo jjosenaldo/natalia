@@ -30,25 +30,25 @@ _expGroup0 expectedType =
     try (_boolTokenExpression expectedType)
     <|> 
     (_intTokenExpression expectedType)
-    -- <|>
-    -- (_doubleTokenExpression expectedType)
-    -- <|>
-    -- (_nullTokenExpression expectedType)
-    -- <|>
-    -- (_stringTokenExpression expectedType)
-    -- <|>
-    -- (_localVarExpression expectedType)
-    -- <|>
-    -- _expParenthesized expectedType
+    <|>
+    (_doubleTokenExpression expectedType)
+    <|>
+    (_nullTokenExpression expectedType)
+    <|>
+    (_stringTokenExpression expectedType)
+    <|>
+    (_localVarExpression expectedType)
+    <|>
+    _expParenthesized expectedType
 
 -- | Throws a type error.
 throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
-               -> Type -- ^ the expected type
-               -> Type -- ^ the actual type
-               -> ParsecT [Token] st IO (ReturnObject) -- ^ the error thrown
+                -> Type -- ^ the expected type
+                -> Type -- ^ the actual type
+                -> ParsecT [Token] st IO (ReturnObject) -- ^ the error thrown
 throwTypeError pos expectedType actualType =  
     do 
-        error ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
+        fail ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
                 
 _boolTokenExpression = _generalLiteralTokenExpression NatBool boolToken 
 _intTokenExpression = _generalLiteralTokenExpression NatInt intToken 
@@ -99,7 +99,7 @@ _expParenthesized expectedType =
 _expGroup1 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup1 expectedType = 
     try
-    (do 
+    (do
         retExpr <- _group1OpExpression expectedType
         let expr = getRetExpression retExpr -- Expression
         return (RetExpression expr))
@@ -118,45 +118,10 @@ _unMinusTokenOp = _generalUnOperatorParser minusToken
 
 -- GROUP 2 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
--- This group contains only the binary operations *, / and %.
 _expGroup2 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup2 expectedType =
-    do   
-        retLeftExpr <- _expGroup1 expectedType
-        let leftExpr = getRetExpression retLeftExpr -- Expression
+_expGroup2 expectedType = _generalBinExpGroupWithChaining _group2OpToken expectedType NatDouble _expGroup1
 
-        retExprResult <- _evalRemainingGroup2 leftExpr
-        let exprResult = getRetExpression retExprResult -- Expression (left)
-        return (RetExpression exprResult)
-
-_evalRemainingGroup2 :: Expression -> ParsecT [Token] st IO(ReturnObject)
-_evalRemainingGroup2 leftExpr =
-    try
-    (do
-        -- Reads a binary operation
-        retOp <- _group2OpToken -- RetToken
-        let op = getRetBinOperator retOp -- BinOperation
-
-        -- Reads the second operation if it is of the correct type
-        let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
-        retExprRight <- _expGroup1 expectedType
-
-        let exprRight = getRetExpression retExprRight -- Expression (right)
-
-        let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
-
-        let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
-
-        retFinalResult <- _evalRemainingGroup2 currentResult 
-        let finalResult = getRetExpression retFinalResult -- Expression
-
-        return (RetExpression finalResult))
-    <|>
-    (do
-        return (RetExpression leftExpr))
-
-
-_group2OpToken = _timesTokenOp <|> _divTokenOp <|> _modTokenOp
+_group2OpToken = try _timesTokenOp <|> try _divTokenOp <|> _modTokenOp
 
 _timesTokenOp = _generalBinOperatorParser timesToken 
 _divTokenOp = _generalBinOperatorParser divToken 
@@ -165,39 +130,9 @@ _modTokenOp = _generalBinOperatorParser modToken
 -- GROUP 3 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 _expGroup3 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup3 expectedType =
-    do
-        retLeftExpr <- _expGroup2 expectedType
-        retExprResult <- _evalRemainingGroup3 (getRetExpression retLeftExpr)
-        return (retExprResult)
+_expGroup3 expectedType = _generalBinExpGroupWithChaining _group3OpToken expectedType NatDouble _expGroup2
 
-_evalRemainingGroup3 :: Expression -> ParsecT [Token] st IO(ReturnObject)
-_evalRemainingGroup3 leftExpr =
-    try
-    (do
-        -- Reads a binary operation
-        retOp <- _group3OpToken -- RetToken
-        let op = getRetBinOperator retOp -- BinOperation
-
-        -- Reads the second operation if it is of the correct type
-        let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
-        retExprRight <- _expGroup2 expectedType
-
-        let exprRight = getRetExpression retExprRight -- Expression (right)
-
-        let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
-
-        let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
-
-        retFinalResult <- _evalRemainingGroup3 currentResult 
-        let finalResult = getRetExpression retFinalResult -- Expression
-
-        return (RetExpression finalResult))
-    <|>
-    (do
-        return (RetExpression leftExpr))
-
-_group3OpToken = _plusTokenOp <|> _binMinusTokenOp
+_group3OpToken = try _plusTokenOp <|> _binMinusTokenOp
 
 _plusTokenOp = _generalBinOperatorParser plusToken 
 _binMinusTokenOp = _generalBinOperatorParser minusToken
@@ -233,26 +168,7 @@ _expoTokenOp = _generalBinOperatorParser expoToken
 -- <, >, <=, <; all of them with numbers as arguments
 _expGroup5 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup5 expectedType = _generalBinExpGroupWithChaining _group5OpToken expectedType NatDouble _expGroup4
-    -- try
-    -- (do
-    --     retLeftExpr <- _expGroup4 NatDouble
-
-    --     if expectedType == NatBool then do 
-    --         retOp <- _group5OpToken
-    --         retRightExpr <- _expGroup4 NatDouble
-
-    --         let leftExpr = getRetExpression retLeftExpr -- Expression
-    --         let op = getRetBinOperator retOp -- BinOperator
-    --         let rightExpr = getRetExpression retRightExpr -- Expression
-    --         let exprRes = buildExpressionFromBinaryOperation op leftExpr rightExpr -- Expression
-            
-    --         return (RetExpression exprRes)
-    --     else do
-    --         err <- throwTypeError (0,0) expectedType NatBool -- TODO: improve the position of the error
-    --         return (RetNothing))
-    -- <|>
-    -- _expGroup4 expectedType
-
+    
 _group5OpToken = try _ltTokenOp <|> try _gtTokenOp <|> try _lteTokenOp <|> _gteTokenOp 
 
 _ltTokenOp = _generalBinOperatorParser lessThanToken
@@ -264,38 +180,8 @@ _gteTokenOp = _generalBinOperatorParser greater_equals_token
 
 _expGroup6 :: Type -> ParsecT [Token] st IO(ReturnObject)
 _expGroup6 expectedType = _generalBinExpGroupWithChaining _group6OpToken expectedType NatGenType _expGroup5
---     do
---         retLeftExpr <- _expGroup5 expectedType
---         retExprResult <- _evalRemainingGroup6 (getRetExpression retLeftExpr)
---         return (retExprResult)
 
--- _evalRemainingGroup6 :: Expression -> ParsecT [Token] st IO(ReturnObject)
--- _evalRemainingGroup6 leftExpr =
---     try
---     (do
---         -- Reads a binary operation
---         retOp <- _group6OpToken -- RetToken
---         let op = getRetBinOperator retOp -- BinOperation
-
---         -- Reads the second operation if it is of the correct type
---         let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
---         retExprRight <- _expGroup5 expectedType
-
---         let exprRight = getRetExpression retExprRight -- Expression (right)
-
---         let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
-
---         let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
-
---         retFinalResult <- _evalRemainingGroup6 currentResult 
---         let finalResult = getRetExpression retFinalResult -- Expression
-
---         return (RetExpression finalResult))
---     <|>
---     (do
---         return (RetExpression leftExpr))
-
-_group6OpToken = _equalsTokenOp <|> _differentTokenOp
+_group6OpToken = try _equalsTokenOp <|> _differentTokenOp
 
 _equalsTokenOp = _generalBinOperatorParser equalsToken
 _differentTokenOp = _generalBinOperatorParser differentToken
@@ -304,37 +190,7 @@ _differentTokenOp = _generalBinOperatorParser differentToken
 -- GROUP 7 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 _expGroup7 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup7 expectedType =
-    do
-        retLeftExpr <- _expGroup6 expectedType
-        retExprResult <- _evalRemainingGroup7 (getRetExpression retLeftExpr)
-        return (retExprResult)
-
-_evalRemainingGroup7 :: Expression -> ParsecT [Token] st IO(ReturnObject)
-_evalRemainingGroup7 leftExpr =
-    try
-    (do
-        -- Reads a binary operation
-        retOp <- _group7OpToken -- RetToken
-        let op = getRetBinOperator retOp -- BinOperation
-
-        -- Reads the second operation if it is of the correct type
-        let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
-        retExprRight <- _expGroup6 expectedType
-
-        let exprRight = getRetExpression retExprRight -- Expression (right)
-
-        let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
-
-        let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
-
-        retFinalResult <- _evalRemainingGroup7 currentResult 
-        let finalResult = getRetExpression retFinalResult -- Expression
-
-        return (RetExpression finalResult))
-    <|>
-    (do
-        return (RetExpression leftExpr))
+_expGroup7 expectedType = _generalBinExpGroupWithChaining _group7OpToken expectedType NatBool _expGroup6
 
 _group7OpToken = _andTokenOp
 
@@ -343,37 +199,7 @@ _andTokenOp = _generalBinOperatorParser andToken
 -- GROUP 8 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
 _expGroup8 :: Type -> ParsecT [Token] st IO(ReturnObject)
-_expGroup8 expectedType =
-    do
-        retLeftExpr <- _expGroup7 expectedType
-        retExprResult <- _evalRemainingGroup8 (getRetExpression retLeftExpr)
-        return (retExprResult)
-
-_evalRemainingGroup8 :: Expression -> ParsecT [Token] st IO(ReturnObject)
-_evalRemainingGroup8 leftExpr =
-    try
-    (do
-        -- Reads a binary operation
-        retOp <- _group8OpToken -- RetToken
-        let op = getRetBinOperator retOp -- BinOperation
-
-        -- Reads the second operation if it is of the correct type
-        let expectedType = getBinOperatorExpectedSecondType op (getTypeOfExpression leftExpr)
-        retExprRight <- _expGroup7 expectedType
-
-        let exprRight = getRetExpression retExprRight -- Expression (right)
-
-        let returnType = getBinOperatorReturnType op (getTypeOfExpression leftExpr) (getTypeOfExpression exprRight)  -- Type
-
-        let currentResult = CONSBinOperation op leftExpr exprRight returnType -- Expression
-
-        retFinalResult <- _evalRemainingGroup8 currentResult 
-        let finalResult = getRetExpression retFinalResult -- Expression
-
-        return (RetExpression finalResult))
-    <|>
-    (do
-        return (RetExpression leftExpr))
+_expGroup8 expectedType = _generalBinExpGroupWithChaining _group8OpToken expectedType NatBool _expGroup7
 
 _group8OpToken = _orTokenOp
 
@@ -412,15 +238,13 @@ _expLocalVarAssignment expectedType =
                 return (RetExpression (CONSExprVarAssignment id expr (getTypeOfExpression expr)))
                 
 
--- return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))
-
 -- PARSER BUILDERS ------------------------------------------------------------------------------------------------------------
 
 -- | Builds a parser for literals that type-checks things.
 _generalLiteralTokenExpression :: Type -- ^ the type of the literal that will be parsed
-                               -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
-                               -> Type -- ^  the expected type
-                               -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser with type-checking for the literal
+                                -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser for a literal 
+                                -> Type -- ^  the expected type
+                                -> ParsecT [Token] st IO (ReturnObject) -- ^ a parser with type-checking for the literal
 _generalLiteralTokenExpression  actualType literalToken  expectedType = 
     do 
         -- Parses a literal
@@ -436,9 +260,9 @@ _generalLiteralTokenExpression  actualType literalToken  expectedType =
                 return (RetExpression ((CONSValue literal) actualType))
 
 -- | Builds a parser for an unary expression.
-_generalUnExpression :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser for an unary operation
-                     -> Type -- ^ the expected type
-                     -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
+_generalUnExpression :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser for an uexpressionParsernary operation
+                        -> Type -- ^ the expected type
+                        -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
 _generalUnExpression generalUnOperator expectedType = 
     do 
         -- Parses a unary operator
@@ -465,7 +289,7 @@ _generalUnExpression generalUnOperator expectedType =
 
 -- | Builds a parser for an unary operator.
 _generalUnOperatorParser :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser that parses the token for an unary operation
-                          -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
+                            -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
 
 _generalUnOperatorParser unOperatorToken = 
     do 
@@ -476,7 +300,7 @@ _generalUnOperatorParser unOperatorToken =
 
 -- | Builds a parser for a binary operator.
 _generalBinOperatorParser :: ParsecT [Token] st IO (ReturnObject) -- ^ a parser that parses the token for a binary operator 
-                          -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
+                            -> ParsecT [Token] st IO (ReturnObject) -- ^ the parser built
 
 _generalBinOperatorParser binOperatorToken = 
     do 
@@ -484,7 +308,6 @@ _generalBinOperatorParser binOperatorToken =
         let tok = getRetToken retOp -- Token
         let op = CONSTokenBinOperator tok -- UnOperation
         return (RetBinOperator op)
-
 
 _generalBinExpGroupWithChaining :: ParsecT [Token] st IO (ReturnObject)
                                 -> Type 
@@ -509,6 +332,8 @@ _generalBinExpGroupWithChaining groupOpToken expectedType leftType nextGroup =
 
         -- Result
         let firstExprRes = buildExpressionFromBinaryOperation op leftExpr rightExpr
+
+
         retExprResult <- _generalBinExpGroupWithChainingRemaining  groupOpToken expectedType firstExprRes nextGroup
 
         return (retExprResult))
@@ -516,10 +341,10 @@ _generalBinExpGroupWithChaining groupOpToken expectedType leftType nextGroup =
     nextGroup expectedType
 
 _generalBinExpGroupWithChainingRemaining :: ParsecT [Token] st IO (ReturnObject)
-                                         -> Type 
-                                         -> Expression
-                                         -> (Type -> ParsecT [Token] st IO (ReturnObject))
-                                         -> ParsecT [Token] st IO (ReturnObject)
+                                            -> Type 
+                                            -> Expression
+                                            -> (Type -> ParsecT [Token] st IO (ReturnObject))
+                                            -> ParsecT [Token] st IO (ReturnObject)
 _generalBinExpGroupWithChainingRemaining groupOpToken expectedType leftExpr nextGroup = 
     try
     (do 
@@ -542,5 +367,5 @@ _generalBinExpGroupWithChainingRemaining groupOpToken expectedType leftExpr next
         if not (checkCompatibleTypes expectedType actualType) then do
             err <- throwTypeError (-1,-1) expectedType actualType
             return (RetNothing)
-        else do 
+        else do
             return (RetExpression leftExpr))
