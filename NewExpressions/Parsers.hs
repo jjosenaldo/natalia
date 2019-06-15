@@ -11,49 +11,21 @@ import Text.Parsec.Expr
 import Text.Parsec.Prim
 import Text.Parsec.String
 
-tableBoolOperations = 
+table = 
     [   
         [Prefix negationToken],
         [Infix andToken AssocLeft],
-        [Infix orToken AssocLeft]
-    ]
-
-tableNumOperations = 
-    [   
+        [Infix orToken AssocLeft],
         [Prefix minusUnToken],
         [Infix expoToken AssocLeft],
         [Infix timesToken AssocLeft, Infix divToken AssocLeft, Infix modToken AssocLeft],
         [Infix plusToken AssocLeft, Infix minusBinToken AssocLeft]
     ]
 
-boolTerms = 
-    try (parens boolExprParser)
-    <|>
-    try boolToken 
-    <|>
-    try 
-    (do 
-        a <- numExprParser
-        op <- lessThan
-        b <- numExprParser
-        return $ CONSBoolExpBinRel op a b)
-    
-numTerms = 
-    try (parens numExprParser)
-    <|>
-    try intToken
-    <|>
-    doubleToken
+terms = 
+    try (parens expr) <|> try intToken <|> try doubleToken <|> boolToken
 
-exprParser = 
-    try
-    (do 
-        a <- boolExprParser
-        return $ CONSBoolExp a)
-    <|>
-    do 
-        a <- numExprParser
-        return $ CONSNumExp a
+expr = buildExpressionParser table terms
 
 parens x = 
     do 
@@ -62,10 +34,8 @@ parens x =
         r <- rightParenToken
         return a
 
-boolExprParser = buildExpressionParser tableBoolOperations boolTerms
-numExprParser = buildExpressionParser tableNumOperations numTerms
 
 --exprParser = boolExprParser
 
 parser :: [Token] -> IO (Either ParseError (Exp))
-parser tokens = runParserT exprParser [] "Syntactical error:" tokens
+parser tokens = runParserT expr [] "Syntactical error:" tokens
