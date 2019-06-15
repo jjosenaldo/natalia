@@ -5,14 +5,40 @@ import Lexical.Lexemes
 
 -- Haskell modules
 
+-- soon...
+-- data Expression = 
+--     CONSExpAssign AssignExp | 
+--     CONSExpOrExp 
+--     deriving (Eq, Show)
+
+-- data AssignExp = 
+--     CONSAssignExp LValueExp Expression
+
+-- data 
 
 data Exp = 
-    CONSExpBool BoolExp
+    CONSNumExp NumExp |
+    CONSBoolExp BoolExp 
+    deriving (Eq, Show)
+
+data NumExp = 
+    CONSNumExpBin NumBinOp NumExp NumExp | 
+    CONSNumExpUn NumUnOp NumExp | 
+    CONSNumExpLit Token
+    deriving (Eq, Show)
+
+data NumBinOp = 
+    CONSNumBinOp Token
+    deriving (Eq, Show)
+
+data NumUnOp = 
+    CONSNumUnOp Token
     deriving (Eq, Show)
 
 data BoolExp = 
     CONSBoolExpBin BoolBinOp BoolExp BoolExp | 
     CONSBoolExpUn BoolUnOp BoolExp | 
+    CONSBoolExpBinRel RelBinOp NumExp NumExp | 
     CONSBoolExpLit Token
     deriving (Eq, Show)
 
@@ -24,9 +50,6 @@ data BoolUnOp =
     CONSBoolUnOp Token
     deriving (Eq, Show)
 
--- data Lit = 
---     CONSLitInt Integer (Int, Int) |
---     CONSLitBool Bool (Int, Int) | 
---     CONSLitDouble Double (Int, Int) | 
---     CONSLitString String (Int, Int) 
-    -- deriving (Eq, Show)
+data RelBinOp = 
+    CONSRelBinOp Token
+    deriving (Eq, Show)
