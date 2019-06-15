@@ -256,9 +256,9 @@ _expGroup5 expectedType = _generalBinExpGroupWithChaining _group5OpToken expecte
 _group5OpToken = try _ltTokenOp <|> try _gtTokenOp <|> try _lteTokenOp <|> _gteTokenOp 
 
 _ltTokenOp = _generalBinOperatorParser lessThanToken
-_gtTokenOp = _generalBinOperatorParser greater_than_token
+_gtTokenOp = _generalBinOperatorParser greaterThanToken
 _lteTokenOp = _generalBinOperatorParser lessEqualsToken 
-_gteTokenOp = _generalBinOperatorParser greater_equals_token
+_gteTokenOp = _generalBinOperatorParser greaterEqualsToken
 
 -- GROUP 6 EXPRESSIONS --------------------------------------------------------------------------------------------------------
 
