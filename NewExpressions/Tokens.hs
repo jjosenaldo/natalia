@@ -89,6 +89,16 @@ lessThan = tokenPrim show updatePos get_token where
     get_token (LessThan p) = Just  (  CONSRelBinOp (LessThan p) ) 
     get_token _       = Nothing
 
+leftParenToken :: ParsecT [Token] st IO (Token)
+leftParenToken = tokenPrim show updatePos get_token where
+    get_token (LParen p) = Just  (  LParen p ) 
+    get_token _       = Nothing
+
+rightParenToken :: ParsecT [Token] st IO (Token)
+rightParenToken = tokenPrim show updatePos get_token where
+    get_token (RParen p) = Just  (  RParen p ) 
+    get_token _       = Nothing
+
 
 -- stringToken = tokenPrim show updatePos get_token where
 --     get_token (String x p) = Just  (  CONSLitString x p)

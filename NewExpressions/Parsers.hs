@@ -27,25 +27,43 @@ tableNumOperations =
     ]
 
 boolTerms = 
-    boolToken 
+    try (parens boolExprParser)
     <|>
-    do 
+    try boolToken 
+    <|>
+    try 
+    (do 
         a <- numExprParser
         op <- lessThan
         b <- numExprParser
-        return $ CONSBoolExpBinRel op a b
+        return $ CONSBoolExpBinRel op a b)
+    
+numTerms = 
+    try (parens numExprParser)
+    <|>
+    try intToken
+    <|>
+    doubleToken
 
 exprParser = 
-    do 
+    try
+    (do 
         a <- boolExprParser
-        return $ CONSBoolExp a
+        return $ CONSBoolExp a)
     <|>
     do 
         a <- numExprParser
         return $ CONSNumExp a
 
+parens x = 
+    do 
+        l <- leftParenToken
+        a <- x
+        r <- rightParenToken
+        return a
+
 boolExprParser = buildExpressionParser tableBoolOperations boolTerms
-numExprParser = buildExpressionParser tableNumOperations (intToken <|> doubleToken)
+numExprParser = buildExpressionParser tableNumOperations numTerms
 
 --exprParser = boolExprParser
 

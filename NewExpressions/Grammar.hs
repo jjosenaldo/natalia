@@ -39,7 +39,7 @@ data BoolExp =
     CONSBoolExpBin BoolBinOp BoolExp BoolExp | 
     CONSBoolExpUn BoolUnOp BoolExp | 
     CONSBoolExpBinRel RelBinOp NumExp NumExp | 
-    CONSBoolExpLit Token
+    CONSBoolExpLit Token 
     deriving (Eq, Show)
 
 data BoolBinOp = 
