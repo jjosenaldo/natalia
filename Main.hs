@@ -43,6 +43,7 @@ module Main (main) where
 
 -------------------------------------------------  SYNTACTICS  ---------------------------------------------------------
 -- natalia's modules
+import Expressions.EvaluationTest
 import Lexical.Lexemes
 import Lexical.Tokens
 import Syntax.Definition
@@ -55,9 +56,8 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
-
 parser :: [Token] -> IO (Either ParseError (ReturnObject))
-parser tokens = runParserT subprogramBodyParser [] "Syntactical error:" tokens
+parser tokens = runParserT expressionEvaluationTest [] "Syntactical error:" tokens
 
 main :: IO ()
 main = do
@@ -69,6 +69,7 @@ main = do
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
                     Right ans -> do
-                                    let res = getRetBlock ans -- Block
-                                    print(res)
+                                    -- let res = getRetExpression ans -- Block
+                                    -- print(res)
+                                    return ()
                 }
