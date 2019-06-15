@@ -133,11 +133,15 @@ idToken = tokenPrim show updatePos get_token where
     get_token (Id x p) = Just  ( Id x p ) 
     get_token _       = Nothing
 
-idTokenAsExp = 
-    do 
-        a <- idToken
-        return $ CONSExpLocalVar NatNothing (get_id_name a) 
+dotToken :: ParsecT [Token] st IO (Token)
+dotToken = tokenPrim show updatePos get_token where
+    get_token (Dot p) = Just  ( Dot p ) 
+    get_token _       = Nothing
 
+commaToken :: ParsecT [Token] st IO (Token)
+commaToken = tokenPrim show updatePos get_token where
+    get_token (Comma p) = Just  ( Comma p ) 
+    get_token _       = Nothing
     
 
 -- stringToken = tokenPrim show updatePos get_token where
