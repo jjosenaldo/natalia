@@ -164,13 +164,13 @@ binary_eval (ConsNatDouble x) (Equals p) (ConsNatInt y) =
 binary_eval _ (Equals p) _ = error ("ERROR at " ++ show(p) ++ ": the == operator expects two numbers.")
 
 -- Operator !=
-binary_eval (ConsNatInt x) (Difference p) (ConsNatInt y) = ConsNatBool (x /= y)
-binary_eval (ConsNatDouble x) (Difference p) (ConsNatDouble y) = ConsNatBool (x /= y)
-binary_eval (ConsNatInt x) (Difference p) (ConsNatDouble y) = 
+binary_eval (ConsNatInt x) (Different p) (ConsNatInt y) = ConsNatBool (x /= y)
+binary_eval (ConsNatDouble x) (Different p) (ConsNatDouble y) = ConsNatBool (x /= y)
+binary_eval (ConsNatInt x) (Different p) (ConsNatDouble y) = 
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
-binary_eval (ConsNatDouble x) (Difference p) (ConsNatInt y) =
+binary_eval (ConsNatDouble x) (Different p) (ConsNatInt y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
-binary_eval _ (Difference p) _ = error ("ERROR at " ++ show(p) ++ ": the != operator expects two numbers.")
+binary_eval _ (Different p) _ = error ("ERROR at " ++ show(p) ++ ": the != operator expects two numbers.")
 
 
 -- | Implementation of binary operations

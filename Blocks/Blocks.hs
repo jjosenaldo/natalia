@@ -198,3 +198,14 @@ structInit structName =
         let actualName = get_id_name (getRetToken retId)
 
         return ( RetStructStructure [ (actualType, actualName)  ]  ))
+
+
+blockOfCommandsWithoutReturn :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+blockOfCommandsWithoutReturn =
+    do
+        retLeftBrace <- leftBraceToken
+        c <- statements
+        retRightBrace <- rightBraceToken
+
+natIf :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+natIf 
