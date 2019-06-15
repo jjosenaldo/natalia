@@ -202,12 +202,16 @@ data Expression =
     CONSValue Value Type | -- literals
     CONSId Id Type |
     CONSUnOperation UnOperator Expression Type |
-    CONSBinOperation BinOperator Expression Expression Type 
+    CONSBinOperation BinOperator Expression Expression Type |
+    CONSExprVarAssignment Id Expression Type
     deriving (Eq, Show)
 
-
 evaluateExpression :: Expression -> [MemoryCell] -> (Value, [MemoryCell])
+
+-- avaliate a value
 evaluateExpression (CONSValue x _) (cell) =  (x, cell) 
+
+-- avaliate a id
 evaluateExpression (CONSId (CONSTokenId id) _) (cell) = 
     (getValue   -- get the value
         (memory_get           -- get the memory cell  
@@ -215,12 +219,16 @@ evaluateExpression (CONSId (CONSTokenId id) _) (cell) =
             (get_pos id)      -- attribute of memory_get - get the position of token (int, int)
              cell )           -- attribute of memory_get - the memory cell
         (get_pos id),   -- attribute of getValue - the position cell of token
-    cell) 
+    cell)
+
+-- avaliate a unary operator
 evaluateExpression (CONSUnOperation (CONSTokenUnOperator unOp) (exp) _) (cell) = 
     ((unary_eval 
         (unOp)
         (fst (evaluateExpression (exp) (cell)))), -- recursion ( get the value)
      cell)
+
+-- avaliate a binary operator
 evaluateExpression (CONSBinOperation (CONSTokenBinOperator binOp) (exp1) (exp2) _) (cell) =
     ((binary_eval
         (fst (evaluateExpression (exp1) (cell)))    -- recursion (get value of exp1)
@@ -228,4 +236,19 @@ evaluateExpression (CONSBinOperation (CONSTokenBinOperator binOp) (exp1) (exp2) 
         (fst (evaluateExpression (exp2) (cell)))),  -- recursion (get value of exp2)
       cell)
 
- 
+-- avaliate a assignment operator
+evaluateExpression (CONSExprVarAssignment (CONSTokenId id) (exp) _) (cell) =
+    ((getValue
+        (setValue 
+            (memory_get
+                (get_id_name id)
+                (get_pos id)
+                (cell)
+            )
+            (fst (evaluateExpression (exp) (cell)))
+        )
+        (get_pos id)),
+        cell
+    )
+
+       
