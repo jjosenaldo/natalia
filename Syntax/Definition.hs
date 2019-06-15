@@ -2,7 +2,7 @@ module Syntax.Definition where
 
 -- natalia's modules
 import Lexical.Lexemes
-import Memory.Memory
+--import Memory.Memory
 import TypeValue.TypeValue
 
 data Block = 
@@ -63,12 +63,6 @@ getTypeOfExpression (CONSExprVarAssignment _ _ x ) = x
 
 getBlockStatements :: Block -> [Statement]
 getBlockStatements (CONSBlock x) = x
-
--- TODO: this function should search in the memory for the local variable.
--- | Returns the type of a local variable.
-getTypeOfLocalVar :: String -- ^ the name of the local variable
-                  -> Type -- ^ the type of the local variable
-getTypeOfLocalVar idName = NatInt
 
 
 getUnOperatorExpectedType :: UnOperator -> Type 

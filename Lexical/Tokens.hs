@@ -27,7 +27,9 @@ data ReturnObject =
     RetType Type | 
     RetValue Value | 
     RetVarInit VarInit |
-    RetUnOperator UnOperator 
+    RetUnOperator UnOperator |
+    RetParamList [Parameter] |
+    RetExpressionList [Expression]
     deriving (Eq, Show)
 
 
@@ -82,6 +84,14 @@ getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetStru
 getRetStructValues :: ReturnObject -> [(String, Value)]
 getRetStructValues (RetStructValues x) = x
 getRetStructValues _ = error "Invalid conversion from ReturnObject to RetStructValues"
+
+getRetParamList :: ReturnObject -> [Parameter]
+getRetParamList (RetParamList x) = x
+getRetParamList _ = error "Invalid conversion from ReturnObject to RetParamList"
+
+getRetExpressionList :: ReturnObject -> [Expression]
+getRetExpressionList (RetExpressionList x) = x
+getRetExpressionList _ = error "Invalid conversion from ReturnObject to RetExpressionList"
 
 procToken :: ParsecT [Token] st IO (ReturnObject)
 procToken = tokenPrim show updatePos get_token where

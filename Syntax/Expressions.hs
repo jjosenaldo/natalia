@@ -6,6 +6,7 @@ import Lexical.Tokens
 import Lexical.Lexemes
 import Types.Types
 import TypeValue.TypeValue
+import Memory.Memory
 
 -- Haskell's modules
 import Text.Parsec
@@ -39,7 +40,9 @@ _expGroup0 expectedType =
     <|>
     (_localVarExpression expectedType)
     <|>
-    _expParenthesized expectedType
+    (_functionCall expectedType)
+    <|>
+    (_expParenthesized expectedType)
 
 -- | Throws a type error.
 throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
@@ -49,6 +52,13 @@ throwTypeError :: (Int, Int) -- ^ the position in which the error occurs
 throwTypeError pos expectedType actualType =  
     do 
         fail ("ERROR at " ++ show(pos) ++ ": You passed a " ++ (getNameOfType actualType) ++ " where a " ++ (getNameOfType expectedType) ++ " was expected.")
+
+throwParameterPassedError :: (Int, Int) -- ^ the position in which the error occurs
+                -> String -- ^ the name of subprogram
+                -> ParsecT [Token] st IO (ReturnObject) -- ^ the error thrown
+throwParameterPassedError pos subpr =  
+    do 
+        fail ("ERROR at " ++ show(pos) ++ ": You passed wrong parameters at subprogram " ++ subpr ++ " call.")
                 
 _boolTokenExpression = _generalLiteralTokenExpression NatBool boolToken 
 _intTokenExpression = _generalLiteralTokenExpression NatInt intToken 
@@ -71,7 +81,54 @@ _localVarExpression expectedType =
         else
             do 
                 return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))
+
+_functionCall :: Type -> ParsecT [Token] st IO (ReturnObject)
+_functionCall expectedType = 
+    do 
+        retId <- idToken
+        let idAsToken = getRetToken retId -- Token, with constructor Id x p
+        let idName = get_id_name idAsToken -- String
+        let actualType = getTypeOfFunctionCall idName -- Type 
+        let pos = get_pos idAsToken
+        retLParen <- leftParenToken
+        retParamsPassed <- getParamsPassed []
+        let paramsPassed = getRetExpressionList retParamsPassed
+        retRParen <- rightParenToken
+        if (not (checkCompatibleTypes expectedType actualType )) then do 
+            err <- throwTypeError pos expectedType actualType
+            return (RetNothing)
+        else do 
+            if not (checkParamsPassed idName paramsPassed) then do
+                err <- throwParameterPassedError pos idName
+                return (RetNothing)
+            else do 
+                return (RetExpression (CONSId (CONSTokenId idAsToken) actualType))
     
+
+getParamsPassed :: [Expression] -> ParsecT [Token] st IO (ReturnObject)
+getParamsPassed [] =
+    try 
+    (do
+        retExp <- _expression
+        let actualExp = getRetExpression retExp
+        retRemainingExp <- getParamsPassed [actualExp]
+        return (RetExpressionList (getRetExpressionList retRemainingExp)))
+    <|>
+    (do
+        return (RetExpressionList []))
+
+getParamsPassed expList =
+    try 
+    (do
+        retComma <- commaToken
+        retExp <- _expression
+        let actualExp = getRetExpression retExp
+        retRemainingExp <- getParamsPassed [actualExp]
+        return (RetExpressionList (getRetExpressionList retRemainingExp)))
+    <|>
+    (do
+        return (RetExpressionList expList))
+
 _expParenthesized :: Type -> ParsecT [Token] st IO (ReturnObject)
 _expParenthesized expectedType = 
     do 

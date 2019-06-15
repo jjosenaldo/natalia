@@ -7,6 +7,7 @@ import Memory.Memory
 import Statements.Statements
 import Types.Typedef
 import TypeValue.TypeValue
+import Syntax.SubprogramBody
 
 -- Haskell's modules
 import Control.Monad.IO.Class
@@ -119,7 +120,7 @@ subprograms =
     try
     (do
         subprogramDef <- subprogramDefinition
-        retRemainingSubprogramDef <- remainingSubprogramDefinitions
+        retRemainingSubprogramDef <- subprograms
         return (RetNothing))
     <|>
     (do
@@ -128,65 +129,94 @@ subprograms =
 subprogramDefinition :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 subprogramDefinition = try procDef <|> funcDef
 
+funcDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+funcDef = 
+    (do
+        funcRetToken <- funcToken
+        funcNameRetToken <- idToken
+        lParenRetToken <- leftParenToken
+        retParamList <- getParams []
+        
+        let funcName = get_id_name (getRetToken funcRetToken)
+        let paramList = getRetParamList retParamList
+
+        retColon <- colonToken
+        retReturnType <- generalType
+
+        let returnType = getRetType retReturnType
+
+        updateState(memoryInsert (SubprogramProtocol (ConstructFunctionProtocol funcName paramList returnType)))
+
+        retBlock <- subprogramBodyParser
+
+        updateState(memoryInsert (ConstructFunction funcName paramList (getRetBlock retBlock) returnType))
+
+        return (RetNothing))
+
+
 procDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 procDef = 
     (do
         procRetToken <- procToken
-        procNameRetToken <- id_token
+        procNameRetToken <- idToken
         lParenRetToken <- leftParenToken
+        retParamList <- getParams []
+        
         let procName = get_id_name (getRetToken procRetToken)
-        retNothing <- getParamsAndBody procName []
+        let paramList = getRetParamList retParamList
+        updateState(memoryInsert (ConstructProcedureProtocol procName paramList))
+
+        retBlock <- subprogramBodyParser
+
+        updateState(memoryInsert (ConstructProcedure procName paramList (getRetBlock retBlock)))
+
         return (RetNothing))
 
-getParamsAndBody :: String -> [Parameter] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
-getParamsAndBody procName [] =
+
+getParams :: [Parameter] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+getParams [] =
     try
     (do
         paramTypeRetType <- generalType
-        paramIdRetToken <- id_token
+        paramIdRetToken <- idToken
         let paramId = get_id_name (getRetToken paramIdRetToken)
         let paramType = getRetType paramTypeRetType
-        retNothing <- getParamsAndBody procName [ConsParameter paramType paramId])
-        return (RetNothing)
+        retParamList <- getParams ([ConsParameter paramType paramId])
+        return (retParamList))
     <|>
     (do
-        rParenRetToken <- rightParenToken
-        lBraceRetToken <- leftBraceToken
-        retNothing <- getBody procName [] NatNull []
-        return (RetNothing))
+        return (RetParamList []))
 
-getParamsAndBody procName paramList =
+getParams paramList =
     try
     (do
         commaRetToken <- commaToken
-        paramIdRetToken <- id_token
+        paramTypeRetType <- generalType
+        paramIdRetToken <- idToken
         let paramId = get_id_name (getRetToken paramIdRetToken)
         let paramType = getRetType paramTypeRetType
-        retNothing <- getParamsAndBody procName [ConsParameter paramType paramId])
-        return (RetNothing))
+        retParamList <- getParams (paramList ++ [ConsParameter paramType paramId])
+        return (retParamList))
     <|>
     (do
-        rParenRetToken <- rightParenToken
-        lBraceRetToken <- leftBraceToken
-        retNothing <- getBody procName paramList NatNull []
-        return (RetNothing))
+        return paramList)
 
 -- receives name of subprogram, list of parameters, return type and list of tokens (the body of the function)
-getBody :: String -> [Parameter] -> Type -> [Token] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
-getBody procName paramList retType body =
-    try 
-    (do
-        )
-    <|>
-    (do
-        rBraceRetToken <- rightBraceToken
-        s <- getState
-        if (retType == NatNull) then 
-            do
-                updateState(memory_insert (Subprogram (ConstructProcedure procName paramList body))))
-        else 
-            do
-                updateState(memory_insert (Subprogram (ConstructFunction procName paramList retType body))))
+-- getBody :: String -> [Parameter] -> Type -> [Token] -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
+-- getBody procName paramList retType body =
+--     try 
+--     (do
+--         )
+--     <|>
+--     (do
+--         rBraceRetToken <- rightBraceToken
+--         s <- getState
+--         if (retType == NatNull) then 
+--             do
+--                 updateState(memoryInsert (Subprogram (ConstructProcedure procName paramList body))))
+--         else 
+--             do
+--                 updateState(memoryInsert (Subprogram (ConstructFunction procName paramList retType body))))
 
 
 typedefs :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
@@ -219,7 +249,7 @@ typeDef = try typeAliasDef <|> structTypeDef
 typeAliasDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
 typeAliasDef = 
     do
-        rettypedefname <- id_token -- RetToken
+        rettypedefname <- idToken -- RetToken
         let typedefname = get_id_name (getRetToken rettypedefname) -- String 
         rettype <- generalType -- RetType
         let typeRead = getRetType rettype -- Type
@@ -229,7 +259,7 @@ typeAliasDef =
 structTypeDef :: ParsecT [Token] [MemoryCell] IO (ReturnObject)        
 structTypeDef = 
     do
-        retStructName <- id_token -- RetToken
+        retStructName <- idToken -- RetToken
         let structName = get_id_name (getRetToken retStructName) -- String 
         retLeftBrace <- leftBraceToken -- RetToken
         retStructInits <- structInits structName []-- RetStructStructure 
@@ -256,8 +286,8 @@ structInit :: String -> ParsecT [Token] [MemoryCell] IO (ReturnObject)
 structInit structName = 
     try 
     (do -- when type of field is recursive
-        retFieldType <- id_token
-        retFieldName <- id_token
+        retFieldType <- idToken
+        retFieldName <- idToken
         retSemiColon <- semiColonToken
         let fieldType = get_id_name (getRetToken retFieldType)
         let fieldName = get_id_name (getRetToken retFieldName)
@@ -268,7 +298,7 @@ structInit structName =
     <|>
     (do -- when type of field is not recursive
         retType <- generalType
-        retId <- id_token
+        retId <- idToken
         retSemiColon <- semiColonToken
         
         let actualType = getRetType retType 
@@ -277,12 +307,12 @@ structInit structName =
         return ( RetStructStructure [ (actualType, actualName)  ]  ))
 
 
-blockOfCommandsWithoutReturn :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-blockOfCommandsWithoutReturn =
-    do
-        retLeftBrace <- leftBraceToken
-        c <- statements
-        retRightBrace <- rightBraceToken
+-- blockOfCommandsWithoutReturn :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+-- blockOfCommandsWithoutReturn =
+--     do
+--         retLeftBrace <- leftBraceToken
+--         c <- statements
+--         retRightBrace <- rightBraceToken
 
-natIf :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
-natIf 
+-- natIf :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+-- natIf 

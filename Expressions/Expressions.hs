@@ -210,7 +210,7 @@ structValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 structValue =
     do
         memory <- getState -- [MemoryCell]
-        retId <- id_token -- RetToken 
+        retId <- idToken -- RetToken 
         -- liftIO(print(show(getRetToken retId)))
         -- liftIO(print("structValue"))
         retLeftBrace <- leftBraceToken
@@ -270,11 +270,11 @@ remainingStructValues inValueList (field:fields) =
 structFieldRead :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 structFieldRead = 
     do
-        retId <- id_token
+        retId <- idToken
         -- liftIO(print((get_id_name.getRetToken) retId))
         -- liftIO(print("structFieldRead"))
         retDot <- dotToken
-        retField <- id_token
+        retField <- idToken
         state <- getState
         let id = (get_id_name.getRetToken) retId
         let pos = get_pos (getRetToken retId)
@@ -320,7 +320,7 @@ var_attribution =
     -- when the attribution is of type arr[p1][p2] = expr
     (do
         mem <- getState
-        nameRetToken <- id_token -- RetToken
+        nameRetToken <- idToken -- RetToken
         let name = get_id_name (getRetToken nameRetToken) -- "arr"
         let var = memoryGet name (get_pos (getRetToken nameRetToken)) mem
         res <- editArray var [] -- RetValue
@@ -328,7 +328,7 @@ var_attribution =
     <|>
     -- when the attribution is 'simple': a = expr
     (do
-    a <- id_token -- RetToken
+    a <- idToken -- RetToken
     --liftIO(print(show(getRetToken a)))
     b <- assignToken -- RetToken
     expr_val <- expression -- RetValue
@@ -352,9 +352,9 @@ var_attribution =
 expParenthesized :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 expParenthesized = 
     do
-        lparen <- left_paren_token
+        lparen <- leftParenToken
         expr <- expression
-        rparen <- right_paren_token
+        rparen <- rightParenToken
         return (expr)
 
         -- Expression that consists of a local variable
@@ -363,7 +363,7 @@ memoryAccess :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 memoryAccess =
     (do -- array variable
         mem <- getState
-        id <- id_token -- RetToken
+        id <- idToken -- RetToken
         if (memoryHasName (get_id_name (getRetToken id)) mem) then 
             do 
                 let pos = get_pos (getRetToken id)
@@ -379,7 +379,7 @@ localVariable =
     do -- simple variable
         liftIO(print("trying to read a local variable"))
         mem <- getState
-        id <- id_token
+        id <- idToken
         liftIO(print(id))
         let name = (get_id_name.getRetToken) id
         let pos = get_pos (getRetToken id)
@@ -503,7 +503,7 @@ lValue :: ParsecT [Token] [MemoryCell] IO(ReturnObject)
 lValue = 
     do
         mem <- getState -- [MemoryCell]
-        name <- id_token -- RetToken Id
+        name <- idToken -- RetToken Id
         let nameRetToken = getRetToken name -- Token Id
         let var = memoryGet (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
         if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")

@@ -4,18 +4,26 @@ import Lexical.Lexemes
 import Types.Types
 import Types.Typedef
 import TypeValue.TypeValue
+import Syntax.Definition
 
 data Variable = 
     ConstructVariable String Value Bool | 
     ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
---                                  id                  body   return                    name                body
-data Subprogram = ConstructFunction String [Parameter] [Token] Type | ConstructProcedure String [Parameter] [Token] deriving (Show, Eq)
+
+data Subprogram = 
+    ConstructFunction String [Parameter] Block Type   | 
+    ConstructProcedure String [Parameter] Block       deriving (Show, Eq)
+
+data SubprogramProtocol = 
+    ConstructFunctionProtocol String [Parameter] Type   |
+    ConstructProcedureProtocol String [Parameter]  deriving (Show, Eq)
 
 data MemoryCell = 
-    Variable Variable       | 
-    Subprogram Subprogram   |
+    Variable Variable                       | 
+    Subprogram Subprogram                   |
+    SubprogramProtocol SubprogramProtocol   |
     Typedef Typedef deriving (Show, Eq)
 
 -- functions to access important fields
@@ -23,10 +31,26 @@ getId (Variable (ConstructVariable x _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (ConstructFunction x _ _ _)) = x
 getId (Subprogram (ConstructProcedure x _ _)) = x
+getId (SubprogramProtocol (ConstructFunctionProtocol x _ _)) = x
+getId (SubprogramProtocol (ConstructProcedureProtocol x _)) = x
 getId (Typedef (ConsTypedef x _)) = x
 getId (Typedef (StructDef x _)) = x
 
 getMemoryCellType (Typedef x) = x  
+
+
+-- TODO: this function should search in the memory for the local variable.
+-- | Returns the type of a local variable.
+getTypeOfLocalVar :: String -- ^ the name of the local variable
+                  -> Type -- ^ the type of the local variable
+getTypeOfLocalVar idName = NatInt
+
+getTypeOfFunctionCall :: String -> Type
+getTypeOfFunctionCall functionId = NatInt
+
+-- TODO: this is not implemented yet
+checkParamsPassed :: String -> [Expression] -> Bool
+checkParamsPassed id exprList = True
 
 setValue::MemoryCell -> Value -> MemoryCell
 setValue (Variable (ConstructVariable name v1 isGlobal)) v2
