@@ -235,3 +235,36 @@ evaluateExpression (CONSExprVarAssignment (CONSTokenId id) (exp) _) (cell) =
     )
     where value = evaluateExpression (exp) (cell)
 
+evaluateStatement :: Statement -> [MemoryCell] -> [MemoryCell]
+-- evaluate init statement
+evaluateStatement (CONSStatementVarInit (_ id exp)) (cell)
+    -- checks if the variable already exists
+    |   not (memoryHasName (get_id_name id) (cell)) = 
+        memoryInsert    -- if not exists, create
+            (Variable (
+                ConstructVariable
+                (get_id_name id)
+                (fst value)
+                (False)
+            ))
+            (snd value)
+        where value = evaluateExpression (exp) (cell)
+    | otherwise = error ("ERROR : conflicting variable name")
+
+-- evaluate assignment statement
+evaluateStatement (CONSStatementVarAssign id exp) (cell)
+    -- check if the variable exists
+    |   memoryHasName (get_id_name id) (cell) = 
+        memoryUpdate 
+            (setValue
+                (memoryGet
+                    (get_id_name id)
+                    (get_pos id)
+                    (cell)
+                )  
+                (fst value)  
+            )
+            (snd value)
+        
+        where value = evaluateExpression (exp) (cell)
+    | otherwise = error ("ERROR : variable " ++ (get_id_name id) ++ " not found" )
