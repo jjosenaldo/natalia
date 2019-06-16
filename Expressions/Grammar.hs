@@ -8,14 +8,32 @@ import TypeValue.TypeValue
 
 data Exp = 
     CONSExpLit Type Token | -- literals
+
+    -- TODO
     CONSExpBin Type BinOp Exp Exp | -- binary operations 
+
+    -- TODO
     CONSExpUn Type UnOp Exp | -- unary operations
+
+    -- TODO
     CONSExpAssign Type LValue Exp | -- assignment
+
+    -- TODO
     CONSExpLValue Type LValue | -- lvalues (they are rvalues aswell)
+
+    -- TODO
     CONSExpStruct Type String [Exp] | -- struct_name{foo1, foo2, ...}
+    
+    -- TODO
     CONSExpSet Type [Exp] | -- {1,2,3}
+
+    -- TODO
     CONSExpFuncCall Type String [Exp] | -- function call 
+
+    -- TODO
     CONSExpCmdZero Type Token | -- binary "command" call (like read())
+
+    -- TODO
     CONSExpCmdUn Type Token Exp  -- unary "command" call (like toString())
     deriving (Eq, Show)
 
