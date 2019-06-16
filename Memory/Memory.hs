@@ -4,7 +4,53 @@ import Lexical.Lexemes
 import Types.Types
 import Types.Typedef
 import TypeValue.TypeValue
-import Syntax.Definition
+
+data Block = 
+    CONSBlock [Statement]
+    deriving (Eq, Show)
+
+data Statement = 
+    CONSStatementVarInit VarInit                            |
+    CONSStatementVarAssign VarAssign                        |
+    CONSStatementPrint Print                                |
+    CONSStatementBlock Block                                |
+    CONSStatementIf Expression Block                        |
+    CONSStatementIfElse Expression Block Block              |
+    CONSStatementWhile Expression Block
+    deriving (Eq, Show)
+
+data Print = 
+    CONSPrint Expression
+    deriving (Eq, Show)
+
+data VarInit = 
+    CONSVarInit Type Id Expression
+    deriving (Eq, Show)
+
+data VarAssign = 
+    CONSVarAssign Id Expression
+    deriving (Eq, Show)
+
+data UnOperator = 
+    CONSTokenUnOperator Token
+    deriving (Eq, Show)
+
+data BinOperator =
+    CONSTokenBinOperator Token 
+    deriving (Eq, Show)
+
+data Id = 
+    CONSTokenId Token -- Id
+    deriving (Eq, Show)
+
+data Expression = 
+    CONSValue Value Type | -- literals
+    CONSId Id Type |
+    CONSUnOperation UnOperator Expression Type |
+    CONSBinOperation BinOperator Expression Expression Type |
+    CONSExprVarAssignment Id Expression Type
+    deriving (Eq, Show)
+
 
 data Variable = 
     ConstructVariable String Value Bool | 

@@ -3,11 +3,9 @@ module Main (main) where
 -----------------------------------------------  SEMANTICS  ---------------------------------------------------------
 
 -- natalia's modules
-import Blocks.Blocks
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
-import Statements.Statements
 import TypeValue.TypeValue
 
 -- Haskell's modules
@@ -19,8 +17,6 @@ import Text.Parsec
 -- the entire program
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
-            retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
-            retMainBlock <- mainBlock
             eof
             return ()
 
