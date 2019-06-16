@@ -1,53 +1,9 @@
-module NewExpressions.Grammar where
+module Expressions.Typing where 
 
 -- natalia's modules
-import Lexical.Lexemes
+import Expressions.Grammar    
 
 -- Haskell modules
-
-data MemoryCell = MemoryCell
-
-data Type = 
-    NatGenType                              |
-    NatInt                                  | 
-    NatBool                                 | 
-    NatString                               | 
-    NatDouble                               | 
-    NatSet Type                             | 
-    NatStruct String                        |
-    NatNothing                              |
-    NatArray Type                           |
-    NatPointer Type                         |
-    NatNull 
-    deriving (Show, Eq)
-
-data Exp = 
-    CONSExpLit Type Token | -- literals
-    CONSExpBin Type BinOp Exp Exp | -- binary operations 
-    CONSExpUn Type UnOp Exp | -- unary operations
-    CONSExpAssign Type LValue Exp | -- assignment
-    CONSExpLValue Type LValue | -- lvalues (they are rvalues aswell)
-    CONSExpStruct Type String [Exp] | -- struct_name{foo1, foo2, ...}
-    CONSExpSet Type [Exp] | -- {1,2,3}
-    CONSExpFuncCall Type String [Exp] | -- function call 
-    CONSExpCmdZero Type Token | -- binary "command" call (like read())
-    CONSExpCmdUn Type Token Exp  -- unary "command" call (like toString())
-    deriving (Eq, Show)
-
-data LValue = 
-    CONSLValueId String | -- a = 1;
-    CONSLValueStruct String [String] | -- node.left = 1;
-    CONSLValueArray String [Exp] | -- v[1][2][3] = 1;
-    CONSLValueDerref String Int   -- *ptr = 1;
-    deriving (Eq, Show)
-
-data BinOp = 
-    CONSBinOp Token
-    deriving (Eq, Show)
-
-data UnOp = 
-    CONSUnOp Token
-    deriving (Eq, Show)
 
 setExpType :: [MemoryCell] -> Exp -> Exp
 setExpType memory (CONSExpBin _ binOp exp1 exp2) = 

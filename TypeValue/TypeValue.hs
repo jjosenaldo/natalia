@@ -2,6 +2,7 @@ module TypeValue.TypeValue where
 
 data Type = 
     NatGenType                              |
+    NatNothing                              |
     NatInt                                  | 
     NatBool                                 | 
     NatString                               | 
