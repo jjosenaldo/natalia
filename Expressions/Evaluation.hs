@@ -187,6 +187,10 @@ unaryEval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operator
 unaryEval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
 unaryEval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
 
+printValue :: Value -> [MemoryCell] -> [MemoryCell]
+printValue (x) (cell) = 
+    do putStr x
+       return cell
 
 evaluateExpression :: Expression -> [MemoryCell] -> (Value, [MemoryCell])
 
@@ -268,3 +272,36 @@ evaluateStatement (CONSStatementVarAssign id exp) (cell)
         
         where value = evaluateExpression (exp) (cell)
     | otherwise = error ("ERROR : variable " ++ (get_id_name id) ++ " not found" )
+
+evaluateStatement (CONSStatementPrint (exp)) (cell)
+    | ((getTypeOfExpression exp) == NatString) =
+        printValue (fst value) (snd value)
+    where value = evaluateExpression (exp) (cell)
+
+
+-- evaluate blocks
+evaluateStatement (CONSStatementBlock list) (cell) 
+    | (lenght list == 1) = evaluateStatement (head list) (cell)
+    | otherwise = evaluateStatement (tail list) (evaluateStatement (head list) (cell))
+
+-- evaluate if 
+evaluateStatement (CONSStatementIf (exp) (block)) (cell) 
+    | ((getTypeOfExpression exp) == NatBool) && ((fst value) == True) =
+        evaluateStatement (getBlockStatements block) (cell)
+    where value = evaluateExpression (exp) (cell)
+
+-- evalate if-else
+evaluateStatement (CONSStatementIfElse (exp) (block1) (block2)) (cell)
+    | ((getTypeOfExpression exp) == NatBool) && ((fst value) == True) =
+        evaluateStatement (getBlockStatements block1) (cell)
+    | ((getTypeOfExpression exp) == NatBool) && ((fst value) == False) =
+        evaluateStatement (getBlockStatements block2) (cell)
+    where value = evaluateExpression (exp) (cell)
+
+-- evaluate while
+evaluateStatement (CONSStatementWhile (exp) (block) ) (cell)
+    | ((getTypeOfExpression exp) == NatBool) && ((fst value) == True) =
+        evaluateStatement (getBlockStatements block) (cell)
+    | ((getTypeOfExpression exp) == NatBool) && ((fst value) == False) =
+        cell  
+    where value = evaluateExpression (exp) (cell)
