@@ -139,12 +139,6 @@ getExpType (CONSExpFuncCall t _ _) = t
 getExpType (CONSExpCmdZero t _) = t
 getExpType (CONSExpCmdUn t _ _) = t
 
--- | Gets the type of a variable in a memory.
-getVarTypeInMemory :: [MemoryCell] -- ^ the memory in which the variable lives
-                   -> String -- ^ the name of the variable
-                   -> Type -- ^ the type of the variable
-getVarTypeInMemory _ _ = NatNothing
-
 getStructFieldType :: [MemoryCell] -> String -> [String] -> Type 
 getStructFieldType memory name [] = 
     NatStruct name
