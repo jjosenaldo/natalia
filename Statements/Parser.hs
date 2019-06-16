@@ -61,10 +61,11 @@ _varInitAsStmt =
 _varInit = 
     do 
         ttype  <- generalType -- Token
+        let actualType = getRetType ttype
         id <- _idToken
         ass <- _assignToken -- Token 
         expr <- _expr -- Exp
-        return $ CONSVarInit (getTypeFromTypeToken ttype) (get_id_name id) expr
+        return $ CONSVarInit actualType (get_id_name id) expr
 
 _return =
     do 

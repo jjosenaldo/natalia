@@ -570,7 +570,7 @@ _rightBracketToken = tokenPrim show updatePos get_token where
     get_token _       = Nothing
 
 
-_returnToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
+_returnToken :: ParsecT [Token] st IO (Token)
 _returnToken = tokenPrim show updatePos get_token where
     get_token (Return p) = Just (Return p)
     get_token _       = Nothing
