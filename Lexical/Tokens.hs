@@ -225,7 +225,7 @@ modToken = tokenPrim show updatePos get_token where
     get_token _       = Nothing
 
 
--- terminal: name of the *int* type %TODO: update comment
+-- terminal: token for a primitive type
 lexicalTypeToken :: ParsecT [Token] st IO (ReturnObject)
 lexicalTypeToken = tokenPrim show updatePos get_token where
     get_token (Type x p) = Just (RetToken (Type x p))
@@ -575,8 +575,6 @@ _readToken = tokenPrim show updatePos get_token where
     get_token (Read p) = Just  ( Read p ) 
     get_token _       = Nothing
 
-
--- TODO
 updatePos :: SourcePos -> Token -> [Token] -> SourcePos
 updatePos pos _ (tok:_) = pos -- necessita melhoria
 updatePos pos _ []      = pos  
