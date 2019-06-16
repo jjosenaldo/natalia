@@ -2,6 +2,7 @@ module Statements.Parser where
 
 -- natalia's modules
 import Expressions.Parser
+import GenParsers.GenParser
 import Lexical.Lexemes
 import Lexical.Tokens
 import Statements.Grammar
@@ -75,17 +76,3 @@ _block =
     do 
         stmts <- _braces _statementList
         return $ CONSBlock stmts
-
-_braces p = 
-    do 
-        lb <- _leftBraceToken 
-        x <- p 
-        rb <- _rightBraceToken
-        return $ x
-
-_parens p = 
-    do 
-        lb <- _leftParenToken 
-        x <- p 
-        rb <- _rightParenToken
-        return $ x

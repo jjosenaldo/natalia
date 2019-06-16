@@ -1,6 +1,7 @@
 module Expressions.Parser where
 
 -- natalia's modules
+import GenParsers.GenParser
 import Lexical.Lexemes
 import Lexical.Tokens
 import Expressions.Grammar
@@ -32,7 +33,7 @@ terms =
     try unaryCmd <|>
     try _nullToken <|> 
     try funcCall <|> 
-    try (parens _expr) <|> 
+    try (_parens _expr) <|> 
     try structValue <|> 
     try setValue <|> 
     try assign <|> 
@@ -149,10 +150,3 @@ lvalueDerref =
 
 -- General expression
 _expr = buildExpressionParser table terms
-
-parens x = 
-    do 
-        l <- _leftParenToken
-        a <- x
-        r <- _rightParenToken
-        return a
