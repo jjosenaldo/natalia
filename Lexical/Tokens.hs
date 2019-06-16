@@ -104,10 +104,14 @@ funcToken = tokenPrim show updatePos get_token where
     get_token (Func p)  = Just (RetToken (Func p))
     get_token _         = Nothing
 
--- Pre-defined block (main)
 mainToken :: ParsecT [Token] st IO (ReturnObject)
 mainToken = tokenPrim show updatePos get_token where
     get_token (Main p) = Just (RetToken (Main p))
+    get_token _       = Nothing
+-- Pre-defined block (main)
+_mainToken :: ParsecT [Token] st IO (Token)
+_mainToken = tokenPrim show updatePos get_token where
+    get_token (Main p) = Just (Main p)
     get_token _       = Nothing
 
 -- Pre-defined block (typedefs)
@@ -117,6 +121,12 @@ typedefsToken = tokenPrim show updatePos get_token where
     get_token _       = Nothing
 
 -- Pre-defined block (subprograms)
+_subprogramsToken :: ParsecT [Token] st IO (Token)
+_subprogramsToken = tokenPrim show updatePos get_token where
+    get_token (Subprograms p) = Just (Subprograms p)
+    get_token _       = Nothing
+
+
 subprogramsToken :: ParsecT [Token] st IO (ReturnObject)
 subprogramsToken = tokenPrim show updatePos get_token where
     get_token (Subprograms p) = Just (RetToken (Subprograms p))
