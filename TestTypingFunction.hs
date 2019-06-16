@@ -25,4 +25,7 @@ main = do
                 }
 
 parser :: [Token] -> IO (Either ParseError (Exp))
-parser tokens = runParserT _expr [] "Syntactical error:" tokens
+parser tokens = 
+    do 
+        expWithoutType <- runParserT _expr [] "Syntactical error:" tokens
+        let expWithType = setExpType

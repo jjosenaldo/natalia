@@ -58,3 +58,4 @@ clean:
 	@rm -rf $(TYPE_PATH)/*.hi
 	@rm -rf $(TV_PATH)/*.o
 	@rm -rf $(TV_PATH)/*.hi
+	#@rm -rf *.out
