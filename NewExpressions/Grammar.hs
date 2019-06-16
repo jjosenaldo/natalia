@@ -6,7 +6,12 @@ import Lexical.Lexemes
 -- Haskell modules
 
 data Type = 
-    NatNothing
+    NatNothing | 
+    NatInt | 
+    NatDouble | 
+    NatNull | 
+    NatString | 
+    NatBool
     deriving (Eq, Show)
 
 data Exp = 
