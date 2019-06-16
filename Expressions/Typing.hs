@@ -1,11 +1,18 @@
 module Expressions.Typing where 
 
 -- natalia's modules
-import Expressions.Grammar    
+import Expressions.Grammar
+import Lexical.Lexemes    
+import Memory.Memory
+import TypeValue.TypeValue
 
 -- Haskell modules
 
 setExpType :: [MemoryCell] -> Exp -> Exp
+
+setExpType _ (CONSExpLit t tok ) = 
+    CONSExpLit t tok 
+
 setExpType memory (CONSExpBin _ binOp exp1 exp2) = 
     CONSExpBin t binOp retExp1 retExp2
     where 

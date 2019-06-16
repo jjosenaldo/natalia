@@ -4,6 +4,7 @@ module TestTypingFunction where
 import Lexical.Lexemes
 import Expressions.Grammar
 import Expressions.Parser
+import Expressions.Typing
 
 -- Haskell modules
 -- import Control.Monad.IO.Class
@@ -20,12 +21,11 @@ main = do
     else
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
-                    Right ans -> do
-                                    print(ans)
+                    Right exprTree -> do
+                                    let memory = []
+                                    let expWithType = setExpType memory exprTree 
+                                    print (expWithType)
                 }
 
 parser :: [Token] -> IO (Either ParseError (Exp))
-parser tokens = 
-    do 
-        expWithoutType <- runParserT _expr [] "Syntactical error:" tokens
-        let expWithType = setExpType
+parser tokens = runParserT   _expr  [] "Syntactical error:" tokens -- Don't alter this line!

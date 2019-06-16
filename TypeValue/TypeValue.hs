@@ -9,6 +9,7 @@ data Type =
     NatDouble                               | 
     NatSet Type                             | 
     NatStruct String                        |
+    NatPointer Type                         |
     NatArray Type                           |
     NatNull deriving (Show, Eq)
 
