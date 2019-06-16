@@ -10,4 +10,4 @@ _program =
         globalsBlock <- _globalsBlock
         subprogramsBlock <- _subprogramsBlock
         mainBlock <- _mainBlock
-        return (CONSProgram (CONSTypedefsBlock []) globalsBlock subprogramsBlock (CONSMainBlock []))
+        return (CONSProgram (CONSTypedefsBlock []) globalsBlock subprogramsBlock mainBlock)
