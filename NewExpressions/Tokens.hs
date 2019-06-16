@@ -9,22 +9,22 @@ import Text.Parsec
 
 intToken :: ParsecT [Token] st IO (Exp)
 intToken = tokenPrim show updatePos get_token where
-    get_token (Int x p) = Just  (  CONSExpLit NatNothing (Int x p) )
+    get_token (Int x p) = Just  (  CONSExpLit NatInt (Int x p) )
     get_token _       = Nothing
 
 doubleToken :: ParsecT [Token] st IO (Exp)
 doubleToken = tokenPrim show updatePos get_token where
-    get_token (Double x p) = Just  (  CONSExpLit NatNothing (Double x p) )
+    get_token (Double x p) = Just  (  CONSExpLit NatDouble (Double x p) )
     get_token _       = Nothing
 
 stringToken :: ParsecT [Token] st IO (Exp)
 stringToken = tokenPrim show updatePos get_token where
-    get_token (String x p) = Just  (  CONSExpLit NatNothing (String x p) )
+    get_token (String x p) = Just  (  CONSExpLit NatString (String x p) )
     get_token _       = Nothing
 
 nullToken :: ParsecT [Token] st IO (Exp)
 nullToken = tokenPrim show updatePos get_token where
-    get_token (Null p) = Just  (  CONSExpLit NatNothing (Null p) )
+    get_token (Null p) = Just  (  CONSExpLit NatNull (Null p) )
     get_token _       = Nothing
 
 minusUnToken :: ParsecT [Token] st IO (Exp -> Exp)
@@ -75,7 +75,7 @@ modToken = tokenPrim show updatePos get_token where
 
 boolToken :: ParsecT [Token] st IO (Exp)
 boolToken = tokenPrim show updatePos get_token where
-    get_token (Bool x p) = Just  (  CONSExpLit NatNothing (Bool x p) )
+    get_token (Bool x p) = Just  (  CONSExpLit NatNull (Bool x p) )
     get_token _       = Nothing
 
 andToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)
