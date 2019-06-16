@@ -38,8 +38,7 @@ _remainingStatements stmts =
     return stmts
 
 
-_statementNotBlock = _varInitAsStmt <|> _printAsStmt
-
+_statementNotBlock = try _varInitAsStmt <|> try _printAsStmt <|> _returnAsStmt
 
 _printAsStmt = 
     do 
@@ -60,12 +59,23 @@ _varInitAsStmt =
 
 _varInit = 
     do 
-        -- TODO: this should be a general type
-        ttype  <- _lexicalTypeToken -- Token
+        ttype  <- generalType -- Token
+        let actualType = getRetType ttype
         id <- _idToken
         ass <- _assignToken -- Token 
         expr <- _expr -- Exp
-        return $ CONSVarInit (getTypeFromTypeToken ttype) (get_id_name id) expr
+        return $ CONSVarInit actualType (get_id_name id) expr
+
+_returnAsStmt = 
+    do 
+        ret <- _return
+        return $ CONSStatementReturn ret
+
+_return =
+    do 
+        returnToken <- _returnToken
+        expr <- _expr;
+        return (CONSReturn expr) 
 
 _block = 
     do 

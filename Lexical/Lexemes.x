@@ -114,7 +114,7 @@ tokens :-
   "proc"                            {\p s -> Proc (getLC p)}
 
   -- NAMES ------------------------------------------------
-
+  "return"                          {\p s -> Return (getLC p)}
   -- identifier
   $alpha [$alpha $digit \_ \']*    { \p s -> Id s (getLC p)}
 
@@ -218,7 +218,9 @@ data Token =
   Double Double (Int, Int)       |
   String String (Int, Int)       |
   Bool Bool (Int, Int)           |
-  Null (Int, Int)                
+  Null (Int, Int)                |
+
+  Return (Int, Int)
 
   ----------------------------------------------------------
 
