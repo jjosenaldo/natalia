@@ -174,6 +174,18 @@ binaryEval (ConsNatDouble x) (Different p) (ConsNatInt y) =
     error ("ERROR at " ++ show(p) ++ ": comparison between two different types.")
 binaryEval _ (Different p) _ = error ("ERROR at " ++ show(p) ++ ": the != operator expects two numbers.")
 
+-- | Implementation of binary operations
+unaryEval :: Token -- ^ operator
+            -> Value -- ^ operand
+            -> Value -- ^ result of the operation
+
+-- Operator - (unary)
+unaryEval (Minus p) (ConsNatInt x) = ConsNatInt (-x) 
+unaryEval (Minus p) (ConsNatDouble x) = ConsNatDouble (-x) 
+unaryEval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a number.")
+
+unaryEval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
+unaryEval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
 
 
 -- Haskell modules
@@ -192,3 +204,7 @@ playExpression memory (CONSExpBin t (CONSBinOp binOp) exp1 exp2) =
     where 
         value1 = snd (playExpression memory exp1)
         value2 = snd (playExpression memory exp2)
+
+playExpression memory (CONSExpUn t (CONSUnOp unOp) exp) = 
+    ( memory, unaryEval (unOp) (value) )
+    where value = snd (playExpression memory exp)

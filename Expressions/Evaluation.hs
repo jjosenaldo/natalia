@@ -8,18 +8,6 @@ import Data.List
 import Syntax.Definition
 
 
--- | Implementation of binary operations
-unaryEval :: Token -- ^ operator
-            -> Value -- ^ operand
-            -> Value -- ^ result of the operation
-
--- Operator - (unary)
-unaryEval (Minus p) (ConsNatInt x) = ConsNatInt (-x) 
-unaryEval (Minus p) (ConsNatDouble x) = ConsNatDouble (-x) 
-unaryEval (Minus p) _ = error ("ERROR at " ++ show(p) ++ ": the unary - operator expects a number.")
-
-unaryEval (Negation p) (ConsNatBool x) = ConsNatBool (not(x)) 
-unaryEval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
 
 
 evaluateExpression :: Expression -> [MemoryCell] -> (Value, [MemoryCell])
