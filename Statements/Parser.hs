@@ -39,7 +39,6 @@ _remainingStatements stmts =
 
 
 _statementNotBlock = try _varInitAsStmt <|> try _printAsStmt <|> _returnAsStmt
-_statementNotReturn = 
 
 _printAsStmt = 
     do 
