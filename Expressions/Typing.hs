@@ -108,8 +108,10 @@ setExpType memory (CONSExpCmdUn _ (ToBool p) exp1)
 -- alias to getNameOfType
 getTypeName = getNameOfType 
 
--- TODO
-getFunctionProtocol :: [MemoryCell] -> String -> ([Type], Type)
+-- | Gets the protocol of a function.
+getFunctionProtocol :: [MemoryCell] -- ^ the memory which contains the protocol of the function
+                       -> String -- ^ the name of the function
+                       -> ([Type], Type) -- ^ the function protocol (in terms of its parameters and its return type)
 getFunctionProtocol _ _ = ([], NatNothing)
 
 bestType :: Type -> [Type] -> Type 
@@ -137,8 +139,10 @@ getExpType (CONSExpFuncCall t _ _) = t
 getExpType (CONSExpCmdZero t _) = t
 getExpType (CONSExpCmdUn t _ _) = t
 
--- TODO
-getVarTypeInMemory :: [MemoryCell] -> String -> Type 
+-- | Gets the type of a variable in a memory.
+getVarTypeInMemory :: [MemoryCell] -- ^ the memory in which the variable lives
+                   -> String -- ^ the name of the variable
+                   -> Type -- ^ the type of the variable
 getVarTypeInMemory _ _ = NatNothing
 
 getStructFieldType :: [MemoryCell] -> String -> [String] -> Type 
@@ -159,8 +163,10 @@ keyFromVal (x:xs) val
     | snd x == val = fst x
     | otherwise = keyFromVal xs val
 
--- TODO
-getStructStructure :: [MemoryCell] -> String -> [(Type, String)]
+-- | Gets the structure  (list of fields) of a... well... struct...
+getStructStructure :: [MemoryCell] -- ^ the memory which contains the definition of the struct
+                   -> String -- ^ the name of the struct
+                   -> [(Type, String)] -- ^ the structure (list of fields) of the struct
 getStructStructure memory x = []
 
 
