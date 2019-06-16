@@ -104,9 +104,8 @@ setExpType memory (CONSExpCmdUn _ (ToBool p) exp1)
         newExp = setExpType memory exp1 
         newExpType = getExpType newExp
 
--- TODO
-getTypeName :: Type -> String
-getTypeName _ = ""
+-- alias to getNameOfType
+getTypeName = getNameOfType 
 
 -- TODO
 getFunctionProtocol :: [MemoryCell] -> String -> ([Type], Type)
