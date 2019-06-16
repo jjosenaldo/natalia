@@ -38,8 +38,8 @@ _remainingStatements stmts =
     return stmts
 
 
-_statementNotBlock = _varInitAsStmt <|> _printAsStmt
-
+_statementNotBlock = try _varInitAsStmt <|> try _printAsStmt <|> _returnAsStmt
+_statementNotReturn = 
 
 _printAsStmt = 
     do 
@@ -66,6 +66,11 @@ _varInit =
         ass <- _assignToken -- Token 
         expr <- _expr -- Exp
         return $ CONSVarInit actualType (get_id_name id) expr
+
+_returnAsStmt = 
+    do 
+        ret <- _return
+        return $ CONSStatementReturn ret
 
 _return =
     do 

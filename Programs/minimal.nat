@@ -1,20 +1,16 @@
 @globals{
-    int a = 1;
-    int b = 2;
+    #int a = 1;
 }
 @subprograms{
     func identity(int x) : int{
-        double a = 3;
-        int b = 1;
-        print(a+b);
+        return x;   
     }
 
-    proc emptyProc(double b){
-        int a = {1,2,3,4};
-    }
+    #proc emptyProc(double b){
+    #}
 }
 
 
 @main{
-    print("hello world");
+
 }
