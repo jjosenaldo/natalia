@@ -22,6 +22,13 @@ checkCompatibleTypes (NatPointer t1) (NatPointer t2) = checkCompatibleTypes t1 t
 checkCompatibleTypes NatNull NatNull = True
 checkCompatibleTypes _ _ = False
 
+isOfStruct :: Type -> Bool
+isOfStruct(NatStruct _) = True
+isOfStruct (NatSet t) = isOfStruct t
+isOfStruct (NatPointer t) = isOfStruct t
+isOfStruct (NatArray t) = isOfStruct t
+isOfStruct _ = False
+
 getTypeFromTypeToken :: Token -> Type
 getTypeFromTypeToken (Type str _) 
     | str == "int" = NatInt

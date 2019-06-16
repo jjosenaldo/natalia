@@ -4,6 +4,7 @@ module Expressions.Operations where
 import Expressions.Grammar
 import Lexical.Lexemes
 import TypeValue.TypeValue
+import Types.Types
 
 -- Haskell modules
 import Text.Parsec
@@ -95,18 +96,22 @@ getReturnTypeOfBinOp (CONSBinOp (Or p)) NatBool NatBool = NatBool
 getReturnTypeOfBinOp (CONSBinOp (Or p)) _ _ = 
     error ("ERROR at " ++ show(p) ++ ": the operator && expects two " ++ (getNameOfType NatBool) )
 
--- TODO: throws error if the types aren't equivalent
-getReturnTypeOfBinOp (CONSBinOp (Equals p)) (NatStruct s1) (NatStruct s2) =
-    error ("ERROR: you can't check two structs for equality")
-getReturnTypeOfBinOp (CONSBinOp (Equals p)) _ _ = NatBool
+-- throws error if the types aren't equivalent
+getReturnTypeOfBinOp (CONSBinOp (Equals p)) t1 t2 
+    | not(checkCompatibleTypes t1 t2) && not(checkCompatibleTypes t2 t1) = 
+        error ("ERROR: you can't check two incompatible types for equality")
+    | (isOfStruct (t1)) || (isOfStruct (t2)) =
+        error ("ERROR: you can't check two structs for equality")
+    | otherwise = NatBool
 
--- TODO: throws error if the types aren't equivalent
-getReturnTypeOfBinOp (CONSBinOp (Different p)) (NatStruct s1) (NatStruct s2) =
-    error ("ERROR: you can't check two structs for inequality")
-getReturnTypeOfBinOp (CONSBinOp (Different p)) _ _ = NatBool
+--  throws error if the types aren't equivalent
+getReturnTypeOfBinOp (CONSBinOp (Different p)) t1 t2 
+    | not(checkCompatibleTypes t1 t2) && not(checkCompatibleTypes t2 t1) = 
+        error ("ERROR: you can't check two incompatible types for inequality")
+    | (isOfStruct (t1)) || (isOfStruct (t2)) =
+        error ("ERROR: you can't check two structs for inequality")
+    | otherwise = NatBool
 
--- TODO
-getReturnTypeOfBinOp (CONSBinOp (Different p)) _ _ = NatNothing
 
 
 --------- UNARY OPERATORS -----------------------------------------------------------------------------------------------------------------
