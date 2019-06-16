@@ -11,8 +11,14 @@ $digit = [0-9]
 $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
+
   -- COMMANDS ---------------------------------------------
-  
+
+  read                             { \p s -> Read (getLC p)}
+  toInt                            { \p s -> ToInt (getLC p)}
+  toDouble                         { \p s -> ToDouble (getLC p)}
+  toString                         { \p s -> ToString (getLC p)}
+  toBool                           { \p s -> Read (getLC p)}
   print                            { \p s -> Print (getLC p)}
 
   -- TYPES  ------------------------------------------------
@@ -117,6 +123,15 @@ tokens :-
 -- The token type:
 data Token =
 
+  -- COMMANDS ---------------------------------------------
+
+  ToDouble (Int, Int)        |
+  ToInt (Int, Int)           |
+  ToString (Int, Int)        |
+  ToBool (Int, Int)          |
+  Print (Int, Int)           |
+  Read (Int, Int)            |
+
   -- BLOCKS -----------------------------------------------
 
   LBrace (Int, Int)          |
@@ -203,11 +218,7 @@ data Token =
   Double Double (Int, Int)       |
   String String (Int, Int)       |
   Bool Bool (Int, Int)           |
-  Null (Int, Int)                |
-
-  -- COMMANDS ---------------------------------------------
-
-  Print (Int, Int)
+  Null (Int, Int)                
 
   ----------------------------------------------------------
 

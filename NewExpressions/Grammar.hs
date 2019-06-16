@@ -17,7 +17,9 @@ data Exp =
     CONSExpLValue Type LValue | -- lvalues (they are rvalues aswell)
     CONSExpStruct Type String [Exp] | -- struct_name{foo1, foo2, ...}
     CONSExpSet Type [Exp] | -- {1,2,3}
-    CONSExpFuncCall Type String [Exp] -- function call 
+    CONSExpFuncCall Type String [Exp] | -- function call 
+    CONSExpCmdZero Type Token | -- binary "command" call (like read())
+    CONSExpCmdUn Type Token Exp  -- unary "command" call (like toString())
     deriving (Eq, Show)
 
 data LValue = 

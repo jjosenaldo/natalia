@@ -22,6 +22,11 @@ stringToken = tokenPrim show updatePos get_token where
     get_token (String x p) = Just  (  CONSExpLit NatNothing (String x p) )
     get_token _       = Nothing
 
+nullToken :: ParsecT [Token] st IO (Exp)
+nullToken = tokenPrim show updatePos get_token where
+    get_token (Null p) = Just  (  CONSExpLit NatNothing (Null p) )
+    get_token _       = Nothing
+
 minusUnToken :: ParsecT [Token] st IO (Exp -> Exp)
 minusUnToken = tokenPrim show updatePos get_token where
     get_token (Minus p) = Just  (  CONSExpUn NatNothing (CONSUnOp (Minus p))   )
@@ -173,21 +178,32 @@ commaToken = tokenPrim show updatePos get_token where
     get_token (Comma p) = Just  ( Comma p ) 
     get_token _       = Nothing
 
--- stringToken = tokenPrim show updatePos get_token where
---     get_token (String x p) = Just  (  CONSLitString x p)
---     get_token _       = Nothing
+toDoubleToken :: ParsecT [Token] st IO (Token)
+toDoubleToken = tokenPrim show updatePos get_token where
+    get_token (ToDouble p) = Just  ( ToDouble p ) 
+    get_token _       = Nothing
 
--- doubleToken = tokenPrim show updatePos get_token where
---     get_token (Double x p) = Just  (  CONSLitDouble x p)
---     get_token _       = Nothing
+toIntToken :: ParsecT [Token] st IO (Token)
+toIntToken = tokenPrim show updatePos get_token where
+    get_token (ToInt p) = Just  ( ToInt p ) 
+    get_token _       = Nothing
 
--- literals = intToken <|> boolToken <|> stringToken <|> doubleToken
+toStringToken :: ParsecT [Token] st IO (Token)
+toStringToken = tokenPrim show updatePos get_token where
+    get_token (ToString p) = Just  ( ToString p ) 
+    get_token _       = Nothing
+
+toBoolToken :: ParsecT [Token] st IO (Token)
+toBoolToken = tokenPrim show updatePos get_token where
+    get_token (ToBool p) = Just  ( ToBool p ) 
+    get_token _       = Nothing
+
+readToken :: ParsecT [Token] st IO (Token)
+readToken = tokenPrim show updatePos get_token where
+    get_token (Read p) = Just  ( Read p ) 
+    get_token _       = Nothing
 
 -- TODO
 updatePos :: SourcePos -> Token -> [Token] -> SourcePos
 updatePos pos _ (tok:_) = pos -- necessita melhoria
 updatePos pos _ []      = pos  
-
--- stringn: concat 
--- subconjuunt
--- pertence 

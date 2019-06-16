@@ -27,8 +27,36 @@ table =
 
 -- Terms of a general expression (i.e., the expressions with the greatest precedence)
 terms = 
-    try funcCall <|> try (parens expr) <|> try structValue <|> try setValue <|> try assign <|> try lvalueAsExpr <|> try intToken <|> try doubleToken <|> boolToken <|> stringToken
-    
+    try zeroaryCmd <|>
+    try unaryCmd <|>
+    try nullToken <|> 
+    try funcCall <|> 
+    try (parens expr) <|> 
+    try structValue <|> 
+    try setValue <|> 
+    try assign <|> 
+    try lvalueAsExpr <|> 
+    try intToken <|> 
+    try doubleToken <|> 
+    try boolToken <|> 
+    stringToken
+
+zeroaryCmd = 
+    do 
+        rd <- readToken
+        lp <- leftParenToken
+        rp <- rightParenToken
+        return $ CONSExpCmdZero NatNothing rd
+
+unaryCmd = 
+    do 
+        rd <- try toStringToken <|> try toIntToken <|> try toDoubleToken <|> toBoolToken
+        lp <- leftParenToken
+        arg <- expr
+        rp <- rightParenToken
+        return $ CONSExpCmdUn NatNothing rd arg
+
+-- Function call, like f(x,y)
 funcCall = 
     do 
         id <- idToken
@@ -37,13 +65,13 @@ funcCall =
         rp <- rightParenToken
         return $ CONSExpFuncCall NatNothing (get_id_name id) exprs 
 
+-- A set, like {1,2,3,4}
 setValue = 
     do 
         lb <- leftBraceToken
         exprs <- sepBy expr commaToken
         rb <- rightBraceToken
         return $ CONSExpSet NatNothing exprs
-
 
 -- Value of a struct, like: rational_t{1, 0}
 structValue = 
