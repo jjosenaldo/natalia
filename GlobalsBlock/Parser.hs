@@ -12,7 +12,10 @@ import Text.Parsec.String
 
 _globalsBlock = 
     do 
+        gtoken <- _globalsToken
+        lBrace <- _leftBraceToken
         initList <- many (_initialization)
+        rBrace <- _rightBraceToken
         return (CONSGlobalsBlock initList)
 
 _initialization = 

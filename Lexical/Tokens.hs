@@ -93,6 +93,11 @@ getRetExpressionList :: ReturnObject -> [Expression]
 getRetExpressionList (RetExpressionList x) = x
 getRetExpressionList _ = error "Invalid conversion from ReturnObject to RetExpressionList"
 
+_procToken :: ParsecT [Token] st IO (Token)
+_procToken = tokenPrim show updatePos get_token where
+    get_token (Proc p)  = Just (Proc p)
+    get_token _         = Nothing
+
 procToken :: ParsecT [Token] st IO (ReturnObject)
 procToken = tokenPrim show updatePos get_token where
     get_token (Proc p)  = Just (RetToken (Proc p))
@@ -137,6 +142,11 @@ subprogramsToken = tokenPrim show updatePos get_token where
     get_token _       = Nothing
 
 -- Pre-defined block (globals)
+_globalsToken :: ParsecT [Token] st IO (Token)
+_globalsToken = tokenPrim show updatePos get_token where
+    get_token (Globals p) = Just (Globals p)
+    get_token _       = Nothing
+
 globalsToken :: ParsecT [Token] st IO (ReturnObject)
 globalsToken = tokenPrim show updatePos get_token where
     get_token (Globals p) = Just (RetToken (Globals p))

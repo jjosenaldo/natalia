@@ -36,6 +36,7 @@ _func =
         id <- _idToken
         lParen <- _leftParenToken
         params <- sepBy _param _commaToken
+        rParen <- _rightParenToken
         colon <- colonToken
         returnType <- generalType
         let actualType = getRetType returnType
@@ -46,7 +47,7 @@ _func =
 
 _proc =
     do
-        fToken <- _funcToken
+        pToken <- _procToken
         id <- _idToken
         lParen <- _leftParenToken
         params <- sepBy _param _commaToken

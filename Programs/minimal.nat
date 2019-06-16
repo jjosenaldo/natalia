@@ -1,6 +1,8 @@
 @globals{
-    
+    int a = 1;
 }
 @subprograms{
-
+    func identity(int x) : int{
+        double a = 3;
+    }
 }
