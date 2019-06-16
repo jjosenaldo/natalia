@@ -5,6 +5,7 @@ import Expressions.Grammar
 import Expressions.Operations
 import Lexical.Lexemes    
 import Memory.Memory
+import Types.Types
 import TypeValue.TypeValue
 
 -- Haskell modules
@@ -127,10 +128,6 @@ applyBinFunctionInTwoLists f (x:xs) (y:ys) =
 -- TODO
 getExpType :: Exp -> Type
 getExpType _ = NatNothing
-
--- TODO
-checkCompatibleTypes :: Type -> Type -> Bool 
-checkCompatibleTypes _ _ = False
 
 -- TODO
 getVarTypeInMemory :: [MemoryCell] -> String -> Type 
