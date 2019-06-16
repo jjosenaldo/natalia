@@ -7,8 +7,13 @@ import TypeValue.TypeValue
 
 data Statement = 
     CONSStatementVarInit VarInit        |
-    CONSStatementPrint Print            |                    
+    CONSStatementPrint Print            |
+    CONSStatementReturn Return          |                  
     CONSStatementBlock Block
+    deriving (Eq, Show)
+
+data Return =
+    CONSReturn Exp
     deriving (Eq, Show)
 
 data Print = 

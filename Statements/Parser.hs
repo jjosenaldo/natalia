@@ -59,12 +59,17 @@ _varInitAsStmt =
 
 _varInit = 
     do 
-        -- TODO: this should be a general type
-        ttype  <- _lexicalTypeToken -- Token
+        ttype  <- generalType -- Token
         id <- _idToken
         ass <- _assignToken -- Token 
         expr <- _expr -- Exp
         return $ CONSVarInit (getTypeFromTypeToken ttype) (get_id_name id) expr
+
+_return =
+    do 
+        returnToken <- _returnToken
+        expr <- _expr;
+        return (CONSReturn expr) 
 
 _block = 
     do 
