@@ -1,11 +1,12 @@
 module SubprogramsBlock.Parser where
 
+import Expressions.Grammar
+import GenParsers.GenParser
 import Lexical.Lexemes
 import Lexical.Tokens
-import Expressions.Grammar
-import TypeValue.TypeValue
 import Statements.Parser
 import SubprogramsBlock.Grammar
+import TypeValue.TypeValue
 
 import Text.Parsec
 import Text.Parsec.Expr
@@ -15,9 +16,8 @@ import Text.Parsec.String
 _subprogramsBlock = 
     do
         stoken <- _subprogramsToken
-        lBrace <- _leftBraceToken
-        subPrograms <- many (_subprogram)
-        rBrace <- _rightBraceToken
+        
+        subPrograms <- _braces $  many (_subprogram)
 
         return (CONSSubprogramsBlock subPrograms)
 
@@ -34,14 +34,11 @@ _func =
     do
         fToken <- _funcToken
         id <- _idToken
-        lParen <- _leftParenToken
-        params <- sepBy _param _commaToken
-        rParen <- _rightParenToken
+        params <- _parens $ sepBy _param _commaToken
         colon <- colonToken
         returnType <- generalType
         let actualType = getRetType returnType
-        lBrace <- _leftBraceToken
-        stmtList <- many (_statement)
+        stmtList <- _braces _statementList
         return (CONSFunction (get_id_name id) params actualType stmtList)
 
 
@@ -49,8 +46,6 @@ _proc =
     do
         pToken <- _procToken
         id <- _idToken
-        lParen <- _leftParenToken
-        params <- sepBy _param _commaToken
-        lBrace <- _leftBraceToken
-        stmtList <- many (_statement)
+        params <- _parens $ sepBy _param _commaToken
+        stmtList <- _braces _statementList
         return (CONSProcedure (get_id_name id) params stmtList)

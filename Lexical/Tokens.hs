@@ -589,6 +589,11 @@ _commaToken = tokenPrim show updatePos get_token where
     get_token (Comma p) = Just  ( Comma p ) 
     get_token _       = Nothing
 
+_semicolonToken :: ParsecT [Token] st IO (Token)
+_semicolonToken = tokenPrim show updatePos get_token where
+    get_token (SemiColon p) = Just  ( SemiColon p ) 
+    get_token _       = Nothing
+
 _toDoubleToken :: ParsecT [Token] st IO (Token)
 _toDoubleToken = tokenPrim show updatePos get_token where
     get_token (ToDouble p) = Just  ( ToDouble p ) 
@@ -612,6 +617,11 @@ _toBoolToken = tokenPrim show updatePos get_token where
 _readToken :: ParsecT [Token] st IO (Token)
 _readToken = tokenPrim show updatePos get_token where
     get_token (Read p) = Just  ( Read p ) 
+    get_token _       = Nothing
+
+_printToken :: ParsecT [Token] st IO (Token)
+_printToken = tokenPrim show updatePos get_token where
+    get_token (Print p) = Just  ( Print p ) 
     get_token _       = Nothing
 
 _lexicalTypeToken :: ParsecT [Token] st IO (Token)

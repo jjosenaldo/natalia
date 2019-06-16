@@ -6,8 +6,9 @@ import Lexical.Lexemes
 import TypeValue.TypeValue
 
 data Statement = 
-    CONSStatementVarInit VarInit                            |
-    CONSStatementPrint Print                                
+    CONSStatementVarInit VarInit        |
+    CONSStatementPrint Print            |                    
+    CONSStatementBlock Block
     deriving (Eq, Show)
 
 data Print = 
@@ -17,6 +18,13 @@ data Print =
 data VarInit = 
     CONSVarInit Type String Exp
     deriving (Eq, Show)
+
+data Block = 
+    CONSBlock [Statement]
+    deriving (Eq, Show)
+
+getBlockStatements :: Block -> [Statement]
+getBlockStatements (CONSBlock ss) = ss
 
 -- data VarAssign = 
 --     CONSVarAssign Id Expression
