@@ -1,29 +1,38 @@
 module PredefBlocks.Grammar where
 
 -- natalia's modules
--- import Lexical.Lexemes
--- import TypeValue.TypeValue
+import Expressions.Grammar
+import Statements.Grammar
+import TypeValue.TypeValue
 
 -- Haskell modules
 
-data PredefBlock = 
-    CONSSubprogramsBlock [Subprogram] | -- literals
-    CONSMainBlock [Statement] | -- binary operations 
-    CONSTypedefsBlock [Typedef] | -- unary operations
-    CONSGlobalsBlock [Initialization]
+data SubprogramsBlock = 
+    CONSSubprogramsBlock [Subprogram]
     deriving (Eq, Show)
 
--- data LValue = 
---     CONSLValueId String | -- a = 1;
---     CONSLValueStruct String [String] | -- node.left = 1;
---     CONSLValueArray String [Exp] | -- v[1][2][3] = 1;
---     CONSLValueDerref String Int   -- *ptr = 1;
---     deriving (Eq, Show)
+data Subprogram =
+    CONSProcedure String [(Type, String)] [Statement] |
+    CONSFunction String [(Type, String)] Type [Statement] 
+    deriving (Eq, Show)
 
--- data BinOp = 
---     CONSBinOp Token
---     deriving (Eq, Show)
+data GlobalsBlock = 
+    CONSGlobalsBlock [Initialization] 
+    deriving (Eq, Show)
 
--- data UnOp = 
---     CONSUnOp Token
---     deriving (Eq, Show)
+data Initialization = 
+    CONSInitialization Type String Exp 
+    deriving (Eq, Show)
+
+data TypedefsBlock = 
+    CONSTypedefsBlock [Typedef] 
+    deriving (Eq, Show)
+
+data Typedef = 
+    CONSTypedef Type String 
+    deriving (Eq, Show)
+    
+data MainBlock = 
+    CONSMainBlock [Statement] 
+    deriving (Eq, Show)
+    

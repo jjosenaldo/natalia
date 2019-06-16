@@ -1,5 +1,6 @@
 @globals{
     int a = 1;
+    int b = 2;
 }
 @subprograms{
     func identity(int x) : int{
@@ -11,4 +12,9 @@
     proc emptyProc(double b){
         int a = {1,2,3,4};
     }
+}
+
+
+@main{
+    print("hello world");
 }
