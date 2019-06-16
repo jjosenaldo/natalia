@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import TypeValue.TypeValue
+import Program.Grammar
 import Program.Parser
 
 -- Haskell's modules
@@ -16,18 +17,15 @@ import System.IO.Unsafe
 import Text.Parsec
 
 -- the entire program
-program :: ParsecT [Token] [MemoryCell] IO ()
+program :: ParsecT [Token] [MemoryCell] IO (Program)
 program = do
             program <- _program
-            liftIO(print(program))
-            -- retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
-            -- retMainBlock <- mainBlock
-            -- eof
-            return ()
+            eof
+            return (program)
 
 -- invocação do parser para o símbolo de partida 
 
-parser :: [Token] -> IO (Either ParseError ())
+parser :: [Token] -> IO (Either ParseError (Program))
 parser tokens = runParserT program [] "Error message" tokens
 
 main :: IO ()
@@ -39,37 +37,5 @@ main = do
     else
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
-                    Right ans -> return ()
+                    Right ans -> print ans;
                 }
-
--------------------------------------------------  SYNTACTICS  ---------------------------------------------------------
--- natalia's modules
--- import Lexical.Lexemes
--- import Lexical.Tokens
--- import Syntax.Definition
--- import Syntax.SubprogramBody
--- import TypeValue.TypeValue
-
--- -- Haskell's modules
--- import Control.Monad.IO.Class
--- import System.Environment
--- import System.IO.Unsafe
--- import Text.Parsec
-
-
--- parser :: [Token] -> IO (Either ParseError (ReturnObject))
--- parser tokens = runParserT subprogramBodyParser [] "Syntactical error:" tokens
-
--- main :: IO ()
--- main = do
---     args <- getArgs
-
---     if length args == 0 then
---         putStrLn "You must pass a natalia program as an argument!"
---     else
---         case unsafePerformIO (parser (getTokens (head args))) of
---                 { Left err -> print err; 
---                     Right ans -> do
---                                     let res = getRetBlock ans -- Block
---                                     print(res)
---                 }
