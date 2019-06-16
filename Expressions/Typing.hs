@@ -57,11 +57,13 @@ setExpType memory (CONSExpStruct _ name exps)
         newExpsTypes = map getExpType exps -- [Type]
         resultList = applyBinFunctionInTwoLists checkCompatibleTypes structTypes newExpsTypes -- [Bool]
 
-setExpType memory (CONSExpSet _ exps) = 
-    CONSExpSet (bestType NatGenType newExpsTypes) newExps 
+setExpType memory (CONSExpSet _ exps) 
+    | typeOfList == NatNothing = error ("ERROR: your set is not homogeneous. ")
+    | otherwise = CONSExpSet typeOfList newExps 
     where 
         newExps = map (setExpType memory) exps -- [Exp]
         newExpsTypes = map getExpType exps -- [Type]
+        typeOfList = typeListType newExpsTypes 
 
         
 setExpType memory (CONSExpFuncCall _ name exps) 
@@ -114,11 +116,16 @@ getFunctionProtocol :: [MemoryCell] -- ^ the memory which contains the protocol 
                        -> ([Type], Type) -- ^ the function protocol (in terms of its parameters and its return type)
 getFunctionProtocol _ _ = ([], NatNothing)
 
-bestType :: Type -> [Type] -> Type 
-bestType t [] = t 
-bestType t1 (t2 : ts)
-    | checkCompatibleTypes t1 t2 = bestType t2 ts
-    | otherwise = error ("ERROR: your set is not homogeneous")
+-- | Gets the most generic type t for a list of types such that all types in the list are compatible with t
+typeListType :: [Type] -> Type 
+typeListType [] = NatGenType 
+typeListType (t : []) = t 
+typeListType (t : ts) 
+    | checkCompatibleTypes tailType t = tailType
+    | checkCompatibleTypes t tailType = t
+    | otherwise = NatNothing
+    where
+         tailType = (typeListType ts)
 
 applyBinFunctionInTwoLists :: (u -> v -> w) -> [u] -> [v] -> [w]
 applyBinFunctionInTwoLists _ (x:xs) [] = error ("lists with different sizes")
