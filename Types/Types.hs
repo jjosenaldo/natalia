@@ -17,7 +17,17 @@ checkCompatibleTypes (NatStruct str1) (NatStruct str2) = str1 == str2
 checkCompatibleTypes (NatSet t1) (NatSet t2) = checkCompatibleTypes t1 t2
 checkCompatibleTypes (NatArray t1) (NatArray t2) = checkCompatibleTypes t1 t2
 checkCompatibleTypes (NatStruct str) (NatNull) = True
+checkCompatibleTypes NatNothing NatNothing = True
+checkCompatibleTypes (NatPointer t1) (NatPointer t2) = checkCompatibleTypes t1 t2
+checkCompatibleTypes NatNull NatNull = True
 checkCompatibleTypes _ _ = False
+
+isOfStruct :: Type -> Bool
+isOfStruct(NatStruct _) = True
+isOfStruct (NatSet t) = isOfStruct t
+isOfStruct (NatPointer t) = isOfStruct t
+isOfStruct (NatArray t) = isOfStruct t
+isOfStruct _ = False
 
 getTypeFromTypeToken :: Token -> Type
 getTypeFromTypeToken (Type str _) 

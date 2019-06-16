@@ -2,11 +2,16 @@ module Expressions.Typing where
 
 -- natalia's modules
 import Expressions.Grammar
+import Expressions.Operations
 import Lexical.Lexemes    
 import Memory.Memory
+import Types.Types
 import TypeValue.TypeValue
 
 -- Haskell modules
+
+
+
 
 setExpType :: [MemoryCell] -> Exp -> Exp
 
@@ -100,9 +105,8 @@ setExpType memory (CONSExpCmdUn _ (ToBool p) exp1)
         newExp = setExpType memory exp1 
         newExpType = getExpType newExp
 
--- TODO
-getTypeName :: Type -> String
-getTypeName _ = ""
+-- alias to getNameOfType
+getTypeName = getNameOfType 
 
 -- TODO
 getFunctionProtocol :: [MemoryCell] -> String -> ([Type], Type)
@@ -121,21 +125,17 @@ applyBinFunctionInTwoLists f [] [] = []
 applyBinFunctionInTwoLists f (x:xs) (y:ys) = 
     (f x y) : (applyBinFunctionInTwoLists  f xs ys)
 
--- TODO
 getExpType :: Exp -> Type
-getExpType _ = NatNothing
-
--- TODO
-checkCompatibleTypes :: Type -> Type -> Bool 
-checkCompatibleTypes _ _ = False
-
--- TODO
-getReturnTypeOfBinOp :: BinOp -> Type -> Type -> Type 
-getReturnTypeOfBinOp _ _ _ = NatNothing
-
--- TODO
-getReturnTypeOfUnOp :: UnOp -> Type -> Type 
-getReturnTypeOfUnOp _ _ = NatNothing
+getExpType (CONSExpLit t _) = t
+getExpType (CONSExpBin t _ _ _ ) = t 
+getExpType (CONSExpUn t _ _) = t
+getExpType (CONSExpAssign t _ _) = t
+getExpType (CONSExpLValue t _) = t
+getExpType (CONSExpStruct t _ _) = t
+getExpType (CONSExpSet t _) = t
+getExpType (CONSExpFuncCall t _ _) = t
+getExpType (CONSExpCmdZero t _) = t
+getExpType (CONSExpCmdUn t _ _) = t
 
 -- TODO
 getVarTypeInMemory :: [MemoryCell] -> String -> Type 
