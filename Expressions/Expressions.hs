@@ -2,7 +2,6 @@ module Expressions.Expressions where
 
 -- natalia's modules
 import Expressions.Evaluation
-import Expressions.Operations
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
@@ -508,3 +507,25 @@ lValue =
         let var = memoryGet (get_id_name nameRetToken) (get_pos nameRetToken) mem -- Variable
         if (not (isVariable var)) then fail ("ERROR name INSERT NAME HERE LATER doesn't correspond to a variable")
         else do return (RetMemoryCell var)
+
+-- Binary operators that are left-associative and have precedence 3
+binOpLeft3Token = timesToken <|> divToken <|> modToken
+
+-- Binary operators that are left-associative and have precedence 4
+binOpLeft4Token = plusToken <|> minusToken
+
+group1OpToken = negationToken <|> minusToken
+group2OpToken = timesToken <|> divToken <|> modToken
+group3OpToken = plusToken <|> minusToken
+group4OpToken = expoToken 
+group5OpToken = lessThanToken    <|> 
+                greaterThanToken <|> 
+                lessEqualsToken  <|>
+                greaterEqualsToken <|>
+                equalsToken <|>
+                differentToken <|>
+                inToken 
+group6OpToken = equalsToken
+group7OpToken = andToken
+group8OpToken = orToken
+group9OpToken = assignToken

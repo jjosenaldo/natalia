@@ -16,4 +16,5 @@ Lexical/Lexemes.hs
 !.vscode/extensions.json
 
 # test Haskell modules
-*Test.hs
+#*Test.hs
+test

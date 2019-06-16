@@ -62,6 +62,11 @@ getValue (Variable (ConstructVariable _ val _)) _ = val
 getValue (Variable (ConstructConstantVariable _ val _)) _ = val
 getValue c p = error ("ERROR "++show(p)++" you can't get value from a " ++ show(c))
 
+getValueByMemoryCell :: MemoryCell -> Value
+getValueByMemoryCell (Variable (ConstructVariable _ val _)) = val
+getValueByMemoryCell (Variable (ConstructConstantVariable _ val _)) = val
+getValueByMemoryCell cell = error ("ERROR:  you can't get value from a " ++ show(cell))
+
 isVariable :: MemoryCell -> Bool
 isVariable (Variable v) = True
 isVariable _ = False
@@ -96,6 +101,14 @@ memoryGet name p [] = error ("ERROR when fetching name " ++ name ++ " at "++show
 memoryGet name p (cell:m) = 
     if (getId cell) == name then cell
     else memoryGet name p m
+
+getMemoryCellByName :: String -- ^ the name of memory cell to be searched
+                    -> [MemoryCell] -- ^ the memory  
+                    -> MemoryCell   -- ^ the value of memory cell
+getMemoryCellByName name [] = error ("ERROR when fetching name " ++ name ++ ": it is not in the memory.")
+getMemoryCellByName name (cell:m) = 
+    if (getId cell)  == name then cell
+    else getMemoryCellByName name m
 
 memoryHasName :: String -- ^ the name of the variable or subprogram to be searched
     -> [MemoryCell] -- ^ the memory
@@ -137,3 +150,11 @@ setValueArray' val [] newVal =
 setValueArray' (ConsNatArray t arr) (h:list) newVal = ConsNatArray t ((take index arr) ++ [setValueArray' (arrayAccess (ConsNatArray t arr) h) list newVal] ++ (drop (index+1) arr))
         where
             index = fromIntegral (getIntFromNatInt h)
+
+-- | Gets the type of a variable in a memory.
+getVarTypeInMemory :: [MemoryCell] -- ^ the memory in which the variable lives
+                   -> String -- ^ the name of the variable
+                   -> Type -- ^ the type of the variable
+getVarTypeInMemory cell str = 
+    getTypeFromValue ( getValueByMemoryCell (cellMem) )
+    where cellMem =  getMemoryCellByName (str) (cell)

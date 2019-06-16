@@ -1,6 +1,7 @@
 module Syntax.Definition where
 
 -- natalia's modules
+import Expressions.Operations
 import Lexical.Lexemes
 --import Memory.Memory
 import TypeValue.TypeValue
@@ -63,6 +64,73 @@ getTypeOfExpression (CONSExprVarAssignment _ _ x ) = x
 
 getBlockStatements :: Block -> [Statement]
 getBlockStatements (CONSBlock x) = x
+
+
+getBinOperatorExpectedSecondType :: BinOperator -> Type -> Type
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator * must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) NatBool = NatBool
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator && must be a " ++ (getNameOfType NatBool))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Equals p)) _ = NatGenType
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Different p)) _ = NatGenType
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) NatBool = NatBool
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator || must be a " ++ (getNameOfType NatBool))    
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) (NatSet t) = (NatSet t)
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator < must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator <= must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator > must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator >= must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+    
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatString = NatString
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) _ =
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator + must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble)++" or a " ++ (getNameOfType NatString))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) _ =
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator - must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatInt = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatDouble = NatDouble
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator / must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
+
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) NatInt = NatInt
+getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) _ = 
+    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator % must be a " ++ (getNameOfType NatInt))
+
+buildExpressionFromBinaryOperation :: BinOperator -> Expression -> Expression -> Expression
+buildExpressionFromBinaryOperation op exp1 exp2 = 
+    CONSBinOperation op exp1 exp2 (getBinOperatorReturnType op leftType rightType)
+    where
+        leftType = getTypeOfExpression exp1 
+        rightType = getTypeOfExpression exp2
 
 
 getUnOperatorExpectedType :: UnOperator -> Type 
@@ -162,69 +230,3 @@ getBinOperatorReturnType (CONSTokenBinOperator (Expo p)) _ _ =
 
 getBinOperatorReturnType (CONSTokenBinOperator (Mod p)) NatInt NatInt = 
     error ("ERROR at " ++ show(p) ++ ": the operator % expects two " ++ (getNameOfType NatInt))
-
-getBinOperatorExpectedSecondType :: BinOperator -> Type -> Type
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Times p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator * must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) NatBool = NatBool
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (And p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator && must be a " ++ (getNameOfType NatBool))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Equals p)) _ = NatGenType
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Different p)) _ = NatGenType
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) NatBool = NatBool
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Or p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator || must be a " ++ (getNameOfType NatBool))    
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) (NatSet t) = (NatSet t)
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessThan p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator < must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (LessEquals p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator <= must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterThan p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator > must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (GreaterEquals p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator >= must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-    
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) NatString = NatString
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Plus p)) _ =
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator + must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble)++" or a " ++ (getNameOfType NatString))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Minus p)) _ =
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator - must be a " ++ (getNameOfType NatInt) ++ " or "++(getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatInt = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) NatDouble = NatDouble
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Div p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator / must be a " ++ (getNameOfType NatInt) ++ " or a " ++ (getNameOfType NatDouble))
-
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) NatInt = NatInt
-getBinOperatorExpectedSecondType (CONSTokenBinOperator (Mod p)) _ = 
-    error ("ERROR at " ++ show(p) ++ ": the first arg of the operator % must be a " ++ (getNameOfType NatInt))
-
-buildExpressionFromBinaryOperation :: BinOperator -> Expression -> Expression -> Expression
-buildExpressionFromBinaryOperation op exp1 exp2 = 
-    CONSBinOperation op exp1 exp2 (getBinOperatorReturnType op leftType rightType)
-    where
-        leftType = getTypeOfExpression exp1 
-        rightType = getTypeOfExpression exp2

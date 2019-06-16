@@ -1,6 +1,6 @@
 # Paths 
 BLK_PATH = Blocks
-EXP_PATH = Expression
+EXP_PATH = Expressions
 LEX_PATH = Lexical
 MEM_PATH = Memory
 STMT_PATH = Statements
@@ -44,6 +44,8 @@ clean:
 	@rm -rf *.o *.hi
 	@rm -rf $(BLK_PATH)/*.o
 	@rm -rf $(BLK_PATH)/*.hi
+	@rm -rf $(EXP_PATH)/*.o
+	@rm -rf $(EXP_PATH)/*.hi
 	@rm -rf $(LEX_PATH)/*.o
 	@rm -rf $(LEX_PATH)/*.hi
 	@rm -rf $(MEM_PATH)/*.o
@@ -56,3 +58,4 @@ clean:
 	@rm -rf $(TYPE_PATH)/*.hi
 	@rm -rf $(TV_PATH)/*.o
 	@rm -rf $(TV_PATH)/*.hi
+	#@rm -rf *.out

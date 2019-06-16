@@ -11,8 +11,14 @@ $digit = [0-9]
 $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
+
   -- COMMANDS ---------------------------------------------
-  
+
+  read                             { \p s -> Read (getLC p)}
+  toInt                            { \p s -> ToInt (getLC p)}
+  toDouble                         { \p s -> ToDouble (getLC p)}
+  toString                         { \p s -> ToString (getLC p)}
+  toBool                           { \p s -> Read (getLC p)}
   print                            { \p s -> Print (getLC p)}
 
   -- TYPES  ------------------------------------------------
@@ -71,6 +77,8 @@ tokens :-
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
   \*                               { \p s -> Times (getLC p)}
+  \&                               { \p s -> Uppersand (getLC p)}
+  \?                               { \p s -> Interrogation (getLC p)}
   \/                               { \p s -> Div (getLC p)}
   "+="                             { \p s -> PlusEquals (getLC p)}
   "-="                             { \p s -> MinusEqual (getLC p)}
@@ -114,6 +122,15 @@ tokens :-
 {
 -- The token type:
 data Token =
+
+  -- COMMANDS ---------------------------------------------
+
+  ToDouble (Int, Int)        |
+  ToInt (Int, Int)           |
+  ToString (Int, Int)        |
+  ToBool (Int, Int)          |
+  Print (Int, Int)           |
+  Read (Int, Int)            |
 
   -- BLOCKS -----------------------------------------------
 
@@ -162,9 +179,11 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
-  Different (Int, Int)      |
+  Different (Int, Int)       |
   In (Int, Int)              |
   Dot (Int, Int)             |
+  Uppersand (Int, Int)       |
+  Interrogation (Int, Int)   |
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -199,11 +218,7 @@ data Token =
   Double Double (Int, Int)       |
   String String (Int, Int)       |
   Bool Bool (Int, Int)           |
-  Null (Int, Int)                |
-
-  -- COMMANDS ---------------------------------------------
-
-  Print (Int, Int)
+  Null (Int, Int)                
 
   ----------------------------------------------------------
 
@@ -266,6 +281,8 @@ get_pos (Bool _ p) = p
 get_pos (Comma p) = p
 get_pos (String _ p) = p
 get_pos (Dot p) = p
+get_pos (Uppersand p) = p
+get_pos (Interrogation p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 

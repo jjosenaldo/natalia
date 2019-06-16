@@ -220,16 +220,18 @@ evaluateExpression (CONSBinOperation (CONSTokenBinOperator binOp) (exp1) (exp2) 
 
 -- avaliate a assignment operator
 evaluateExpression (CONSExprVarAssignment (CONSTokenId id) (exp) _) (cell) =
-    ((getValue
-        (setValue 
-            (memoryGet
-                (get_id_name id)
-                (get_pos id)
-                (cell)
+    (fst value, 
+        (memoryUpdate 
+            (setValue 
+                (memoryGet
+                    (get_id_name id)
+                    (get_pos id)
+                    (cell)
+                )
+                (fst value)
             )
-            (fst (evaluateExpression (exp) (cell)))
+            (cell)
         )
-        (get_pos id)),
-        cell
     )
+    where value = evaluateExpression (exp) (cell)
 
