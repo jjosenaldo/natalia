@@ -569,6 +569,12 @@ _rightBracketToken = tokenPrim show updatePos get_token where
     get_token (RBracket p) = Just  (  RBracket p ) 
     get_token _       = Nothing
 
+
+_returnToken :: ParsecT [Token] st IO (Token)
+_returnToken = tokenPrim show updatePos get_token where
+    get_token (Return p) = Just (Return p)
+    get_token _       = Nothing
+    
 _assignToken :: ParsecT [Token] st IO (Token)
 _assignToken = tokenPrim show updatePos get_token where
     get_token (Assign p) = Just  (  Assign p ) 
