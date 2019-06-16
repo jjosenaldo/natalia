@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import TypeValue.TypeValue
+import Program.Parser
 
 -- Haskell's modules
 import Control.Monad.IO.Class
@@ -17,7 +18,11 @@ import Text.Parsec
 -- the entire program
 program :: ParsecT [Token] [MemoryCell] IO ()
 program = do
-            eof
+            program <- _program
+            liftIO(print(program))
+            -- retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
+            -- retMainBlock <- mainBlock
+            -- eof
             return ()
 
 -- invocação do parser para o símbolo de partida 

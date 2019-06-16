@@ -98,6 +98,11 @@ procToken = tokenPrim show updatePos get_token where
     get_token (Proc p)  = Just (RetToken (Proc p))
     get_token _         = Nothing
 
+_funcToken :: ParsecT [Token] st IO (Token)
+_funcToken = tokenPrim show updatePos get_token where
+    get_token (Func p)  = Just (Func p)
+    get_token _         = Nothing
+
 funcToken :: ParsecT [Token] st IO (ReturnObject)
 funcToken = tokenPrim show updatePos get_token where
     get_token (Func p)  = Just (RetToken (Func p))
@@ -316,6 +321,11 @@ inToken = tokenPrim show updatePos get_token where
     get_token _         = Nothing
 
 -- terminal: command terminator
+_semiColonToken :: ParsecT [Token] st IO (Token)
+_semiColonToken = tokenPrim show updatePos get_token where
+    get_token (SemiColon p) = Just (SemiColon p)
+    get_token _         = Nothing
+
 semiColonToken :: ParsecT [Token] st IO (ReturnObject)
 semiColonToken = tokenPrim show updatePos get_token where
     get_token (SemiColon p) = Just (RetToken (SemiColon p))

@@ -1,10 +1,13 @@
 module SubprogramsBlock.Grammar where
 
-    
+import TypeValue.TypeValue
+import Statements.Grammar 
+import TypeValue.TypeValue
+
 data SubprogramsBlock = 
-    CONSSubprogramBlock [Subprogram]
+    CONSSubprogramsBlock [Subprogram]
     deriving (Eq, Show)
 
 data Subprogram =
-    CONSProcedure String [(Type, String)] [Statement]
-    CONSFunction String [(Type, String)] deriving (Eq, Show)
+    CONSProcedure String [(Type, String)] [Statement] |
+    CONSFunction String [(Type, String)] Type [Statement] deriving (Eq, Show)

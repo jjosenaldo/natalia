@@ -4,6 +4,8 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Expressions.Grammar
 import TypeValue.TypeValue
+import Statements.Parser
+import SubprogramsBlock.Grammar
 
 import Text.Parsec
 import Text.Parsec.Expr
@@ -19,13 +21,13 @@ _subprogramsBlock =
 
         return (CONSSubprogramsBlock subPrograms)
 
-_subprogram = try _func <|> try _proc
+_subprogram = (try _func) <|> (try _proc)
 
 _param =
     do
         retType <- generalType
         let actualType = getRetType retType
-        name = _idToken
+        name <- _idToken
         return (actualType, get_id_name name)
 
 _func =
@@ -39,7 +41,7 @@ _func =
         let actualType = getRetType returnType
         lBrace <- _leftBraceToken
         stmtList <- many (_statement)
-        return CONSFunction (get_id_name id) params actualType stmtList
+        return (CONSFunction (get_id_name id) params actualType stmtList)
 
 
 _proc =
@@ -50,4 +52,4 @@ _proc =
         params <- sepBy _param _commaToken
         lBrace <- _leftBraceToken
         stmtList <- many (_statement)
-        return CONSFunction (get_id_name id) params stmtList
+        return (CONSProcedure (get_id_name id) params stmtList)
