@@ -125,9 +125,17 @@ applyBinFunctionInTwoLists f [] [] = []
 applyBinFunctionInTwoLists f (x:xs) (y:ys) = 
     (f x y) : (applyBinFunctionInTwoLists  f xs ys)
 
--- TODO
 getExpType :: Exp -> Type
-getExpType _ = NatNothing
+getExpType (CONSExpLit t _) = t
+getExpType (CONSExpBin t _ _ _ ) = t 
+getExpType (CONSExpUn t _ _) = t
+getExpType (CONSExpAssign t _ _) = t
+getExpType (CONSExpLValue t _) = t
+getExpType (CONSExpStruct t _ _) = t
+getExpType (CONSExpSet t _) = t
+getExpType (CONSExpFuncCall t _ _) = t
+getExpType (CONSExpCmdZero t _) = t
+getExpType (CONSExpCmdUn t _ _) = t
 
 -- TODO
 getVarTypeInMemory :: [MemoryCell] -> String -> Type 
