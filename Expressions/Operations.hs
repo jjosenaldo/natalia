@@ -14,11 +14,13 @@ getReturnTypeOfBinOp _ _ _ = NatNothing
 
 getReturnTypeOfUnOp :: UnOp -> Type -> Type 
 
+-- Returns NatBool
 getReturnTypeOfUnOp (CONSUnOp (Negation p)) NatBool = 
     NatBool
 getReturnTypeOfUnOp (CONSUnOp (Negation p)) other = 
     error ("ERROR at " ++ show(p) ++ ": the ! operator expects a " ++  (getNameOfType NatBool) ++ " but you passed a " ++ (getNameOfType other))
 
+-- Returns NatDouble or NatInt
 getReturnTypeOfUnOp (CONSUnOp (Minus p)) NatDouble = 
     NatDouble
 getReturnTypeOfUnOp (CONSUnOp (Minus p)) NatInt = 
