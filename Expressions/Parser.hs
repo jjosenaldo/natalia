@@ -79,7 +79,7 @@ structValue =
     do 
         id <- _idToken 
         lb <- _leftBraceToken
-        exprs <- sepBy _expr commaToken
+        exprs <- sepBy _expr _commaToken
         rb <- _rightBraceToken
         return $ CONSExpStruct NatNothing (get_id_name id) exprs
 
@@ -152,7 +152,7 @@ _expr = buildExpressionParser table terms
 
 parens x = 
     do 
-        l <- leftParenToken
+        l <- _leftParenToken
         a <- x
-        r <- rightParenToken
+        r <- _rightParenToken
         return a

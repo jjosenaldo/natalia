@@ -3,7 +3,6 @@ module Lexical.Tokens where
 -- natalia's modules
 import Expressions.Grammar
 import Lexical.Lexemes
-import Syntax.Definition
 import Memory.Memory
 import TypeValue.TypeValue
 import Types.Typedef
@@ -594,6 +593,11 @@ _readToken :: ParsecT [Token] st IO (Token)
 _readToken = tokenPrim show updatePos get_token where
     get_token (Read p) = Just  ( Read p ) 
     get_token _       = Nothing
+
+_lexicalTypeToken :: ParsecT [Token] st IO (Token)
+_lexicalTypeToken = tokenPrim show updatePos get_token where
+    get_token (Type x p) = Just (Type x p)
+    get_token _        = Nothing 
 
 updatePos :: SourcePos -> Token -> [Token] -> SourcePos
 updatePos pos _ (tok:_) = pos -- necessita melhoria
