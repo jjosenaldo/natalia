@@ -177,7 +177,7 @@ binaryEval _ (Different p) _ = error ("ERROR at " ++ show(p) ++ ": the != operat
 -- | Implementation of binary operations
 unaryEval :: Token -- ^ operator
             -> Value -- ^ operand
-            -> Value -- ^ result of the operation
+            -> Value -- ^ result of the operation   
 
 -- Operator - (unary)
 unaryEval (Minus p) (ConsNatInt x) = ConsNatInt (-x) 
@@ -204,7 +204,24 @@ playExpression memory (CONSExpBin t (CONSBinOp binOp) exp1 exp2) =
     where 
         value1 = snd (playExpression memory exp1)
         value2 = snd (playExpression memory exp2)
-
+-- semantics to unary expressions
 playExpression memory (CONSExpUn t (CONSUnOp unOp) exp) = 
     ( memory, unaryEval (unOp) (value) )
     where value = snd (playExpression memory exp)
+
+-- TODO
+-- semantics to assignment operator
+-- playExpression memory (CONSExpAssign t (CONSLValueId str) exp) = 
+--     where memCell = getMemoryCellByName (str) (memory)
+
+-- TODO
+-- semantics to LValue
+-- playExpression memory (CONSExpLValue t (CONSLValueId str)) =
+
+-- TODO
+-- semantics to sets
+-- playExpression memory (CONSExpStruct t (CONSLValueId str) list) =
+
+--TODO
+-- playExpression memory (CONSExpSet t listExp) =
+
