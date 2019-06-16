@@ -75,7 +75,7 @@ modToken = tokenPrim show updatePos get_token where
 
 boolToken :: ParsecT [Token] st IO (Exp)
 boolToken = tokenPrim show updatePos get_token where
-    get_token (Bool x p) = Just  (  CONSExpLit NatNull (Bool x p) )
+    get_token (Bool x p) = Just  (  CONSExpLit NatBool (Bool x p) )
     get_token _       = Nothing
 
 andToken :: ParsecT [Token] st IO (Exp -> Exp -> Exp)

@@ -122,7 +122,7 @@ lvalueStructAccess =
         firstField <- structAccess
         remainingFields <- many (structAccess)
 
-        return $ CONSLValueStruct (firstField : remainingFields)
+        return $ CONSLValueStruct (get_id_name id) (firstField : remainingFields)
 
 -- .FIELD for some field FIELD of a struct. This is used in the "lvalueStructAccess" function
 structAccess = 
