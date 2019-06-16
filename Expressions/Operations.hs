@@ -8,8 +8,14 @@ import TypeValue.TypeValue
 -- Haskell modules
 import Text.Parsec
 
+
+--------- BINARY OPERATORS -----------------------------------------------------------------------------------------------------------------
+
 -- TODO
 getReturnTypeOfBinOp :: BinOp -> Type -> Type -> Type 
+
+-- Returns NatInt or NatDouble -------------------------------------------------------------------------------------------------------
+
 getReturnTypeOfBinOp (CONSBinOp (Times p)) NatInt NatInt = NatInt
 getReturnTypeOfBinOp (CONSBinOp (Times p)) NatDouble NatInt = NatDouble
 getReturnTypeOfBinOp (CONSBinOp (Times p)) NatInt NatDouble = NatDouble
@@ -37,7 +43,20 @@ getReturnTypeOfBinOp (CONSBinOp (Plus p)) NatInt NatDouble = NatDouble
 getReturnTypeOfBinOp (CONSBinOp (Plus p)) NatDouble NatDouble = NatDouble
 getReturnTypeOfBinOp (CONSBinOp (Plus p)) NatString NatString = NatString
 getReturnTypeOfBinOp (CONSBinOp (Plus p)) _ _ = 
-    error ("ERROR at " ++ show(p) ++ ": the operator + expects two " ++ (getNameOfType NatInt) ++ " or " ++ (getNameOfType NatString))
+    error ("ERROR at " ++ show(p) ++ ": the operator + expects two (" ++ (getNameOfType NatInt) ++ " or " ++ (getNameOfType NatDouble) ++ ") or two " ++ (getNameOfType NatString))
+
+getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatInt NatInt = NatDouble
+getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatDouble NatInt = NatDouble
+getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatInt NatDouble = NatDouble
+getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatDouble NatDouble = NatDouble
+getReturnTypeOfBinOp (CONSBinOp (Expo p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator ^ expects two " ++ (getNameOfType NatDouble))
+
+getReturnTypeOfBinOp (CONSBinOp (Mod p)) NatInt NatInt = NatInt
+getReturnTypeOfBinOp (CONSBinOp (Mod p)) _ _ = 
+    error ("ERROR at " ++ show(p) ++ ": the operator % expects two " ++ (getNameOfType NatInt))
+
+-- Returns NatBool -------------------------------------------------------------------------------------------------------------------
 
 getReturnTypeOfBinOp (CONSBinOp (LessThan p)) NatInt NatInt = NatBool
 getReturnTypeOfBinOp (CONSBinOp (LessThan p)) NatDouble NatInt = NatBool
@@ -76,29 +95,31 @@ getReturnTypeOfBinOp (CONSBinOp (Or p)) NatBool NatBool = NatBool
 getReturnTypeOfBinOp (CONSBinOp (Or p)) _ _ = 
     error ("ERROR at " ++ show(p) ++ ": the operator && expects two " ++ (getNameOfType NatBool) )
 
+-- TODO: throws error if the types aren't equivalent
+getReturnTypeOfBinOp (CONSBinOp (Equals p)) (NatStruct s1) (NatStruct s2) =
+    error ("ERROR: you can't check two structs for equality")
 getReturnTypeOfBinOp (CONSBinOp (Equals p)) _ _ = NatBool
 
+-- TODO: throws error if the types aren't equivalent
+getReturnTypeOfBinOp (CONSBinOp (Different p)) (NatStruct s1) (NatStruct s2) =
+    error ("ERROR: you can't check two structs for inequality")
 getReturnTypeOfBinOp (CONSBinOp (Different p)) _ _ = NatBool
 
-getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatInt NatInt = NatDouble
-getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatDouble NatInt = NatDouble
-getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatInt NatDouble = NatDouble
-getReturnTypeOfBinOp (CONSBinOp (Expo p)) NatDouble NatDouble = NatDouble
-getReturnTypeOfBinOp (CONSBinOp (Expo p)) _ _ = 
-    error ("ERROR at " ++ show(p) ++ ": the operator ^ expects two " ++ (getNameOfType NatDouble))
+-- TODO
+getReturnTypeOfBinOp (CONSBinOp (Different p)) _ _ = NatNothing
 
-getReturnTypeOfBinOp (CONSBinOp (Mod p)) NatInt NatInt = 
-    error ("ERROR at " ++ show(p) ++ ": the operator % expects two " ++ (getNameOfType NatInt))
+
+--------- UNARY OPERATORS -----------------------------------------------------------------------------------------------------------------
 
 getReturnTypeOfUnOp :: UnOp -> Type -> Type 
 
--- Returns NatBool
+-- Returns NatBool  -------------------------------------------------------------------------------------------------------
 getReturnTypeOfUnOp (CONSUnOp (Negation p)) NatBool = 
     NatBool
 getReturnTypeOfUnOp (CONSUnOp (Negation p)) other = 
     error ("ERROR at " ++ show(p) ++ ": the ! operator expects a " ++  (getNameOfType NatBool) ++ " but you passed a " ++ (getNameOfType other))
 
--- Returns NatDouble or NatInt
+-- Returns NatInt or NatDouble  -------------------------------------------------------------------------------------------------------
 getReturnTypeOfUnOp (CONSUnOp (Minus p)) NatDouble = 
     NatDouble
 getReturnTypeOfUnOp (CONSUnOp (Minus p)) NatInt = 
