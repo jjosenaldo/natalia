@@ -37,7 +37,7 @@ playStmtWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
 playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
-playPrint :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playPrint :: Statement -> ParsecT [Token] ProgramState IO ()
 playPrint stmt = 
     do 
         let maybeprnt = getStatementPrint stmt -- Maybe Print 

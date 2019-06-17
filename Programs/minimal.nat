@@ -12,15 +12,15 @@
 }
 
 @globals{
-    #int a = 1;
+    int a = 1;
 }
 @subprograms{
-    #func identity(int x) : int{
-    #    return x;   
-    #}
+    func identity(int x) : int{
+        return x;   
+    }
 
-    #proc emptyProc(double b){
-    #}
+    proc emptyProc(double b){
+    }
 }
 
 
