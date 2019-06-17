@@ -240,5 +240,16 @@ playExpUnEval _ =
     do
         fail ("error")   
 
---TODO - semantics to assignment
--- playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
+-- semantics to assignment
+playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
+    do
+        mem <- getState -- [MemoryCell] 
+        res <- (playExp exp)
+        let cellMem = (getMemoryCellByName (str) (mem))
+        let newCell = (setValue (cellMem) (res))
+        return $ res
+
+playExpAssignEval _ = 
+    do
+        fail ("error")
+        
