@@ -1,6 +1,8 @@
 module Statements.Parser where 
 
 -- natalia's modules
+import Data.Maybe
+import Expressions.Grammar
 import Expressions.Parser
 import GenParsers.GenParser
 import Lexical.Lexemes
@@ -9,6 +11,7 @@ import Statements.Grammar
 import Types.Types
 
 -- Haskell modules
+import Control.Monad.IO.Class
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Prim
@@ -38,7 +41,7 @@ _remainingStatements stmts =
     return stmts
 
 _statementWithoutSemicolon = try _ifElseAsStmt <|>  try _ifAsStmt <|> try _whileAsStmt <|> _blockAsStmt 
-_statementNotBlock =  try _varInitAsStmt <|> try _printAsStmt <|>  _returnAsStmt 
+_statementNotBlock =  try _varInitAsStmt <|> try _assignmentAsStmt <|> try _printAsStmt <|>  try _returnAsStmt <|> _procCallAsStmt
 
 
 -- PRINT -----------------------------------------------------------------------------
@@ -69,6 +72,22 @@ _varInit =
         ass <- _assignToken -- Token 
         expr <- _expr -- Exp
         return $ CONSVarInit actualType (get_id_name id) expr
+
+-- LVALUE ASSIGNMENT -----------------------------------------------------------------------------
+
+_assignmentAsStmt = 
+    do 
+        ass <- _assignment
+        return $ CONSStatementAssignment ass
+
+_assignment = 
+    do 
+        lv <- lvalue  
+        liftIO(print(show(lv)))
+        ass <- _assignToken
+        expr2 <- _expr 
+        return $ CONSAssignment lv expr2
+
 
 -- RETURN-------------- -----------------------------------------------------------------------------
 
@@ -137,3 +156,15 @@ _while =
         expr <- _parens _expr
         block <- _block
         return (CONSWhile expr block)
+
+-- PROC CALL ------------------------------------------------------------
+
+_procCallAsStmt = 
+    do 
+        proc <- _procCall
+        return $ CONSStatementProcCall proc 
+_procCall = 
+    do 
+        id <- _idToken
+        exps <- _parens $ sepBy _expr _commaToken
+        return $ CONSProcCall (get_id_name id) exps

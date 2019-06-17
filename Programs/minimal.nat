@@ -26,16 +26,16 @@
 
 @main{
     #int a = 1+1;
-    if(True){
-        print("porra");
-    }
-    else{
-        print("oi");
-    }
-
-    if(False){
-        print("sou fodoa");
-    }
-    
-    
+    #if(True){
+    #    print("porra");
+    #}
+    #else{
+    #    print("oi");
+    #}
+#
+ #   if(False){
+  #      print("sou fodoa");
+   # }
+    #call(1);
+    v[1][2][3] = 5;
 }
