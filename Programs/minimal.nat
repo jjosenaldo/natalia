@@ -3,6 +3,10 @@
         int num;
         int den;
     },
+    node {
+        node b;
+        int b;
+    },
     setComplexo {{{{int}}}},
     meuint int
 }
