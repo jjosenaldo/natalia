@@ -81,17 +81,28 @@ getId (Subprogram (CONSProcedure x _ _)) = x
 getId (Typedef (ConsTypedef x _)) = x
 getId (Typedef (StructDef x _)) = x
 
-getMemoryCellType (Typedef x) = x  
+getMemoryCellType (Typedef x) = x
+
+getStructType (Typedef (StructDef x y)) = NatStruct x
 
 
 -- TODO: this function should search in the memory for the local variable.
 -- | Returns the type of a local variable.
 getTypeOfLocalVar :: String -- ^ the name of the local variable
+                  -> ProgramState
                   -> Type -- ^ the type of the local variable
-getTypeOfLocalVar idName = NatInt
+getTypeOfLocalVar idName state = getVarTypeInMemory state idName
 
-getTypeOfFunctionCall :: String -> Type
-getTypeOfFunctionCall functionId = NatInt
+getTypeOfFunctionCall :: String -> [MemoryCell] -> Type
+getTypeOfFunctionCall functionId mem = getFunctionType (getFunctionFromMemory functionId mem)
+
+getFunctionType (Subprogram (CONSFunction _ _ t _)) = t
+getFunctionType _ = error("ERROR Trying to fetch return type from a cell that is not a function")
+
+getFunctionFromMemory name (h:mem) =
+    if ((getId h) == name) && (isFunction h) then h
+    else getFunctionFromMemory name mem
+getFunctionFromMemory name [] = error("ERROR Function " ++ (name) ++ " is not defined")
 
 -- TODO: this is not implemented yet
 -- checkParamsPassed :: String -> [Expression] -> Bool
@@ -123,6 +134,14 @@ getValueByMemoryCell cell = error ("ERROR:  you can't get value from a " ++ show
 isVariable :: MemoryCell -> Bool
 isVariable (Variable v) = True
 isVariable _ = False
+
+isFunction :: MemoryCell -> Bool
+isFunction (Subprogram (CONSFunction _ _ _ _)) = True
+isFunction _ = False
+
+isStruct :: MemoryCell -> Bool
+isStruct (Typedef (StructDef _ _)) = True
+isStruct _ = False
 
 isConstantVariable (Variable (ConstructConstantVariable c _ _)) = True
 isConstantVariable _ = False
@@ -226,3 +245,9 @@ getVarTypeInMemory :: ProgramState -- ^ the memory in which the variable lives
 getVarTypeInMemory state str = 
     getTypeFromValue ( getValueByMemoryCell (cellMem) )
     where cellMem =  getMemoryCellByName (str) (state)
+
+getStructFromMemory :: String -> [MemoryCell] -> MemoryCell
+getStructFromMemory name (h:list) = 
+    if (name == (getId h)) && (isStruct h) then h
+    else getStructFromMemory name list
+getStructFromMemory name [] = error("ERROR Can't find definition for " ++ (name))

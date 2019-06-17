@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Memory.Memory
 import Types.Types
 import TypeValue.TypeValue
+import PredefBlocks.Grammar
 
 -- Haskell modules
 
@@ -114,7 +115,10 @@ getTypeName = getNameOfType
 getFunctionProtocol :: ProgramState -- ^ the memory which contains the protocol of the function
                        -> String -- ^ the name of the function
                        -> ([Type], Type) -- ^ the function protocol (in terms of its parameters and its return type)
-getFunctionProtocol _ _ = ([], NatNothing)
+getFunctionProtocol state name = funcProtocol f
+    where
+        funcProtocol (Subprogram (CONSFunction _ a b _ )) = (fst (unzip a), b)
+        f = getFunctionFromMemory name (getStateGlobalMemory state)
 
 -- | Gets the most generic type t for a list of types such that all types in the list are compatible with t
 typeListType :: [Type] -> Type 
@@ -147,8 +151,8 @@ getExpType (CONSExpCmdZero t _) = t
 getExpType (CONSExpCmdUn t _ _) = t
 
 getStructFieldType :: ProgramState -> String -> [String] -> Type 
-getStructFieldType state name [] = 
-    NatStruct name
+getStructFieldType state name [] = getStructType (getStructFromMemory name globalMem)
+    where globalMem = getStateGlobalMemory state
 
 getStructFieldType state name (field : fields) 
     | fields == [] = actualFieldType
