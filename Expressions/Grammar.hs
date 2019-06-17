@@ -37,8 +37,9 @@ data UnOp =
 
 -- FIELD FUNCTIONS FOR EXPS ---------------------------------------------------------------------
 
-getExpLitToken :: Exp -> Token 
-getExpLitToken (CONSExpLit _ tok) = tok
+getExpLitToken :: Exp -> Maybe Token 
+getExpLitToken (CONSExpLit _ tok) = Just tok
+getExpLitToken _ = Nothing
 
 getExpBinBinOp :: Exp -> BinOp 
 getExpBinBinOp (CONSExpBin _ op _ _) = op

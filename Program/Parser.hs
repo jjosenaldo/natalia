@@ -88,4 +88,5 @@ _program =
         liftIO(print(s))
 
         mainBlock <- _mainBlock
+
         return (CONSProgram typedefsBlock globalsBlock subprogramsBlock mainBlock)

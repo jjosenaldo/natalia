@@ -27,4 +27,6 @@ playProgram  =
         let mainBlk = getProgramMainBlock pg -- MainBlock
         let mainStmts = getMainBlockStatements mainBlk -- [Statements]
         ret <- playStmtsWithNoReturn mainStmts
+        s <- getState
+        liftIO(print(s))
         return ()

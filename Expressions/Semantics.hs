@@ -3,6 +3,7 @@ module Expressions.Semantics where
 -- natalia's modules
 import Expressions.Grammar
 import Expressions.Typing
+import Data.Maybe
 import Lexical.Lexemes
 import Memory.Memory
 import PredefBlocks.Grammar
@@ -211,14 +212,17 @@ playMyExp expr =
         return $ val
 
 playExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
-playExp expr = (try (playExpBinEval expr)) <|> 
+playExp expr = try (playExpAssignEval expr) <|>(try (playExpBinEval expr)) <|> 
         (try (playExpUnEval expr) ) <|> (playExpLit expr) 
 
 playExpLit expr = 
     do 
-        let tok = getExpLitToken expr -- Token
-        let val = getValueFromToken tok -- Value
-        return $ val 
+        let maybetok = getExpLitToken expr -- Maybe Token
+        if isNothing maybetok then fail ("error")
+        else do 
+            let tok = fromJust maybetok
+            let val = getValueFromToken tok -- Value
+            return $ val 
 
 playExpBinEval (CONSExpBin t (CONSBinOp binOp) expr1 expr2) = 
     do 
