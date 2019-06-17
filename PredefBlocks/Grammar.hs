@@ -12,6 +12,8 @@ data SubprogramsBlock =
     CONSSubprogramsBlock [Subprogram]
     deriving (Eq, Show)
 
+getSubprograms (CONSSubprogramsBlock t) = t
+
 data Subprogram =
     CONSProcedure String [(Type, String)] [Statement] |
     CONSFunction String [(Type, String)] Type [Statement] 
@@ -21,13 +23,21 @@ data GlobalsBlock =
     CONSGlobalsBlock [Initialization] 
     deriving (Eq, Show)
 
+getInitializations (CONSGlobalsBlock t) = t
+
 data Initialization = 
     CONSInitialization Type String Exp 
     deriving (Eq, Show)
 
+getInitializationType (CONSInitialization a b c) = a
+getInitializationId (CONSInitialization a b c) = b
+getInitializationExp (CONSInitialization a b c) = c
+
 data TypedefsBlock = 
     CONSTypedefsBlock [Typedef] 
     deriving (Eq, Show)
+
+getTypedefs (CONSTypedefsBlock t) = t
 
 -- data Typedef = 
 --     CONSTypedef Type String 

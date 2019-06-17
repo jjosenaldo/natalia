@@ -366,23 +366,23 @@ dotToken = tokenPrim show updatePos get_token where
     get_token (Dot p)  = Just (RetToken (Dot p))
     get_token _ = Nothing
 
-generalType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+generalType :: ParsecT [Token] ProgramState IO (ReturnObject)
 generalType = 
     try preDefinedTypedefType <|> try primitiveType <|> try aggregateType
 
-preDefinedTypedefType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+preDefinedTypedefType :: ParsecT [Token] ProgramState IO (ReturnObject)
 preDefinedTypedefType = 
     do
         retIdToken <- idToken -- RetToken
         let actualIdToken = getRetToken retIdToken -- Id
-        memory <- getState
+        s <- getState
         let pos = get_pos actualIdToken -- (Int, Int)
         let idName = get_id_name actualIdToken -- String
-        let typedefReturnType = getMemoryCellType (memoryGet idName pos memory)
+        let typedefReturnType = getMemoryCellType (memoryGet idName pos (getStateLocalMemory s))
 
         return (RetType(getTypedefType typedefReturnType))
 
-primitiveType :: ParsecT [Token] [MemoryCell] IO (ReturnObject) 
+primitiveType :: ParsecT [Token] ProgramState IO (ReturnObject) 
 primitiveType = 
     do
         retprimitivetype <- lexicalTypeToken -- ReturnObject
@@ -391,14 +391,14 @@ primitiveType =
 
         return (RetType typeToReturn)
 
-aggregateType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+aggregateType :: ParsecT [Token] ProgramState IO (ReturnObject)
 aggregateType = 
     try
     setType
     <|>
     arrayType
 
-setType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+setType :: ParsecT [Token] ProgramState IO (ReturnObject)
 setType =
     do
         retlbrace <- leftBraceToken
@@ -410,7 +410,7 @@ setType =
 
         return (return_type)
 
-arrayType :: ParsecT [Token] [MemoryCell] IO (ReturnObject)
+arrayType :: ParsecT [Token] ProgramState IO (ReturnObject)
 arrayType =
     do
         lbrack <- leftBracketToken

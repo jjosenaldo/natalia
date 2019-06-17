@@ -17,12 +17,13 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
--- -- the entire program
--- program :: ParsecT [Token] [MemoryCell] IO (Program)
--- program = do
---             program <- _program
---             eof
---             return (program)
+
+-- the entire program
+program :: ParsecT [Token] ProgramState IO (Program)
+program = do
+            program <- _program
+            eof
+            return (program)
 
 -- -- invocação do parser para o símbolo de partida 
 
@@ -44,7 +45,7 @@ import Text.Parsec
 -- SEMANTICS ----------------------------------------------------------------
 
 parser :: [Token] -> IO (Either ParseError ())
-parser tokens = runParserT playProgram [] "Error message" tokens
+parser tokens = runParserT playProgram (CONSState "" 0 [] []) "Error message" tokens
 
 main :: IO ()
 main = do

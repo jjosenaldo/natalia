@@ -8,6 +8,13 @@ import Types.Typedef
 import TypeValue.TypeValue
 import PredefBlocks.Grammar
 
+--                                        global        local
+data ProgramState = CONSState String Int [MemoryCell] [MemoryCell] deriving (Eq, Show)
+getStateGlobalMemory (CONSState _ _ m _) = m
+getStateLocalMemory (CONSState _ _ _ m) = m
+getStateLevel (CONSState _ l _ _) = l
+getStateActiveSubprogram (CONSState a _ _ _) = a
+
 data Block = 
     CONSBlock [Statement]
     deriving (Eq, Show)
@@ -55,8 +62,8 @@ data Block =
 --     deriving (Eq, Show)
 
 
-data Variable = 
-    ConstructVariable String Value Bool | 
+data Variable = --                      subpr  level
+    ConstructVariable String Value Bool String Int| 
     ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
@@ -66,7 +73,7 @@ data MemoryCell =
     Typedef Typedef deriving (Show, Eq)
 
 -- functions to access important fields
-getId (Variable (ConstructVariable x _ _)) = x
+getId (Variable (ConstructVariable x _ _ _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
 getId (Subprogram (CONSFunction x _ _ _)) = x
 getId (Subprogram (CONSProcedure x _ _)) = x
@@ -90,17 +97,21 @@ getTypeOfFunctionCall functionId = NatInt
 -- checkParamsPassed id exprList = True
 
 setValue::MemoryCell -> Value -> MemoryCell
-setValue (Variable (ConstructVariable name v1 isGlobal)) v2
-    | checkCompatibleTypes (getTypeFromValue v1) (getTypeFromValue v2) = Variable (ConstructVariable name v2 isGlobal)
+setValue (Variable (ConstructVariable name v1 isGlobal creator level)) v2
+    | checkCompatibleTypes (getTypeFromValue v1) (getTypeFromValue v2) = Variable (ConstructVariable name v2 isGlobal creator level)
     | otherwise = error ("ERROR type mismatch in variable " ++ name)
 
 getValue::MemoryCell -> (Int, Int) -> Value
-getValue (Variable (ConstructVariable _ val _)) _ = val
+getValue (Variable (ConstructVariable _ val _ _ _)) _ = val
 getValue (Variable (ConstructConstantVariable _ val _)) _ = val
 getValue c p = error ("ERROR "++show(p)++" you can't get value from a " ++ show(c))
 
+getCaller :: MemoryCell -> String
+getCaller (Variable (ConstructVariable _ _ _ f _)) = f
+getCaller _ = error ("Can't get creator of this cell (not a variable)")
+
 getValueByMemoryCell :: MemoryCell -> Value
-getValueByMemoryCell (Variable (ConstructVariable _ val _)) = val
+getValueByMemoryCell (Variable (ConstructVariable _ val _ _ _)) = val
 getValueByMemoryCell (Variable (ConstructConstantVariable _ val _)) = val
 getValueByMemoryCell cell = error ("ERROR:  you can't get value from a " ++ show(cell))
 
@@ -112,10 +123,10 @@ isConstantVariable (Variable (ConstructConstantVariable c _ _)) = True
 isConstantVariable _ = False
 
 memoryInsert :: MemoryCell -- ^ the variable to be inserted
-                -> [MemoryCell] -- ^ the memory before the insertion
-                -> [MemoryCell] -- ^ the memory after the insertion
-memoryInsert symbol []  = [symbol]
-memoryInsert symbol memory = memory ++ [symbol]
+                -> ProgramState -- ^ the memory before the insertion
+                -> ProgramState -- ^ the memory after the insertion
+memoryInsert symbol (CONSState a b c [])  = (CONSState a b c [symbol])
+memoryInsert symbol (CONSState a b c d) = CONSState a b c (d ++ [symbol])
 
 -- | Updates the value of a variable in the table of symbols
 memoryUpdate :: MemoryCell -- ^ the variable with its new value
@@ -167,14 +178,14 @@ memoryDelete name (v:m) =
 
 -- Receives a variable, a list of NatInts (representing indexes) and a value, returns the same variable with new value setted
 setValueArray :: MemoryCell -> [Value] -> Value -> MemoryCell
-setValueArray (Variable (ConstructVariable name val isGlobal)) [] newVal = 
-    if checkCompatibleTypes t1 t2 then Variable (ConstructVariable name newVal isGlobal)
+setValueArray (Variable (ConstructVariable name val isGlobal creator level)) [] newVal = 
+    if checkCompatibleTypes t1 t2 then Variable (ConstructVariable name newVal isGlobal creator level)
     else error ("ERROR type mismatch, trying to insert "++ show(t1) ++ " in " ++ show(t2))
     where 
         t1 = getTypeFromValue val
         t2 = getTypeFromValue newVal
 
-setValueArray (Variable (ConstructVariable name val isGlobal)) list newVal = Variable (ConstructVariable name (setValueArray' val list newVal) isGlobal)
+setValueArray (Variable (ConstructVariable name val isGlobal creator level)) list newVal = Variable (ConstructVariable name (setValueArray' val list newVal) isGlobal creator level)
 
 -- Auxiliar function, that receives an array, a list of NatInt (representing indexes), and a new value, and sets the value correspondingly
 setValueArray' :: Value -> [Value] -> Value -> Value
