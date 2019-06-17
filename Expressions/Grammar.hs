@@ -50,6 +50,10 @@ getExpBinExp1 (CONSExpBin _ _ exp1 _) = exp1
 getExpBinExp2 :: Exp -> Exp
 getExpBinExp2 (CONSExpBin _ _ _ exp2) = exp2
 
+getExpLValue :: Exp -> Maybe LValue
+getExpLValue (CONSExpLValue _ lv) = Just lv
+getExpLValue _ = Nothing
+
 -- FIELD FUNCTIONS FOR BINOPS ------------------------------------------------------------
 
 getBinOpTok :: BinOp -> Token

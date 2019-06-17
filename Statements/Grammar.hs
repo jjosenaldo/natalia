@@ -6,13 +6,15 @@ import Lexical.Lexemes
 import TypeValue.TypeValue
 
 data Statement = 
-    CONSStatementVarInit VarInit   | -- SYNT
-    CONSStatementPrint Print       | -- SYNT, SEM 
-    CONSStatementReturn Return     | -- SYNT                   
-    CONSStatementBlock Block       | -- SYNT, SEM
-    CONSStatementIf If             | -- SYNT, SEM 
-    CONSStatementIfElse IfElse     | -- SYNT 
-    CONSStatementWhile While
+    CONSStatementVarInit VarInit       | -- SYNT
+    CONSStatementPrint Print           | -- SYNT, SEM 
+    CONSStatementReturn Return         | -- SYNT                   
+    CONSStatementBlock Block           | -- SYNT, SEM
+    CONSStatementIf If                 | -- SYNT, SEM 
+    CONSStatementIfElse IfElse         | -- SYNT 
+    CONSStatementWhile While           | -- SYNT, 
+    CONSStatementProcCall ProcCall     | -- SYNT
+    CONSStatementAssignment Assignment
     deriving (Eq, Show)
 
 data Return =
@@ -43,6 +45,13 @@ data While =
     CONSWhile Exp Block
     deriving (Eq, Show)
 
+data ProcCall = 
+    CONSProcCall String [Exp]
+    deriving (Eq, Show)
+
+data Assignment = 
+    CONSAssignment LValue Exp
+    deriving (Eq, Show)
 
 getBlockStatements :: Block -> [Statement]
 getBlockStatements (CONSBlock ss) = ss
