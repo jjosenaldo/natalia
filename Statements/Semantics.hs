@@ -22,7 +22,7 @@ import System.IO.Unsafe
 import Text.Parsec
     
 
-playStmtsWithoutRet :: [Statement] -> ParsecT [Token] [MemoryCell] IO ()
+playStmtsWithoutRet :: [Statement] -> ParsecT [Token] ProgramState IO ()
 playStmtsWithoutRet [] = 
     do 
         return ()
@@ -33,7 +33,7 @@ playStmtsWithoutRet (stmt : stmts ) =
         ret <- playStmtsWithoutRet stmts
         return ()
 
-playStmtWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playStmtWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
 playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
@@ -54,7 +54,7 @@ playPrint stmt =
             else 
                 error ("EXECERROR: You can only print " ++ (getNameOfType NatString) ++ "!")
 
-playIfWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playIfWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
 playIfWithoutRet stmt = 
     do 
         let maybeif = getStatementIf stmt 
@@ -75,7 +75,7 @@ playIfWithoutRet stmt =
 
 
 
-playIfElseWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playIfElseWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
 playIfElseWithoutRet stmt = 
     do 
         let maybeifelse = getStatementIfElse stmt -- Maybe IfElse
@@ -97,7 +97,7 @@ playIfElseWithoutRet stmt =
                 ret <- playBlockWithoutRet blk2
                 return ()
 
-playBlockWithoutRet :: Block -> ParsecT [Token] [MemoryCell] IO ()
+playBlockWithoutRet :: Block -> ParsecT [Token] ProgramState IO ()
 playBlockWithoutRet blk = 
     do 
         let blkStmts = getBlockStatementList blk -- [Statement]
