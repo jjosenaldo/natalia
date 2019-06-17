@@ -4,9 +4,10 @@ module Program.Parser where
 import PredefBlocks.Grammar
 import PredefBlocks.Parser
 import Program.Grammar
-import Program.ProgramState
 import Memory.Memory
 import Types.Typedef
+import Types.Types
+import TypeValue.TypeValue
 import Lexical.Lexemes
 import Expressions.Semantics
 
@@ -20,15 +21,40 @@ populateTypedefs :: [Typedef] -> ProgramState -> ProgramState
 populateTypedefs [] s = s
 populateTypedefs (h:tdList) (CONSState a l glbMem locMem) = populateTypedefs tdList (CONSState a l (glbMem++[Typedef h]) locMem)
 
-populateGlobals [] s = 
+globalMemoryInsert var (CONSState a b glb c) = CONSState a b (glb++[var]) c 
+
+convertToVars ((CONSInitialization a b c):inits) = 
     do
-        return (s)
-populateGlobals (h:tdList) (CONSState a l glbMem locMem) =
+        val <- playExp c
+        if checkCompatibleTypes a (getTypeFromValue val) then 
+            do
+                let var = Variable (ConstructVariable b val True)
+                return ([var]:(convertToVars inits))
+        else error("Incompatible types at global declarations")
+convertToVars [] =
     do
-        val <- playExp (getInitializationExp h)
-        let id = getInitializationId h
-        let var = Variable (ConstructVariable id val True)
-        return (populateGlobals tdList (CONSState a l (glbMem++[var]) locMem))
+        return ([])
+
+calculateAndPopulateGlobals ((CONSInitialization a b c):inits) =
+    do
+        val <- playExp c
+        if checkCompatibleTypes a (getTypeFromValue val) then 
+            do
+                let var = Variable (ConstructVariable b val True)
+                updateState(globalMemoryInsert var)
+                return (calculateAndPopulateGlobals inits)
+        else error("Incompatible types at global declarations")
+
+calculateAndPopulateGlobals [] = 
+    do
+        return ([])
+
+
+
+
+populateGlobals :: [MemoryCell] -> ProgramState -> ProgramState
+populateGlobals [] s = s
+populateGlobals (h:tdList) (CONSState a l glbMem locMem) = populateGlobals tdList (CONSState a l (glbMem++[h]) locMem)
 
 populateSubprograms :: [Subprogram] -> ProgramState -> ProgramState
 populateSubprograms [] s = s
@@ -42,13 +68,16 @@ _program =
         globalsBlock <- _globalsBlock
         subprogramsBlock <- _subprogramsBlock
 
+        
         updateState(populateTypedefs (getTypedefs typedefsBlock))
-        updateState(populateTypedefs (getInitializations globalsBlock))
-        updateState(populateTypedefs (getSubprograms subprogramsBlock))
+
+        aux <- convertToVars (getInitializations globalsBlock)
+
+        updateState(populateSubprograms (getSubprograms subprogramsBlock))
 
         s <- getState
 
-        liftIO(print(s))
+        --liftIO(print(s))
 
         mainBlock <- _mainBlock
         return (CONSProgram typedefsBlock globalsBlock subprogramsBlock mainBlock)

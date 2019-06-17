@@ -19,7 +19,7 @@ import Text.Parsec
 
 
 -- the entire program
-program :: ParsecT [Token] State IO (Program)
+program :: ParsecT [Token] ProgramState IO (Program)
 program = do
             program <- _program
             eof

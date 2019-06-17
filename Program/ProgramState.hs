@@ -1,6 +1,6 @@
 module Program.ProgramState where
 
-import Memory.Memory
+--import Memory.Memory
 --                                  global        local
 data ProgramState = CONSState String Int [MemoryCell] [MemoryCell] deriving (Eq, Show)
 getStateGlobalMemory (CONSState _ _ m _) = m

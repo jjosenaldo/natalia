@@ -8,6 +8,13 @@ import Types.Typedef
 import TypeValue.TypeValue
 import PredefBlocks.Grammar
 
+--                                  global        local
+data ProgramState = CONSState String Int [MemoryCell] [MemoryCell] deriving (Eq, Show)
+getStateGlobalMemory (CONSState _ _ m _) = m
+getStateLocalMemory (CONSState _ _ _ m) = m
+getStateLevel (CONSState _ l _ _) = l
+getStateActiveSubprogram (CONSState a _ _ _) = a
+
 data Block = 
     CONSBlock [Statement]
     deriving (Eq, Show)
@@ -112,10 +119,10 @@ isConstantVariable (Variable (ConstructConstantVariable c _ _)) = True
 isConstantVariable _ = False
 
 memoryInsert :: MemoryCell -- ^ the variable to be inserted
-                -> [MemoryCell] -- ^ the memory before the insertion
-                -> [MemoryCell] -- ^ the memory after the insertion
-memoryInsert symbol []  = [symbol]
-memoryInsert symbol memory = memory ++ [symbol]
+                -> ProgramState -- ^ the memory before the insertion
+                -> ProgramState -- ^ the memory after the insertion
+memoryInsert symbol (CONSState a b c [])  = (CONSState a b c [symbol])
+memoryInsert symbol (CONSState a b c d) = CONSState a b c (d ++ [symbol])
 
 -- | Updates the value of a variable in the table of symbols
 memoryUpdate :: MemoryCell -- ^ the variable with its new value
