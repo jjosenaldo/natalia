@@ -29,7 +29,9 @@ convertToVars ((CONSInitialization a b c):inits) =
         if checkCompatibleTypes a (getTypeFromValue val) then 
             do
                 let var = Variable (ConstructVariable b val True)
-                return ([var]:(convertToVars inits))
+                preResult <- convertToVars inits
+
+                return  (    [var]   ++   preResult   )
         else error("Incompatible types at global declarations")
 convertToVars [] =
     do
@@ -42,7 +44,9 @@ calculateAndPopulateGlobals ((CONSInitialization a b c):inits) =
             do
                 let var = Variable (ConstructVariable b val True)
                 updateState(globalMemoryInsert var)
-                return (calculateAndPopulateGlobals inits)
+
+                preResult <- calculateAndPopulateGlobals inits
+                return (preResult)
         else error("Incompatible types at global declarations")
 
 calculateAndPopulateGlobals [] = 
