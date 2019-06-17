@@ -81,3 +81,42 @@ _block =
     do 
         stmts <- _braces _statementList
         return $ CONSBlock stmts
+
+_ifAsStmt = 
+    do
+        if_ <- _if
+        return $ CONSStatementIf if_
+
+_if =
+    do
+        ifcommand <- ifToken
+        expr <- _parens _expr
+        block <- _block
+        return  (CONSIf (expr) (block)) 
+
+_ifElseAsStmt = 
+    do 
+        ifElse <- _ifElse
+        return $ CONSStatementIfElse ifElse
+
+
+_ifElse = 
+    do 
+        if_ <- ifToken
+        expr <- _parens _expr
+        block1_ <- _block
+        else_ <- elseToken
+        block2_ <- _block
+        return (CONSIfElse (expr) (block1_) (block2_) )
+
+_whileAsStmt = 
+    do 
+        while_ <- _while
+        return $ CONSStatementWhile while_
+
+_while =
+    do 
+        while_ <- whileToken
+        expr <- _parens _expr
+        block <- _block
+        return (CONSWhile expr block)
