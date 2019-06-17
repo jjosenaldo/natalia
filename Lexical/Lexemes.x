@@ -12,6 +12,15 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
 
+  -- COMMANDS ---------------------------------------------
+
+  read                             { \p s -> Read (getLC p)}
+  toInt                            { \p s -> ToInt (getLC p)}
+  toDouble                         { \p s -> ToDouble (getLC p)}
+  toString                         { \p s -> ToString (getLC p)}
+  toBool                           { \p s -> Read (getLC p)}
+  print                            { \p s -> Print (getLC p)}
+
   -- TYPES  ------------------------------------------------
 
   int                              { \p s -> Type s (getLC p)}
@@ -47,8 +56,9 @@ tokens :-
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  ";"                              { \p s -> SemiColon (getLC p)}
-  ","                              { \p s -> Comma (getLC p)}
+  ";"                               { \p s -> SemiColon (getLC p)}
+  ","                               { \p s -> Comma (getLC p)}
+  ":"                               { \p s -> Colon (getLC p)}
 
   -- LITERALS  ---------------------------------------------
   
@@ -57,7 +67,7 @@ tokens :-
   "True"                            { \p s -> Bool (read s) (getLC p) }
   "False"                           { \p s -> Bool (read s) (getLC p)}
   \" ([.\n]#\")* \"                 { \p s -> String (reverse (drop 1 (reverse (drop 1 s)))) (getLC p)}
-  "Null"                         { \p s -> Null (getLC p)}
+  "Null"                            { \p s -> Null (getLC p)}
  
   -- OPERATORS  --------------------------------------------
 
@@ -67,6 +77,8 @@ tokens :-
   \+                               { \p s -> Plus (getLC p)}
   \-                               { \p s -> Minus (getLC p)}
   \*                               { \p s -> Times (getLC p)}
+  \&                               { \p s -> Uppersand (getLC p)}
+  \?                               { \p s -> Interrogation (getLC p)}
   \/                               { \p s -> Div (getLC p)}
   "+="                             { \p s -> PlusEquals (getLC p)}
   "-="                             { \p s -> MinusEqual (getLC p)}
@@ -79,7 +91,7 @@ tokens :-
   "<="                             { \p s -> LessEquals (getLC p)}
   ">="                             { \p s -> GreaterEquals (getLC p)}
   "=="                             { \p s -> Equals (getLC p)}
-  "!="                             { \p s -> Difference (getLC p)}
+  "!="                             { \p s -> Different (getLC p)}
   "!"                              { \p s -> Negation (getLC p)}
   "&&"                             { \p s -> And (getLC p)}
   "||"                             { \p s -> Or (getLC p)}
@@ -94,20 +106,31 @@ tokens :-
 
   -- LOOPS  ------------------------------------------------
 
-  while                            { \p s -> Loop s (getLC p)}
-  for                              { \p s -> Loop s (getLC p)}
+  while                            { \p s -> While (getLC p)}
+  for                              { \p s -> For (getLC p)}
+
+  -- SUBPROGRAMS -------------------------------------------
+  "func"                            {\p s -> Func (getLC p)}
+  "proc"                            {\p s -> Proc (getLC p)}
 
   -- NAMES ------------------------------------------------
-
-  -- filename
-  --[$alpha\_$digit]+   \.  [a-z]+   { \p s -> Filename s (getLC p)}
 
   -- identifier
   $alpha [$alpha $digit \_ \']*    { \p s -> Id s (getLC p)}
 
+
 {
 -- The token type:
 data Token =
+
+  -- COMMANDS ---------------------------------------------
+
+  ToDouble (Int, Int)        |
+  ToInt (Int, Int)           |
+  ToString (Int, Int)        |
+  ToBool (Int, Int)          |
+  Print (Int, Int)           |
+  Read (Int, Int)            |
 
   -- BLOCKS -----------------------------------------------
 
@@ -129,8 +152,9 @@ data Token =
   -- SEPARATORS -------------------------------------------
 
   -- statement separator
-  SemiColon (Int, Int)       |
-  Comma (Int, Int)           |
+  SemiColon (Int, Int)        |
+  Comma (Int, Int)            |
+  Colon (Int, Int)            |
   
   -- OPERATORS  --------------------------------------------
 
@@ -155,9 +179,11 @@ data Token =
   Negation (Int, Int)        |
   And (Int, Int)             |
   Or (Int, Int)              |
-  Difference (Int, Int)      |
+  Different (Int, Int)       |
   In (Int, Int)              |
   Dot (Int, Int)             |
+  Uppersand (Int, Int)       |
+  Interrogation (Int, Int)   |
 
   -- CONDITIONALS  -----------------------------------------
 
@@ -171,9 +197,14 @@ data Token =
   
   -- LOOPS  ------------------------------------------------
 
-  Loop String (Int, Int)     |
+  While (Int, Int)     |
+  For (Int, Int)       |
 
-  -- NAMES ------------------------------------------------
+  -- SUBPROGRAMS -------------------------------------------
+  Func (Int, Int)      |
+  Proc (Int, Int)      |
+
+  -- NAMES -------------------------------------------------
 
   -- identifier
   Id String (Int, Int)       |
@@ -187,7 +218,7 @@ data Token =
   Double Double (Int, Int)       |
   String String (Int, Int)       |
   Bool Bool (Int, Int)           |
-  Null (Int, Int)
+  Null (Int, Int)                
 
   ----------------------------------------------------------
 
@@ -234,13 +265,14 @@ get_pos (Equals p) = p
 get_pos (Negation p) = p
 get_pos (And p) = p
 get_pos (Or p) = p
-get_pos (Difference p) = p
+get_pos (Different p) = p
 get_pos (In p) = p
 get_pos (If p) = p
 get_pos (Else p) = p
 get_pos (ElseIf p) = p
 get_pos (Type _ p) = p
-get_pos (Loop _ p) = p
+get_pos (While p) = p
+get_pos (For p) = p
 get_pos (Id _ p) = p
 -- get_pos (Filename _ p) = p
 get_pos (Int _ p) = p
@@ -249,6 +281,8 @@ get_pos (Bool _ p) = p
 get_pos (Comma p) = p
 get_pos (String _ p) = p
 get_pos (Dot p) = p
+get_pos (Uppersand p) = p
+get_pos (Interrogation p) = p
 
 getLC (AlexPn _ l c) = (l, c) 
 

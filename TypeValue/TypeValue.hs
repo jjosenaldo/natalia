@@ -2,12 +2,14 @@ module TypeValue.TypeValue where
 
 data Type = 
     NatGenType                              |
+    NatNothing                              |
     NatInt                                  | 
     NatBool                                 | 
     NatString                               | 
     NatDouble                               | 
     NatSet Type                             | 
     NatStruct String                        |
+    NatPointer Type                         |
     NatArray Type                           |
     NatNull deriving (Show, Eq)
 
@@ -23,6 +25,23 @@ data Value =
     ConsNatNull deriving (Show, Eq)
 
 
+getNameOfType :: Type -> String
+getNameOfType NatInt         =  "int"  
+getNameOfType NatBool        =  "bool"
+getNameOfType NatString      =  "string"
+getNameOfType NatDouble      =  "double"
+getNameOfType NatNothing     =  "NatNothing"
+getNameOfType (NatSet t)     =  "{" ++ (getNameOfType t) ++ "}"
+getNameOfType (NatStruct t)  =  t
+getNameOfType (NatArray t)   =  "[" ++ (getNameOfType t) ++ "]"
+getNameOfType NatNull        =  "Null"  
+getNameOfType NatGenType     =  "NatGenType"
+getNameOfType (NatPointer t) =  "*" ++ (getNameOfType t) ++ "*" 
+
+
+-- TODO: improve this...
+getPosValue :: Value -> (Int, Int)
+getPosValue x = (0,0)
 
 getIntFromNatInt (ConsNatInt x) = x
 getIntFromNatInt v = error ("Trying to fetch Int from " ++ (show (getTypeFromValue v)))

@@ -1,12 +1,14 @@
 module Main (main) where
 
+-----------------------------------------------  SEMANTICS  ---------------------------------------------------------
+
 -- natalia's modules
-import Blocks.Blocks
 import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
-import Statements.Statements
 import TypeValue.TypeValue
+import Program.Grammar
+import Program.Parser
 
 -- Haskell's modules
 import Control.Monad.IO.Class
@@ -15,16 +17,15 @@ import System.IO.Unsafe
 import Text.Parsec
 
 -- the entire program
-program :: ParsecT [Token] [MemoryCell] IO ()
+program :: ParsecT [Token] [MemoryCell] IO (Program)
 program = do
-            retPredefinedBlocks <- predefinedBlocks (ConsNatInt 0)
-            retMainBlock <- mainBlock
+            program <- _program
             eof
-            return ()
+            return (program)
 
 -- invocação do parser para o símbolo de partida 
 
-parser :: [Token] -> IO (Either ParseError ())
+parser :: [Token] -> IO (Either ParseError (Program))
 parser tokens = runParserT program [] "Error message" tokens
 
 main :: IO ()
@@ -36,9 +37,5 @@ main = do
     else
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
-                    Right ans -> return ()
+                    Right ans -> print ans;
                 }
-
-
-
-

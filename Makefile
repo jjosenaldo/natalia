@@ -1,6 +1,12 @@
 # Paths 
+BLK_PATH = Blocks
+EXP_PATH = Expressions
 LEX_PATH = Lexical
-PARSER_PATH = Parsers
+MEM_PATH = Memory
+STMT_PATH = Statements
+SYTX_PATH = Syntax
+TYPE_PATH = Types
+TV_PATH = TypeValue
 
 # extensions
 LEX_EXT = x
@@ -35,8 +41,23 @@ generate:
 .PHONY: clean
 clean: 
 	@echo "\nCleaning up..."
-	@rm -f *.o *.hi
+	@rm -rf *.o *.hi
+	@rm -rf $(BLK_PATH)/*.o
+	@rm -rf $(BLK_PATH)/*.hi
+	@rm -rf $(EXP_PATH)/*.o
+	@rm -rf $(EXP_PATH)/*.hi
 	@rm -rf $(LEX_PATH)/*.o
 	@rm -rf $(LEX_PATH)/*.hi
-	@rm -rf $(PARSER_PATH)/*.o
-	@rm -rf $(PARSER_PATH)/*.hi
+	@rm -rf $(MEM_PATH)/*.o
+	@rm -rf $(MEM_PATH)/*.hi
+	@rm -rf $(STMT_PATH)/*.o
+	@rm -rf $(STMT_PATH)/*.hi
+	@rm -rf $(SYTX_PATH)/*.o
+	@rm -rf $(SYTX_PATH)/*.hi
+	@rm -rf $(TYPE_PATH)/*.o
+	@rm -rf $(TYPE_PATH)/*.hi
+	@rm -rf $(TV_PATH)/*.o
+	@rm -rf $(TV_PATH)/*.hi
+
+cleanall: clean
+	@rm -rf *.out
