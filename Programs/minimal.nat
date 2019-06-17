@@ -33,12 +33,12 @@
     #    print("oi");
     #}
 #
- #   if(False){
-  #      print("sou fodoa");
-   # }
+    if(True){
+        print("tudo");
+    }
     #call(1);
     #v[1][2][3] = 5;
     int x = 1;
-    int y = 2;
-    int b = 3;
+    string z = toString(Null);
+    #print(z);
 }

@@ -212,7 +212,7 @@ playMyExp expr =
         return $ val
 
 playExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
-playExp expr = try (playExpAssignEval expr) <|>(try (playExpBinEval expr)) <|> 
+playExp expr = try (playExpCmdUn expr) <|> try (playExpAssignEval expr) <|>(try (playExpBinEval expr)) <|> 
         (try (playExpUnEval expr) ) <|> (playExpLit expr) 
 
 playExpLit expr = 
@@ -259,26 +259,26 @@ playExpAssignEval _ =
     do
         fail ("error in the assignment of a variable")
         
--- -- TODO: sets, structs and stuff
--- playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) = 
---     do 
---         val <- playExp expr -- Value
---         if isValueString val then do 
---             return $ val 
---         else if isValueInteger val then do 
---             let valint = getValueAsInteger val -- Integer
---             return $ ConsNatString (show valint)
---         else if isValueDouble val then do 
---             let valdou  = getValueAsDouble val -- Double
---             return $ ConsNatString (show valdou)
---         else if isValueBool val then do 
---             let valbool  = getValueAsBool val -- Bool
---             return $ ConsNatString (show valbool)
---         else 
---             error ("EXECERROR: can't convert a " ++ (show (getTypeFromValue val)) ++ " to a string." )
+-- TODO: sets, structs and stuff
+playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) = 
+    do 
+        val <- playExp expr -- Value
+        if isValueString val then do 
+            return $ val 
+        else if isValueInteger val then do 
+            let valint = getValueAsInteger val -- Integer
+            return $ ConsNatString (show valint)
+        else if isValueDouble val then do 
+            let valdou  = getValueAsDouble val -- Double
+            return $ ConsNatString (show valdou)
+        else if isValueBool val then do 
+            let valbool  = getValueAsBool val -- Bool
+            return $ ConsNatString (show valbool)
+        else 
+            error ("EXECERROR: can't convert a " ++ (show (getTypeFromValue val)) ++ " to a string." )
 
--- playExpCmdUn _ = 
---     fail ("error")
+playExpCmdUn _ = 
+    fail ("error in the execution of an unary command")
 
 
     
