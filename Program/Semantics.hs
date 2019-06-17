@@ -26,5 +26,5 @@ playProgram  =
         pg <- _program -- Program
         let mainBlk = getProgramMainBlock pg -- MainBlock
         let mainStmts = getMainBlockStatements mainBlk -- [Statements]
-        ret <- playStmtsWithNoReturn mainStmts
+        ret <- playStmtsWithoutRet mainStmts
         return ()

@@ -49,17 +49,25 @@ getBlockStatements (CONSBlock ss) = ss
 
 -- FIELD FUNCTIONS FOR STATEMENTS ---------------------------------------------------------------------
 
-getStatementReturn :: Statement -> Return
-getStatementReturn (CONSStatementReturn r) = r
-getStatementReturn s = error ("The statement" ++ (show s) ++  "is not a return!")
+getStatementReturn :: Statement -> Maybe Return
+getStatementReturn (CONSStatementReturn r) = Just r
+getStatementReturn s = Nothing --fail ("The statement" ++ (show s) ++  "is not a return!")
 
-getStatementPrint :: Statement -> Print
-getStatementPrint (CONSStatementPrint r) = r
-getStatementPrint s = error ("The statement" ++ (show s) ++  "is not a print!")
+getStatementPrint :: Statement -> Maybe Print
+getStatementPrint (CONSStatementPrint r) = Just r
+getStatementPrint s = Nothing --fail ("The statement" ++ (show s) ++  "is not a print!")
 
-getStatementVarInit :: Statement -> VarInit
-getStatementVarInit (CONSStatementVarInit r) = r
-getStatementVarInit s = error ("The statement" ++ (show s) ++  "is not a VarInit!")
+getStatementVarInit :: Statement -> Maybe VarInit
+getStatementVarInit (CONSStatementVarInit r) = Just r
+getStatementVarInit s = Nothing --fail ("The statement" ++ (show s) ++  "is not a VarInit!")
+
+getStatementIfElse :: Statement -> Maybe IfElse
+getStatementIfElse (CONSStatementIfElse r) = Just r
+getStatementIfElse s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a IfElse!")
+
+getStatementBlock :: Statement -> Maybe Block
+getStatementBlock (CONSStatementBlock r) = Just r
+getStatementBlock s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a Block!")
 
 -- FIELD FUNCTIONS FOR RETURNS ---------------------------------------------------------------------
 
@@ -70,3 +78,19 @@ getReturnExp (CONSReturn expr ) = expr
 
 getPrintExp :: Print -> Exp 
 getPrintExp (CONSPrint expr ) = expr 
+
+-- FIELD FUNCTIONS FOR IFELSES -----------------------------------------------------------------------
+
+getIfElseExp :: IfElse -> Exp 
+getIfElseExp (CONSIfElse ex _ _ ) = ex 
+
+getIfElseBlock1 :: IfElse -> Block 
+getIfElseBlock1 (CONSIfElse _ blk1 _) = blk1
+
+getIfElseBlock2 :: IfElse -> Block 
+getIfElseBlock2 (CONSIfElse _ _ blk2) = blk2
+
+-- FIELD FUNCTIONS FOR BLOCKS -----------------------------------------------------------------------
+
+getBlockStatementList :: Block -> [Statement]
+getBlockStatementList (CONSBlock l) = l

@@ -26,5 +26,11 @@
 
 @main{
     #int a = 1+1;
-    print("oi" + ", Josenaldo");
+    if(False){
+        print("porra");
+    }
+    else{
+        print("oi");
+    }
+    
 }

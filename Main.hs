@@ -20,8 +20,8 @@ import Text.Parsec
 
 -- SEMANTICS ----------------------------------------------------------------
 
-parser :: [Token] -> IO (Either ParseError (Program))
-parser tokens = runParserT _program [] "Error message" tokens
+parser :: [Token] -> IO (Either ParseError ())
+parser tokens = runParserT playProgram [] "Error message" tokens
 
 main :: IO ()
 main = do

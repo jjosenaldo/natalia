@@ -16,36 +16,67 @@ import Value.Value
 
 -- Haskell's modules
 import Control.Monad.IO.Class
+import Data.Maybe
 import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
     
 
-playStmtsWithNoReturn :: [Statement] -> ParsecT [Token] [MemoryCell] IO ()
-playStmtsWithNoReturn [] = 
+playStmtsWithoutRet :: [Statement] -> ParsecT [Token] [MemoryCell] IO ()
+playStmtsWithoutRet [] = 
     do 
         return ()
 
-playStmtsWithNoReturn (stmt : stmts ) = 
+playStmtsWithoutRet (stmt : stmts ) = 
     do 
-        ret <- playStmtWithNoReturn stmt 
-        ret <- playStmtsWithNoReturn stmts
+        ret <- playStmtWithoutRet stmt 
+        ret <- playStmtsWithoutRet stmts
         return ()
 
-playStmtWithNoReturn = playPrint
+playStmtWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> playPrint stmt
 
 
 playPrint :: Statement -> ParsecT [Token] [MemoryCell] IO ()
 playPrint stmt = 
     do 
-        let prnt = getStatementPrint stmt -- Print 
-        let expr = getPrintExp prnt -- Exp
-        val <- playMyExp expr
-        
-        if (getTypeFromValue val) == NatString then do 
-            liftIO (putStrLn (getValueAsString val))
-            return ()
-        else 
-            error ("EXECERROR: You can only print " ++ (getNameOfType NatString) ++ "!")
+        let maybeprnt = getStatementPrint stmt -- Maybe Print 
 
+        if isNothing maybeprnt then fail ("error")
+        else do 
+            let prnt = fromJust maybeprnt
+            let expr = getPrintExp prnt -- Exp
+            val <- playMyExp expr
+            
+            if (getTypeFromValue val) == NatString then do 
+                liftIO (putStrLn (getValueAsString val))
+                return ()
+            else 
+                error ("EXECERROR: You can only print " ++ (getNameOfType NatString) ++ "!")
+
+playIfElseWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playIfElseWithoutRet stmt = 
+    do 
+        let maybeifelse = getStatementIfElse stmt -- Maybe IfElse
+
+        if isNothing maybeifelse then fail ("error")
+        else do 
+            let ifelse = fromJust maybeifelse
+            let blk1 = getIfElseBlock1 ifelse -- Block
+            let blk2 = getIfElseBlock2 ifelse -- Block
+            let expr = getIfElseExp ifelse -- Block
+            exprval <- playMyExp expr 
+
+            if (exprval == (ConsNatBool True)) then do 
+                ret <- playBlockWithoutRet blk1
+                return ()
+            else do
+                ret <- playBlockWithoutRet blk2
+                return ()
+
+playBlockWithoutRet :: Block -> ParsecT [Token] [MemoryCell] IO ()
+playBlockWithoutRet blk = 
+    do 
+        let blkStmts = getBlockStatementList blk -- [Statement]
+        ret <- playStmtsWithoutRet blkStmts
         return ()

@@ -8,9 +8,9 @@ import Types.Typedef
 import TypeValue.TypeValue
 import PredefBlocks.Grammar
 
-data Block = 
-    CONSBlock [Statement]
-    deriving (Eq, Show)
+-- data Block = 
+--     CONSBlock [Statement]
+--     deriving (Eq, Show)
 
 -- data Statement = 
 --     CONSStatementVarInit VarInit                            |
