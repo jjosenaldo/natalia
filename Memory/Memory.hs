@@ -14,6 +14,7 @@ getStateGlobalMemory (CONSState _ _ m _) = m
 getStateLocalMemory (CONSState _ _ _ m) = m
 getStateLevel (CONSState _ l _ _) = l
 getStateActiveSubprogram (CONSState a _ _ _) = a
+getFullMemory (CONSState _ _ m1 m2) = m1 ++ m2
 
 data Block = 
     CONSBlock [Statement]

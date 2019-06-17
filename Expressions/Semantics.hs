@@ -201,16 +201,16 @@ unaryEval (Negation p) (ConsNatBool x) = ConsNatBool (not(x))
 unaryEval (Negation p) _ = error ("ERROR at " ++ show(p) ++ ": the unary ! operator expects a boolean.")
 
 
-playMyExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
+playMyExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
 playMyExp expr = 
     do 
         
-        mem <- getState -- [MemoryCell]
-        let newExp = setExpType mem expr -- Exp
+        state <- getState -- ProgramState
+        let newExp = setExpType (getFullMemory state) expr -- Exp
         val <- playExp newExp
         return $ val
 
-playExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
+playExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
 playExp expr = (try (playExpBinEval expr)) <|> 
         (try (playExpUnEval expr) ) <|> (playExpLit expr) 
 
@@ -244,9 +244,9 @@ playExpUnEval _ =
 -- semantics to assignment
 playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
     do
-        mem <- getState -- [MemoryCell] 
+        state <- getState -- ProgramState 
         res <- (playExp exp)
-        let cellMem = (getMemoryCellByName (str) (mem))
+        let cellMem = (getMemoryCellByName (str) (getFullMemory state))
         let newCell = (setValue (cellMem) (res))
         return $ res
 
