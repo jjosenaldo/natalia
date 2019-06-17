@@ -1,43 +1,16 @@
 @typedefs {
-    #rational {
-    #    int num;
-    #    int den;
-    #},
-    #node {
-    #    node b;
-    #    int b;
-    #},
-    #setComplexo {{{{int}}}},
-    #meuint int
+    
 }
 
 @globals{
-    string a = "oi";
+  
 }
 @subprograms{
-    func identity(int x) : int{
-        return x;   
-    }
-
-    proc emptyProc(double b){
-    }
+  
 }
 
 
 @main{
-    #int a = 1+1;
-    #if(True){
-    #    print("porra");
-    #}
-    #else{
-    #    print("oi");
-    #}
-#
- #   if(False){
-  #      print("sou fodoa");
-   # }
-    #call(1);
-    #v[1][2][3] = 5;
-    int x = 1;
-    int y = 1;
+  
+    int b = 1;
 }
