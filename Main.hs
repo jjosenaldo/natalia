@@ -17,12 +17,13 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
--- -- the entire program
--- program :: ParsecT [Token] [MemoryCell] IO (Program)
--- program = do
---             program <- _program
---             eof
---             return (program)
+
+-- the entire program
+program :: ParsecT [Token] State IO (Program)
+program = do
+            program <- _program
+            eof
+            return (program)
 
 -- -- invocação do parser para o símbolo de partida 
 
