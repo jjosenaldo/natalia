@@ -70,6 +70,10 @@ getStatementVarInit :: Statement -> Maybe VarInit
 getStatementVarInit (CONSStatementVarInit r) = Just r
 getStatementVarInit s = Nothing --fail ("The statement" ++ (show s) ++  "is not a VarInit!")
 
+getStatementAssignment :: Statement -> Maybe Assignment
+getStatementAssignment (CONSStatementAssignment ass) = Just ass
+getStatementAssignment s = Nothing
+
 getStatementIfElse :: Statement -> Maybe IfElse
 getStatementIfElse (CONSStatementIfElse r) = Just r
 getStatementIfElse s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a IfElse!")
@@ -127,3 +131,11 @@ getVarInitName (CONSVarInit _ n _) = n
 
 getVarInitExp :: VarInit -> Exp
 getVarInitExp (CONSVarInit _ _ expr) = expr 
+
+-- FIELD FUNCTIONS FOR VAR ASSIGNMENT -----------------------------------------------------------------------
+
+getLValueAssign :: Assignment -> LValue
+getLValueAssign (CONSAssignment value _ ) = value
+
+getVarAssignExp :: Assignment -> Exp
+getVarAssignExp (CONSAssignment _ expr) = expr
