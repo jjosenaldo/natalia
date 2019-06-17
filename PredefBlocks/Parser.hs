@@ -8,6 +8,7 @@ import Lexical.Tokens
 import PredefBlocks.Grammar
 import Statements.Parser
 import Types.Typedef
+import TypeValue.TypeValue
 
 -- Haskell modules
 import Text.Parsec
@@ -19,25 +20,39 @@ import Text.Parsec.String
 -- TYPEDEFS BLOCK -------------------------------------------------------------------------------
 _typedefsBlock =
     do
-        stoken <- _typedefsToken
+        ttoken <- _typedefsToken
         tdList <- _braces typedefsList
         return (CONSTypedefsBlock tdList) 
 
 _typedef = (try _typeAlias) <|> (try _structDef)
 
-_structFieldDecl =
-    do
+_structFieldDecl structName =
+    try
+    (do -- recursive field
+        id <- _idToken
+        nameId <- _idToken
+        let fieldType = get_id_name id
+        let fieldName = get_id_name nameId
+        scolon <- _semiColonToken
+        if fieldType == structName then 
+            do
+                return ((NatStruct structName), fieldName)
+        else
+            do
+                fail ("expected recursive field definition"))
+    <|>
+    (do -- nonrecursive field
         retType <- generalType
         let actualType = getRetType retType
         id <- _idToken
         scolon <- _semiColonToken
-        return (actualType, (get_id_name id))
+        return (actualType, (get_id_name id)))
 
 _structDef =
     do
         id <- _idToken
-        structFields <- _braces (many _structFieldDecl)
-        return (StructDef (get_id_name id) structFields) 
+        structFields <- _braces (many (_structFieldDecl (get_id_name id)))
+        return (StructDef (get_id_name id) structFields)
 
 _typeAlias =
     do
