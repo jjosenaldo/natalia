@@ -6,10 +6,13 @@ import Lexical.Lexemes
 import TypeValue.TypeValue
 
 data Statement = 
-    CONSStatementVarInit VarInit        |
-    CONSStatementPrint Print            |
-    CONSStatementReturn Return          |                  
-    CONSStatementBlock Block
+    CONSStatementVarInit VarInit   |
+    CONSStatementPrint Print       |
+    CONSStatementReturn Return     |                  
+    CONSStatementBlock Block       |
+    CONSStatementIf If             |
+    CONSStatementIfElse IfElse     |
+    CONSStatementWhile While
     deriving (Eq, Show)
 
 data Return =
@@ -28,8 +31,18 @@ data Block =
     CONSBlock [Statement]
     deriving (Eq, Show)
 
+data If = 
+    CONSIf Exp Block
+    deriving (Eq, Show)
 
--- FIELD FUNCTIONS FOR BLOCKS ---------------------------------------------------------------------
+data IfElse = 
+    CONSIfElse Exp Block Block
+    deriving (Eq, Show)
+
+data While =
+    CONSWhile Exp Block
+    deriving (Eq, Show)
+
 
 getBlockStatements :: Block -> [Statement]
 getBlockStatements (CONSBlock ss) = ss
@@ -43,6 +56,10 @@ getStatementReturn s = error ("The statement" ++ (show s) ++  "is not a return!"
 getStatementPrint :: Statement -> Print
 getStatementPrint (CONSStatementPrint r) = r
 getStatementPrint s = error ("The statement" ++ (show s) ++  "is not a print!")
+
+getStatementVarInit :: Statement -> VarInit
+getStatementVarInit (CONSStatementVarInit r) = r
+getStatementVarInit s = error ("The statement" ++ (show s) ++  "is not a VarInit!")
 
 -- FIELD FUNCTIONS FOR RETURNS ---------------------------------------------------------------------
 
