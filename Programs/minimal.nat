@@ -1,3 +1,12 @@
+@typedefs {
+    rational {
+        int num;
+        int den;
+    },
+    setComplexo {{{{int}}}},
+    meuint int
+}
+
 @globals{
     int a = 1;
     int b = 2;

@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import PredefBlocks.Grammar
 import Statements.Parser
+import Types.Typedef
 
 -- Haskell modules
 import Text.Parsec
@@ -15,12 +16,41 @@ import Text.Parsec.Prim
 import Text.Parsec.String
 
 
+-- TYPEDEFS BLOCK -------------------------------------------------------------------------------
+_typedefsBlock =
+    do
+        stoken <- _typedefsToken
+        tdList <- _braces typedefsList
+        return (CONSTypedefsBlock tdList) 
 
--- _typedefsBlock =
---     do
---         stoken <- _typedefsToken
---         tdList <- _braces typedefsList
---         return (CONSPredefSubprogramsBlock subprList) 
+_typedef = (try _typeAlias) <|> (try _structDef)
+
+_structFieldDecl =
+    do
+        retType <- generalType
+        let actualType = getRetType retType
+        id <- _idToken
+        scolon <- _semiColonToken
+        return (actualType, (get_id_name id))
+
+_structDef =
+    do
+        id <- _idToken
+        structFields <- _braces (many _structFieldDecl)
+        return (StructDef (get_id_name id) structFields) 
+
+_typeAlias =
+    do
+        id <- _idToken
+        retType <- generalType
+        let actualType = getRetType retType
+        return (ConsTypedef (get_id_name id) actualType)
+
+typedefsList = 
+    do -- type def
+        tdList <- sepBy _typedef _commaToken
+        return tdList
+
 
 
 -- SUBPROGRAMS BLOCK ----------------------------------------------------------------------------

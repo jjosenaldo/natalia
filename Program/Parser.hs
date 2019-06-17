@@ -6,8 +6,8 @@ import Program.Grammar
 
 _program =
     do
-        --typedefsBlock <- _typedefsBlock
+        typedefsBlock <- _typedefsBlock
         globalsBlock <- _globalsBlock
         subprogramsBlock <- _subprogramsBlock
         mainBlock <- _mainBlock
-        return (CONSProgram (CONSTypedefsBlock []) globalsBlock subprogramsBlock mainBlock)
+        return (CONSProgram typedefsBlock globalsBlock subprogramsBlock mainBlock)
