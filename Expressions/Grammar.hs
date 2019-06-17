@@ -4,6 +4,7 @@ module Expressions.Grammar where
 import Lexical.Lexemes
 import TypeValue.TypeValue
 
+
 -- Haskell modules
 
 data Exp = 
@@ -38,3 +39,17 @@ data UnOp =
 
 getExpLitToken :: Exp -> Token 
 getExpLitToken (CONSExpLit _ tok) = tok
+
+getExpBinBinOp :: Exp -> BinOp 
+getExpBinBinOp (CONSExpBin _ op _ _) = op
+
+getExpBinExp1 :: Exp -> Exp
+getExpBinExp1 (CONSExpBin _ _ exp1 _) = exp1 
+
+getExpBinExp2 :: Exp -> Exp
+getExpBinExp2 (CONSExpBin _ _ _ exp2) = exp2
+
+-- FIELD FUNCTIONS FOR BINOPS ------------------------------------------------------------
+
+getBinOpTok :: BinOp -> Token
+getBinOpTok (CONSBinOp tok) = tok
