@@ -127,3 +127,13 @@ playVarInit stmt =
                 return ()
 
             else error ("EXECERROR: you can't assign a " ++ (getNameOfType exprtype) ++ " to a variable of type " ++ (getNameOfType t))
+
+-- playAssignment :: Statement -> ParsecT [Token] ProgramState IO ()
+-- playAssignment stmt =
+--     do 
+--         let maybeassign = getStatementAssignment stmt 
+--         if isNothing maybeassign then fail ("error")
+--         else do
+--             let assign = fromJust maybeassign -- Assignment
+--             let t = 
+
