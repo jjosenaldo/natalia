@@ -103,3 +103,27 @@ playBlockWithoutRet blk =
         let blkStmts = getBlockStatementList blk -- [Statement]
         ret <- playStmtsWithoutRet blkStmts
         return ()
+
+playVarInit :: Statement -> ParsecT [Token] ProgramState IO ()
+playVarInit stmt = 
+    do 
+        let maybevarinit = getStatementVarInit stmt 
+        if isNothing maybevarinit then fail ("error")
+        else do 
+            let varinit = fromJust maybevarinit -- VarInit
+            let t = getVarInitType varinit -- Type 
+            let n = getVarInitName varinit -- String
+            let expr = getVarInitExp varinit -- Exp
+            exprval <- playMyExp expr -- Value 
+            let exprtype = getTypeFromValue exprval -- Type 
+
+            if checkCompatibleTypes t exprtype then do 
+                s <- getState
+                let level = getStateLevel s -- Int
+                let sub = getStateActiveSubprogram s-- String
+                let var = ConstructVariable n exprval False sub level
+                let cell = Variable var -- MemoryCell
+                modifyState(memoryInsert cell)
+                return ()
+
+            else error ("EXECERROR: you can't assign a " ++ (getNameOfType exprtype) ++ " to a variable of type " ++ (getNameOfType t))

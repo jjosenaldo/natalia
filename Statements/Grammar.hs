@@ -116,3 +116,14 @@ getIfBlock (CONSIf _ blk1 ) = blk1
 
 getBlockStatementList :: Block -> [Statement]
 getBlockStatementList (CONSBlock l) = l
+
+-- FIELD FUNCTIONS FOR VAR INITS -----------------------------------------------------------------------
+
+getVarInitType :: VarInit -> Type
+getVarInitType (CONSVarInit t _ _) = t
+
+getVarInitName :: VarInit -> String
+getVarInitName (CONSVarInit _ n _) = n 
+
+getVarInitExp :: VarInit -> Exp
+getVarInitExp (CONSVarInit _ _ expr) = expr 

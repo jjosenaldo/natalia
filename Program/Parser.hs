@@ -84,8 +84,8 @@ _program =
 
         s <- getState
 
-        liftIO(print("PRE MEMORY"))
-        liftIO(print(s))
+        --liftIO(print("PRE MEMORY"))
+        --liftIO(print(s))
 
         mainBlock <- _mainBlock
 
