@@ -6,12 +6,12 @@ import Lexical.Lexemes
 import TypeValue.TypeValue
 
 data Statement = 
-    CONSStatementVarInit VarInit   |
-    CONSStatementPrint Print       |
-    CONSStatementReturn Return     |                  
-    CONSStatementBlock Block       |
-    CONSStatementIf If             |
-    CONSStatementIfElse IfElse     |
+    CONSStatementVarInit VarInit   | -- SYNT
+    CONSStatementPrint Print       | -- SYNT, SEM 
+    CONSStatementReturn Return     | -- SYNT                   
+    CONSStatementBlock Block       | -- SYNT, SEM
+    CONSStatementIf If             | -- SYNT, SEM 
+    CONSStatementIfElse IfElse     | -- SYNT 
     CONSStatementWhile While
     deriving (Eq, Show)
 
