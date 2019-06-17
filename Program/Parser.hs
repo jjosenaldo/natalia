@@ -28,7 +28,7 @@ convertToVars ((CONSInitialization a b c):inits) =
         val <- playExp c
         if checkCompatibleTypes a (getTypeFromValue val) then 
             do
-                let var = Variable (ConstructVariable b val True)
+                let var = Variable (ConstructVariable b val True "global" 0)
                 preResult <- convertToVars inits
 
                 return  (    [var]   ++   preResult   )
@@ -42,7 +42,7 @@ calculateAndPopulateGlobals ((CONSInitialization a b c):inits) =
         val <- playExp c
         if checkCompatibleTypes a (getTypeFromValue val) then 
             do
-                let var = Variable (ConstructVariable b val True)
+                let var = Variable (ConstructVariable b val True "global" 0)
                 updateState(globalMemoryInsert var)
 
                 preResult <- calculateAndPopulateGlobals inits
