@@ -21,6 +21,7 @@ populateTypedefs :: [Typedef] -> ProgramState -> ProgramState
 populateTypedefs [] s = s
 populateTypedefs (h:tdList) (CONSState a l glbMem locMem) = populateTypedefs tdList (CONSState a l (glbMem++[Typedef h]) locMem)
 
+globalMemoryInsert :: MemoryCell -> ProgramState -> ProgramState
 globalMemoryInsert var (CONSState a b glb c) = CONSState a b (glb++[var]) c 
 
 convertToVars ((CONSInitialization a b c):inits) = 
