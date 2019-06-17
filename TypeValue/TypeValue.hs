@@ -25,20 +25,6 @@ data Value =
     ConsNatNull deriving (Show, Eq)
 
 
-getNameOfType :: Type -> String
-getNameOfType NatInt         =  "int"  
-getNameOfType NatBool        =  "bool"
-getNameOfType NatString      =  "string"
-getNameOfType NatDouble      =  "double"
-getNameOfType NatNothing     =  "NatNothing"
-getNameOfType (NatSet t)     =  "{" ++ (getNameOfType t) ++ "}"
-getNameOfType (NatStruct t)  =  t
-getNameOfType (NatArray t)   =  "[" ++ (getNameOfType t) ++ "]"
-getNameOfType NatNull        =  "Null"  
-getNameOfType NatGenType     =  "NatGenType"
-getNameOfType (NatPointer t) =  "*" ++ (getNameOfType t) ++ "*" 
-
-
 -- TODO: improve this...
 getPosValue :: Value -> (Int, Int)
 getPosValue x = (0,0)

@@ -37,3 +37,5 @@ data MainBlock =
     CONSMainBlock [Statement] 
     deriving (Eq, Show)
     
+getMainBlockStatements :: MainBlock -> [Statement]
+getMainBlockStatements (CONSMainBlock ss) = ss
