@@ -181,7 +181,7 @@ getMemoryCellByName :: String -- ^ the name of memory cell to be searched
                     -> ProgramState -- ^ the memory  
                     -> MemoryCell   -- ^ the value of memory cell
 getMemoryCellByName name (CONSState creator _ m1 m2) = getMemoryCellByNameAndCreator name creator (m1++m2)
---getMemoryCellByName _ _ = error ("ERROR variable not found")
+getMemoryCellByName name _ = error ("EXECERROR: variable " ++ name ++ "not found in the current scope.")
 
 getMemoryCellByNameAndCreator name creator (c:mem) = 
     if (name == (getId c)) && (creator == (getCreator c)) then c
