@@ -212,7 +212,7 @@ playMyExp expr =
         return $ val
 
 playExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
-playExp expr = try (playExpCmdUn expr) <|> {-try (playExpAssignEval expr) <|>-}(try (playExpBinEval expr)) <|> 
+playExp expr = try (playExpCmdZero expr)   <|> try (playExpCmdUn expr) <|> {-try (playExpAssignEval expr) <|>-}(try (playExpBinEval expr)) <|> 
         (try (playExpUnEval expr) ) <|> try (playExpLit expr) <|> playExpLValue expr 
 
 playExpLit expr = 
@@ -226,9 +226,9 @@ playExpLit expr =
 
 playExpBinEval (CONSExpBin t (CONSBinOp binOp) expr1 expr2) = 
     do 
-        res1 <- (playExp expr1)
-        res2 <- (playExp expr2)
-        let val = (binaryEval (res1) (binOp) (res2))
+        res1 <- (playExp expr1) -- Value
+        res2 <- (playExp expr2) -- Value
+        let val = (binaryEval (res1) (binOp) (res2)) -- Value
         return $ val
         
 playExpBinEval _ = 
@@ -293,3 +293,11 @@ playExpCmdUn _ =
     fail ("error in the execution of an unary command")
     
 -- TODO: other unary operators: _toStringToken <|> try _toIntToken <|> try _toDoubleToken <|> _toBoolToken
+
+playExpCmdZero (  CONSExpCmdZero t (Read p)) = 
+    do 
+        str <-  liftIO (getLine)
+        return $ ConsNatString str 
+
+playExpCmdZero _ = 
+    fail ("error in the execution of a zero-ary operator")
