@@ -38,7 +38,8 @@ _remainingStatements stmts =
     return stmts
 
 
-_statementNotBlock = try _varInitAsStmt <|> try _printAsStmt <|> _returnAsStmt
+_statementNotBlock = try _ifAsStmt <|> try _varInitAsStmt <|> try _printAsStmt <|>  _returnAsStmt 
+       -- <|> try _ifElseAsStmt <|>  _whileAsStmt
 
 _printAsStmt = 
     do 

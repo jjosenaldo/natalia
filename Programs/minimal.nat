@@ -12,5 +12,11 @@
 
 
 @main{
+    bool t = True;
+  
+    if ( True ) {
+        
+    }
+
     return 1;
 }
