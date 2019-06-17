@@ -21,6 +21,7 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 import Data.List
+import Data.Typeable
 
 -- | Implementation of binary operations
 binaryEval :: Value -- ^ first operand
@@ -288,6 +289,17 @@ playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) =
             return $ ConsNatString (show valbool)
         else 
             error ("EXECERROR: can't convert a " ++ (show (getTypeFromValue val)) ++ " to a string." )
+
+-- TODO: sets, structs and stuff
+playExpCmdUn (CONSExpCmdUn typ (ToInt p) expr) = 
+    do 
+        val <- playExp expr -- Value
+        if isValueString val then do 
+            let str = getValueAsString val
+            let ourInt = read str::Integer
+            return $ ConsNatInt ourInt 
+        else 
+            error ("EXECERROR: you can only convert " ++ (getNameOfType NatString) ++ " to " ++ (getNameOfType NatInt))
 
 playExpCmdUn _ = 
     fail ("error in the execution of an unary command")
