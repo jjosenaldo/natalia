@@ -29,17 +29,19 @@ _remainingStatements stmts =
     <|>
     try 
     (do 
-        blk <- _block
-        let currStmtList = stmts ++ (getBlockStatements blk)
+        stmt <- _statementWithoutSemicolon
+        let currStmtList = stmts ++ [stmt]
         ret <- _remainingStatements  currStmtList
         return $  ret
     )
     <|>
     return stmts
 
+_statementWithoutSemicolon = try _ifElseAsStmt <|>  try _ifAsStmt <|> try _whileAsStmt <|> _blockAsStmt 
+_statementNotBlock =  try _varInitAsStmt <|> try _printAsStmt <|>  _returnAsStmt 
 
-_statementNotBlock = try _ifAsStmt <|> try _varInitAsStmt <|> try _printAsStmt <|>  _returnAsStmt 
-       -- <|> try _ifElseAsStmt <|>  _whileAsStmt
+
+-- PRINT -----------------------------------------------------------------------------
 
 _printAsStmt = 
     do 
@@ -52,6 +54,7 @@ _print =
         expr <- _parens _expr -- Exp
         return $ CONSPrint expr
 
+-- VAR INTIIALIZATION -----------------------------------------------------------------------------
 
 _varInitAsStmt = 
     do 
@@ -67,6 +70,8 @@ _varInit =
         expr <- _expr -- Exp
         return $ CONSVarInit actualType (get_id_name id) expr
 
+-- RETURN-------------- -----------------------------------------------------------------------------
+
 _returnAsStmt = 
     do 
         ret <- _return
@@ -78,10 +83,19 @@ _return =
         expr <- _expr;
         return (CONSReturn expr) 
 
+-- BLOCK ----------------------------------------------------------------------------
+
+_blockAsStmt = 
+    do 
+        blk <- _block
+        return $ CONSStatementBlock blk
+
 _block = 
     do 
         stmts <- _braces _statementList
         return $ CONSBlock stmts
+
+-- IF ------------------------------------------------------------------------
 
 _ifAsStmt = 
     do
@@ -109,6 +123,8 @@ _ifElse =
         else_ <- elseToken
         block2_ <- _block
         return (CONSIfElse (expr) (block1_) (block2_) )
+
+-- WHILE ------------------------------------------------------------
 
 _whileAsStmt = 
     do 

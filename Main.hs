@@ -7,6 +7,7 @@ import Lexical.Lexemes
 import Lexical.Tokens
 import Memory.Memory
 import TypeValue.TypeValue
+import Program.Semantics
 import Program.Grammar
 import Program.Parser
 
@@ -16,17 +17,11 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
--- the entire program
-program :: ParsecT [Token] [MemoryCell] IO (Program)
-program = do
-            program <- _program
-            eof
-            return (program)
 
--- invocação do parser para o símbolo de partida 
+-- SEMANTICS ----------------------------------------------------------------
 
 parser :: [Token] -> IO (Either ParseError (Program))
-parser tokens = runParserT program [] "Error message" tokens
+parser tokens = runParserT _program [] "Error message" tokens
 
 main :: IO ()
 main = do
@@ -39,3 +34,5 @@ main = do
                 { Left err -> print err; 
                     Right ans -> print ans;
                 }
+
+-- SYNTAX ----------------------------------------------------------------

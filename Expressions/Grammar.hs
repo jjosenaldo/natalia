@@ -33,3 +33,8 @@ data BinOp =
 data UnOp = 
     CONSUnOp Token
     deriving (Eq, Show)
+
+-- FIELD FUNCTIONS FOR EXPS ---------------------------------------------------------------------
+
+getExpLitToken :: Exp -> Token 
+getExpLitToken (CONSExpLit _ tok) = tok

@@ -4,6 +4,7 @@ module PredefBlocks.Grammar where
 import Expressions.Grammar
 import Statements.Grammar
 import TypeValue.TypeValue
+import Types.Typedef
 
 -- Haskell modules
 
@@ -28,11 +29,13 @@ data TypedefsBlock =
     CONSTypedefsBlock [Typedef] 
     deriving (Eq, Show)
 
-data Typedef = 
-    CONSTypedef Type String 
-    deriving (Eq, Show)
+-- data Typedef = 
+--     CONSTypedef Type String 
+--     deriving (Eq, Show)
     
 data MainBlock = 
     CONSMainBlock [Statement] 
     deriving (Eq, Show)
     
+getMainBlockStatements :: MainBlock -> [Statement]
+getMainBlockStatements (CONSMainBlock ss) = ss

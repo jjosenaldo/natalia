@@ -47,6 +47,26 @@ data While =
 getBlockStatements :: Block -> [Statement]
 getBlockStatements (CONSBlock ss) = ss
 
--- data VarAssign = 
---     CONSVarAssign Id Expression
---     deriving (Eq, Show)
+-- FIELD FUNCTIONS FOR STATEMENTS ---------------------------------------------------------------------
+
+getStatementReturn :: Statement -> Return
+getStatementReturn (CONSStatementReturn r) = r
+getStatementReturn s = error ("The statement" ++ (show s) ++  "is not a return!")
+
+getStatementPrint :: Statement -> Print
+getStatementPrint (CONSStatementPrint r) = r
+getStatementPrint s = error ("The statement" ++ (show s) ++  "is not a print!")
+
+getStatementVarInit :: Statement -> VarInit
+getStatementVarInit (CONSStatementVarInit r) = r
+getStatementVarInit s = error ("The statement" ++ (show s) ++  "is not a VarInit!")
+
+-- FIELD FUNCTIONS FOR RETURNS ---------------------------------------------------------------------
+
+getReturnExp :: Return -> Exp 
+getReturnExp (CONSReturn expr ) = expr 
+
+-- FIELD FUNCTIONS FOR PRINTS ---------------------------------------------------------------------
+
+getPrintExp :: Print -> Exp 
+getPrintExp (CONSPrint expr ) = expr 
