@@ -82,6 +82,10 @@ getStatementIf :: Statement -> Maybe If
 getStatementIf (CONSStatementIf r) = Just r
 getStatementIf s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a If!")
 
+getStatementWhile :: Statement -> Maybe While
+getStatementWhile (CONSStatementWhile r) = Just r
+getStatementWhile s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a While!")
+
 getStatementBlock :: Statement -> Maybe Block
 getStatementBlock (CONSStatementBlock r) = Just r
 getStatementBlock s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a Block!")
@@ -114,6 +118,15 @@ getIfExp (CONSIf ex  _ ) = ex
 
 getIfBlock :: If -> Block 
 getIfBlock (CONSIf _ blk1 ) = blk1
+
+-- FIELD FUNCTIONS FOR WHILES -----------------------------------------------------------------------
+
+getWhileExp :: While -> Exp 
+getWhileExp (CONSWhile ex  _ ) = ex 
+
+getWhileBlock :: While -> Block 
+getWhileBlock (CONSWhile _  blk1 ) = blk1
+
 
 
 -- FIELD FUNCTIONS FOR BLOCKS -----------------------------------------------------------------------

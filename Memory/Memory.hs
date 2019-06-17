@@ -152,6 +152,17 @@ memoryInsert :: MemoryCell -- ^ the variable to be inserted
 memoryInsert symbol (CONSState a b c [])  = (CONSState a b c [symbol])
 memoryInsert symbol (CONSState a b c d) = CONSState a b c (d ++ [symbol])
 
+
+whichMemory :: MemoryCell -- ^ the variable to be searched 
+            -> [MemoryCell]
+            -> [MemoryCell]
+            -> Int
+
+whichMemory (Variable (ConstructVariable name v b s i)) mem1 mem2 
+    | memoryHasName name mem1 = 1 
+    | memoryHasName name mem2 = 2 
+    | otherwise = -1
+
 -- | Updates the value of a variable in the table of symbols
 memoryUpdate :: MemoryCell -- ^ the variable with its new value
                 -> [MemoryCell] -- ^ the memory before the update
@@ -165,7 +176,13 @@ memoryUpdate (Variable v1) (v2:t) =
 memoryUpdate (Subprogram s) mem = error ("ERROR you can't update the value of subprogram in memory")
 
 stateMemoryUpdate :: MemoryCell -> ProgramState -> ProgramState
-stateMemoryUpdate (Variable v) (CONSState a b c d) = CONSState a b (memoryUpdate (Variable v) c) (memoryUpdate (Variable v) d)
+stateMemoryUpdate (Variable v) (CONSState a b c d)
+    | memoryThatHasTheCell == -1 = error ("EXECERRROR: " ++ (getId (Variable v)) ++ " is not in the memory.") 
+    | memoryThatHasTheCell == 1 = CONSState a b (memoryUpdate (Variable v) c) d
+    | memoryThatHasTheCell == 2 = CONSState a b c (memoryUpdate (Variable v) d)
+    | otherwise = error ("This error will never be thrown :P")
+    where 
+        memoryThatHasTheCell = whichMemory (Variable v) c d 
 
 -- | Gets the value of a variable in the table of symbols
 memoryGet :: String -- ^ the name of the memory cell to be searched
@@ -181,7 +198,7 @@ getMemoryCellByName :: String -- ^ the name of memory cell to be searched
                     -> ProgramState -- ^ the memory  
                     -> MemoryCell   -- ^ the value of memory cell
 getMemoryCellByName name (CONSState creator _ m1 m2) = getMemoryCellByNameAndCreator name creator (m1++m2)
---getMemoryCellByName _ _ = error ("ERROR variable not found")
+--getMemoryCellByName name _ = error ("EXECERROR: variable " ++ name ++ "not found in the current scope.")
 
 getMemoryCellByNameAndCreator name creator (c:mem) = 
     if (name == (getId c)) && (creator == (getCreator c)) then c

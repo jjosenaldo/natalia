@@ -59,9 +59,23 @@ getExpLValue _ = Nothing
 getBinOpTok :: BinOp -> Token
 getBinOpTok (CONSBinOp tok) = tok
 
--- FIELD FUNCTIONS FOR LVALUES ----------------------------------------------------------------
+-- FIELD FUNCTIONS FOR LVALUES --------------------------------------------------------
 
--- NOT NEEDED AT THE MOMENT
--- getLValueIdId ::  LValue -> Maybe String 
--- getLValueIdId (CONSLValueId id) = Just id
--- getLValueIdId _ = Nothing 
+isLValueLocalVar :: LValue -> Bool
+isLValueLocalVar (CONSLValueId _) = True 
+isLValueLocalVar _ = False
+
+getLocalVarId :: LValue -> String 
+getLocalVarId (CONSLValueId id) = id 
+
+isLValueStruct :: LValue -> Bool 
+isLValueStruct (CONSLValueStruct _ _ ) = True 
+isLValueStruct _ = False
+
+isLValueArray :: LValue -> Bool 
+isLValueArray (CONSLValueArray _ _ ) = True 
+isLValueArray _ = False
+
+isLValueDerref :: LValue -> Bool 
+isLValueDerref (CONSLValueDerref _ _ ) = True 
+isLValueDerref _ = False

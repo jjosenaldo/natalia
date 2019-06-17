@@ -38,6 +38,15 @@
     }
     #call(1);
     #v[1][2][3] = 5;
-    string ddd = read();
+    #string ddd = read();
     #print(z);
+
+    int x = 5;
+
+    x = x + 1;
+
+    while ( x > 0) {
+        print(toString(x));
+        x = x-1;
+    }
 }

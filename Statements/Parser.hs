@@ -83,7 +83,7 @@ _assignmentAsStmt =
 _assignment = 
     do 
         lv <- lvalue  
-        liftIO(print(show(lv)))
+        --liftIO(print(show(lv)))
         ass <- _assignToken
         expr2 <- _expr 
         return $ CONSAssignment lv expr2
