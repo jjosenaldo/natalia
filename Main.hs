@@ -45,7 +45,7 @@ program = do
 -- SEMANTICS ----------------------------------------------------------------
 
 parser :: [Token] -> IO (Either ParseError ())
-parser tokens = runParserT playProgram [] "Error message" tokens
+parser tokens = runParserT playProgram (CONSState "" 0 [] []) "Error message" tokens
 
 main :: IO ()
 main = do

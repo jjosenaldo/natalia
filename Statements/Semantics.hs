@@ -21,7 +21,7 @@ import System.IO.Unsafe
 import Text.Parsec
     
 
-playStmtsWithNoReturn :: [Statement] -> ParsecT [Token] [MemoryCell] IO ()
+playStmtsWithNoReturn :: [Statement] -> ParsecT [Token] ProgramState IO ()
 playStmtsWithNoReturn [] = 
     do 
         return ()
@@ -35,7 +35,7 @@ playStmtsWithNoReturn (stmt : stmts ) =
 playStmtWithNoReturn = playPrint
 
 
-playPrint :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playPrint :: Statement -> ParsecT [Token] ProgramState IO ()
 playPrint stmt = 
     do 
         let prnt = getStatementPrint stmt -- Print 

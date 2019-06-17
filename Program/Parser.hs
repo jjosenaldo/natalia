@@ -12,9 +12,9 @@ import Lexical.Lexemes
 import Expressions.Semantics
 
 -- Haskell's modules
--- import Control.Monad.IO.Class
--- import System.Environment
--- import System.IO.Unsafe
+import Control.Monad.IO.Class
+import System.Environment
+import System.IO.Unsafe
 import Text.Parsec
 
 populateTypedefs :: [Typedef] -> ProgramState -> ProgramState
@@ -77,11 +77,14 @@ _program =
 
         aux <- convertToVars (getInitializations globalsBlock)
 
+        updateState(populateGlobals aux)
+
         updateState(populateSubprograms (getSubprograms subprogramsBlock))
 
         s <- getState
 
-        --liftIO(print(s))
+        liftIO(print("PRE MEMORY"))
+        liftIO(print(s))
 
         mainBlock <- _mainBlock
         return (CONSProgram typedefsBlock globalsBlock subprogramsBlock mainBlock)

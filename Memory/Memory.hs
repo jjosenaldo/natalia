@@ -8,7 +8,7 @@ import Types.Typedef
 import TypeValue.TypeValue
 import PredefBlocks.Grammar
 
---                                  global        local
+--                                        global        local
 data ProgramState = CONSState String Int [MemoryCell] [MemoryCell] deriving (Eq, Show)
 getStateGlobalMemory (CONSState _ _ m _) = m
 getStateLocalMemory (CONSState _ _ _ m) = m
