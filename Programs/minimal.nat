@@ -26,11 +26,16 @@
 
 @main{
     #int a = 1+1;
-    if(False){
+    if(1){
         print("porra");
     }
     else{
         print("oi");
     }
+
+    if(False){
+        print("sou fodoa");
+    }
+    
     
 }

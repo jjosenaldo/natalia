@@ -34,7 +34,7 @@ playStmtsWithoutRet (stmt : stmts ) =
         return ()
 
 playStmtWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
-playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> playPrint stmt
+playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
 playPrint :: Statement -> ParsecT [Token] [MemoryCell] IO ()
@@ -54,6 +54,27 @@ playPrint stmt =
             else 
                 error ("EXECERROR: You can only print " ++ (getNameOfType NatString) ++ "!")
 
+playIfWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
+playIfWithoutRet stmt = 
+    do 
+        let maybeif = getStatementIf stmt 
+        if isNothing maybeif then fail ("error")
+        else do 
+            let myIf = fromJust maybeif
+            let blk = getIfBlock myIf
+            let expr = getIfExp myIf
+            exprval <- playMyExp expr 
+            let actualType = getTypeFromValue exprval
+            
+            if not ( actualType == NatBool ) then error ("EXECERROR: The expression in a if must be of type " ++ (getNameOfType NatBool))
+            else if (exprval == (ConsNatBool True)) then do 
+                ret <- playBlockWithoutRet blk
+                return ()
+            else do 
+                return ()
+
+
+
 playIfElseWithoutRet :: Statement -> ParsecT [Token] [MemoryCell] IO ()
 playIfElseWithoutRet stmt = 
     do 
@@ -66,8 +87,10 @@ playIfElseWithoutRet stmt =
             let blk2 = getIfElseBlock2 ifelse -- Block
             let expr = getIfElseExp ifelse -- Block
             exprval <- playMyExp expr 
+            let actualType = getTypeFromValue exprval
 
-            if (exprval == (ConsNatBool True)) then do 
+            if not ( actualType == NatBool ) then error ("EXECERROR: The expression in a if must be of type " ++ (getNameOfType NatBool))
+            else if (exprval == (ConsNatBool True)) then do 
                 ret <- playBlockWithoutRet blk1
                 return ()
             else do

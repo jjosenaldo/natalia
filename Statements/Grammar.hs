@@ -65,6 +65,10 @@ getStatementIfElse :: Statement -> Maybe IfElse
 getStatementIfElse (CONSStatementIfElse r) = Just r
 getStatementIfElse s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a IfElse!")
 
+getStatementIf :: Statement -> Maybe If
+getStatementIf (CONSStatementIf r) = Just r
+getStatementIf s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a If!")
+
 getStatementBlock :: Statement -> Maybe Block
 getStatementBlock (CONSStatementBlock r) = Just r
 getStatementBlock s = Nothing -- fail ("The statement" ++ (show s) ++  "is not a Block!")
@@ -89,6 +93,15 @@ getIfElseBlock1 (CONSIfElse _ blk1 _) = blk1
 
 getIfElseBlock2 :: IfElse -> Block 
 getIfElseBlock2 (CONSIfElse _ _ blk2) = blk2
+
+-- FIELD FUNCTIONS FOR IFS -----------------------------------------------------------------------
+
+getIfExp :: If -> Exp 
+getIfExp (CONSIf ex  _ ) = ex 
+
+getIfBlock :: If -> Block 
+getIfBlock (CONSIf _ blk1 ) = blk1
+
 
 -- FIELD FUNCTIONS FOR BLOCKS -----------------------------------------------------------------------
 
