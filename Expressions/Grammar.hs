@@ -58,3 +58,10 @@ getExpLValue _ = Nothing
 
 getBinOpTok :: BinOp -> Token
 getBinOpTok (CONSBinOp tok) = tok
+
+-- FIELD FUNCTIONS FOR LVALUES ----------------------------------------------------------------
+
+-- NOT NEEDED AT THE MOMENT
+-- getLValueIdId ::  LValue -> Maybe String 
+-- getLValueIdId (CONSLValueId id) = Just id
+-- getLValueIdId _ = Nothing 

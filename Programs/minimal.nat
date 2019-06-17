@@ -38,7 +38,7 @@
     }
     #call(1);
     #v[1][2][3] = 5;
-    int x = 1;
-    string z = toString(Null);
+    int x = 50;
+    int y = x;
     #print(z);
 }
