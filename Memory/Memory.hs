@@ -4,6 +4,7 @@ import Lexical.Lexemes
 import Types.Types
 import Types.Typedef
 import TypeValue.TypeValue
+import PredefBlocks.Grammar
 
 data Block = 
     CONSBlock [Statement]
@@ -57,28 +58,16 @@ data Variable =
     ConstructConstantVariable String Value Bool deriving (Show, Eq)
 data Parameter = ConsParameter String Type deriving (Show, Eq)
 
-
-data Subprogram = 
-    ConstructFunction String [Parameter] Block Type   | 
-    ConstructProcedure String [Parameter] Block       deriving (Show, Eq)
-
-data SubprogramProtocol = 
-    ConstructFunctionProtocol String [Parameter] Type   |
-    ConstructProcedureProtocol String [Parameter]  deriving (Show, Eq)
-
 data MemoryCell = 
     Variable Variable                       | 
     Subprogram Subprogram                   |
-    SubprogramProtocol SubprogramProtocol   |
     Typedef Typedef deriving (Show, Eq)
 
 -- functions to access important fields
 getId (Variable (ConstructVariable x _ _)) = x
 getId (Variable (ConstructConstantVariable x _ _)) = x
-getId (Subprogram (ConstructFunction x _ _ _)) = x
-getId (Subprogram (ConstructProcedure x _ _)) = x
-getId (SubprogramProtocol (ConstructFunctionProtocol x _ _)) = x
-getId (SubprogramProtocol (ConstructProcedureProtocol x _)) = x
+getId (Subprogram (CONSFunction x _ _ _)) = x
+getId (Subprogram (CONSProcedure x _ _)) = x
 getId (Typedef (ConsTypedef x _)) = x
 getId (Typedef (StructDef x _)) = x
 
