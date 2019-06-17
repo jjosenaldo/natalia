@@ -19,11 +19,30 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
+binaryEval :: Value -- ^ first operand
+            -> Token -- ^ operator
+            -> Value -- ^ second operand
+            -> Value -- ^ result of the operation
+
+binaryEval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
+binaryEval _ (Plus p) _ = error ("ERROR at " ++ show(p) ++ ": the + operator expects two numbers.")
+
 playExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
-playExp = playExpLit 
+playExp expr = try (playExpBinEval expr) <|> (playExpLit expr) 
+
 
 playExpLit expr = 
     do 
         let tok = getExpLitToken expr -- Token
         let val = getValueFromToken tok -- Value
         return $ val 
+
+playExpBinEval (CONSExpBin t (CONSBinOp binOp) expr1 expr2) = 
+    do 
+        res1 <- (playExp expr1)
+        liftIO(print(show(res1)))
+        res2 <- (playExp expr2)
+        let val = (binaryEval (res1) (binOp) (res2))
+        liftIO(print(show(val)))
+        return $ val
+
