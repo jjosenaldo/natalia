@@ -212,8 +212,8 @@ playMyExp expr =
         return $ val
 
 playExp :: Exp -> ParsecT [Token] ProgramState IO (Value)
-playExp expr = try (playExpCmdUn expr) <|> try (playExpAssignEval expr) <|>(try (playExpBinEval expr)) <|> 
-        (try (playExpUnEval expr) ) <|> (playExpLit expr) 
+playExp expr = try (playExpCmdZero expr)   <|> try (playExpCmdUn expr) <|> {-try (playExpAssignEval expr) <|>-}(try (playExpBinEval expr)) <|> 
+        (try (playExpUnEval expr) ) <|> try (playExpLit expr) <|> playExpLValue expr 
 
 playExpLit expr = 
     do 
@@ -226,9 +226,9 @@ playExpLit expr =
 
 playExpBinEval (CONSExpBin t (CONSBinOp binOp) expr1 expr2) = 
     do 
-        res1 <- (playExp expr1)
-        res2 <- (playExp expr2)
-        let val = (binaryEval (res1) (binOp) (res2))
+        res1 <- (playExp expr1) -- Value
+        res2 <- (playExp expr2) -- Value
+        let val = (binaryEval (res1) (binOp) (res2)) -- Value
         return $ val
         
 playExpBinEval _ = 
@@ -245,20 +245,32 @@ playExpUnEval _ =
     do
         fail ("error when trying to parse an unary operation")   
 
--- semantics to assignment
-playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
-    do
-        state <- getState -- ProgramState 
-        res <- (playExp exp)
-        let cellMem = (getMemoryCellByName (str) state)
-        let newCell = (setValue (cellMem) (res))
+-- TODO
+-- playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
+--     do
+--         state <- getState -- ProgramState 
+--         res <- (playExp exp)
+--         let cellMem = (getMemoryCellByName (str) state)
+--         let newCell = (setValue (cellMem) (res))
         
-        return $ res
+--         return $ res
 
-playExpAssignEval _ = 
-    do
-        fail ("error in the assignment of a variable")
+-- playExpAssignEval _ = 
+--     do
+--         fail ("error in the assignment of a variable")
         
+
+playExpLValue (CONSExpLValue t (CONSLValueId name)) = 
+    do 
+        s <- getState 
+        let cell = getMemoryCellByName name s -- MemoryCell
+        let val = getValue cell (0,0) -- Value
+        return $ val 
+
+playExpLValue _ = 
+    do 
+        error ("error: unsupported LValue")
+
 -- TODO: sets, structs and stuff
 playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) = 
     do 
@@ -279,7 +291,13 @@ playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) =
 
 playExpCmdUn _ = 
     fail ("error in the execution of an unary command")
-
-
     
--- _toStringToken <|> try _toIntToken <|> try _toDoubleToken <|> _toBoolToken
+-- TODO: other unary operators: _toStringToken <|> try _toIntToken <|> try _toDoubleToken <|> _toBoolToken
+
+playExpCmdZero (  CONSExpCmdZero t (Read p)) = 
+    do 
+        str <-  liftIO (getLine)
+        return $ ConsNatString str 
+
+playExpCmdZero _ = 
+    fail ("error in the execution of a zero-ary operator")
