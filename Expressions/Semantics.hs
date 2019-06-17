@@ -206,7 +206,7 @@ playMyExp expr =
     do 
         
         state <- getState -- ProgramState
-        let newExp = setExpType (getFullMemory state) expr -- Exp
+        let newExp = setExpType state expr -- Exp
         val <- playExp newExp
         return $ val
 
@@ -246,8 +246,9 @@ playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
     do
         state <- getState -- ProgramState 
         res <- (playExp exp)
-        let cellMem = (getMemoryCellByName (str) (getFullMemory state))
+        let cellMem = (getMemoryCellByName (str) state)
         let newCell = (setValue (cellMem) (res))
+        
         return $ res
 
 playExpAssignEval _ = 

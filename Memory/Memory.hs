@@ -111,6 +111,10 @@ getCreator :: MemoryCell -> String
 getCreator (Variable (ConstructVariable _ _ _ f _)) = f
 getCreator _ = error ("Can't get creator of this cell (not a variable)")
 
+getLevel :: MemoryCell -> Int
+getLevel (Variable (ConstructVariable _ _ _ _ l)) = l
+getLevel _ = error ("Can't get level of this cell (not a variable)")
+
 getValueByMemoryCell :: MemoryCell -> Value
 getValueByMemoryCell (Variable (ConstructVariable _ val _ _ _)) = val
 getValueByMemoryCell (Variable (ConstructConstantVariable _ val _)) = val
@@ -141,6 +145,9 @@ memoryUpdate (Variable v1) (v2:t) =
 
 memoryUpdate (Subprogram s) mem = error ("ERROR you can't update the value of subprogram in memory")
 
+stateMemoryUpdate :: MemoryCell -> ProgramState -> ProgramState
+stateMemoryUpdate (Variable v) (CONSState a b c d) = CONSState a b c (memoryUpdate (Variable v) d)
+
 -- | Gets the value of a variable in the table of symbols
 memoryGet :: String -- ^ the name of the memory cell to be searched
              -> (Int, Int) -- ^ the (line, column) where the variable was used in program
@@ -155,11 +162,11 @@ getMemoryCellByName :: String -- ^ the name of memory cell to be searched
                     -> ProgramState -- ^ the memory  
                     -> MemoryCell   -- ^ the value of memory cell
 getMemoryCellByName name (CONSState creator _ m1 m2) = getMemoryCellByNameAndCreator name creator (m1++m2)
+--getMemoryCellByName _ _ = error ("ERROR variable not found")
 
 getMemoryCellByNameAndCreator name creator (c:mem) = 
     if (name == (getId c)) && (creator == (getCreator c)) then c
     else getMemoryCellByNameAndCreator name creator mem
-getMemoryCellByName _ _ [] = error ("ERROR variable not found")
 
 
 
@@ -171,43 +178,51 @@ memoryHasName str (v:t)
     | str == getId v = True
     | otherwise = memoryHasName str t
 
-memoryDelete :: String -- ^ the name of the variable 
-        -> [MemoryCell] -- ^ the memory before removal
-        -> [MemoryCell] -- ^ the memory after removal
-memoryDelete name (v:m) = 
-    if (getId v) == name then
-        if (isVariable v) then m
-        else error ("ERROR you can't delete a subprogram")
-    else (v : (memoryDelete name m))
+-- memoryDelete :: String -- ^ the name of the variable 
+--         -> ProgramState -- ^ the memory before removal
+--         -> ProgramState -- ^ the memory after removal
+-- memoryDelete name (v:m) = 
+--     if (getId v) == name then
+--         if (isVariable v) then m
+--         else error ("ERROR you can't delete a subprogram")
+--     else (v : (memoryDelete name m))
+
+
+stateDeleteLevel level (CONSState a b c d) = CONSState a b c (memoryDeleteLevel level d)
+
+memoryDeleteLevel level (h:mem) = 
+    if (getLevel h) >= level then memoryDeleteLevel level mem
+    else h:(memoryDeleteLevel level mem)
+
 
 
 -- Receives a variable, a list of NatInts (representing indexes) and a value, returns the same variable with new value setted
-setValueArray :: MemoryCell -> [Value] -> Value -> MemoryCell
-setValueArray (Variable (ConstructVariable name val isGlobal creator level)) [] newVal = 
-    if checkCompatibleTypes t1 t2 then Variable (ConstructVariable name newVal isGlobal creator level)
-    else error ("ERROR type mismatch, trying to insert "++ show(t1) ++ " in " ++ show(t2))
-    where 
-        t1 = getTypeFromValue val
-        t2 = getTypeFromValue newVal
+-- setValueArray :: MemoryCell -> [Value] -> Value -> MemoryCell
+-- setValueArray (Variable (ConstructVariable name val isGlobal creator level)) [] newVal = 
+--     if checkCompatibleTypes t1 t2 then Variable (ConstructVariable name newVal isGlobal creator level)
+--     else error ("ERROR type mismatch, trying to insert "++ show(t1) ++ " in " ++ show(t2))
+--     where 
+--         t1 = getTypeFromValue val
+--         t2 = getTypeFromValue newVal
 
-setValueArray (Variable (ConstructVariable name val isGlobal creator level)) list newVal = Variable (ConstructVariable name (setValueArray' val list newVal) isGlobal creator level)
+-- setValueArray (Variable (ConstructVariable name val isGlobal creator level)) list newVal = Variable (ConstructVariable name (setValueArray' val list newVal) isGlobal creator level)
 
--- Auxiliar function, that receives an array, a list of NatInt (representing indexes), and a new value, and sets the value correspondingly
-setValueArray' :: Value -> [Value] -> Value -> Value
-setValueArray' val [] newVal = 
-    if checkCompatibleTypes t1 t2 then newVal
-    else error ("ERROR type mismatch, trying to insert " ++ show(t1) ++ " in " ++ show(t2))
-    where 
-        t1 = getTypeFromValue val
-        t2 = getTypeFromValue newVal
-setValueArray' (ConsNatArray t arr) (h:list) newVal = ConsNatArray t ((take index arr) ++ [setValueArray' (arrayAccess (ConsNatArray t arr) h) list newVal] ++ (drop (index+1) arr))
-        where
-            index = fromIntegral (getIntFromNatInt h)
+-- -- Auxiliar function, that receives an array, a list of NatInt (representing indexes), and a new value, and sets the value correspondingly
+-- setValueArray' :: Value -> [Value] -> Value -> Value
+-- setValueArray' val [] newVal = 
+--     if checkCompatibleTypes t1 t2 then newVal
+--     else error ("ERROR type mismatch, trying to insert " ++ show(t1) ++ " in " ++ show(t2))
+--     where 
+--         t1 = getTypeFromValue val
+--         t2 = getTypeFromValue newVal
+-- setValueArray' (ConsNatArray t arr) (h:list) newVal = ConsNatArray t ((take index arr) ++ [setValueArray' (arrayAccess (ConsNatArray t arr) h) list newVal] ++ (drop (index+1) arr))
+--         where
+--             index = fromIntegral (getIntFromNatInt h)
 
 -- | Gets the type of a variable in a memory.
-getVarTypeInMemory :: [MemoryCell] -- ^ the memory in which the variable lives
+getVarTypeInMemory :: ProgramState -- ^ the memory in which the variable lives
                    -> String -- ^ the name of the variable
                    -> Type -- ^ the type of the variable
-getVarTypeInMemory cell str = 
+getVarTypeInMemory state str = 
     getTypeFromValue ( getValueByMemoryCell (cellMem) )
-    where cellMem =  getMemoryCellByName (str) (cell)
+    where cellMem =  getMemoryCellByName (str) (state)
