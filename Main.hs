@@ -56,5 +56,7 @@ main = do
     else
         case unsafePerformIO (parser (getTokens (head args))) of
                 { Left err -> print err; 
-                    Right ans -> return ();
+                    Right ans -> print ans;
                 }
+
+-- SYNTAX ----------------------------------------------------------------
