@@ -165,7 +165,7 @@ memoryUpdate (Variable v1) (v2:t) =
 memoryUpdate (Subprogram s) mem = error ("ERROR you can't update the value of subprogram in memory")
 
 stateMemoryUpdate :: MemoryCell -> ProgramState -> ProgramState
-stateMemoryUpdate (Variable v) (CONSState a b c d) = CONSState a b c (memoryUpdate (Variable v) d)
+stateMemoryUpdate (Variable v) (CONSState a b c d) = CONSState a b (memoryUpdate (Variable v) c) (memoryUpdate (Variable v) d)
 
 -- | Gets the value of a variable in the table of symbols
 memoryGet :: String -- ^ the name of the memory cell to be searched
