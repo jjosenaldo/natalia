@@ -7,114 +7,118 @@ import Lexical.Lexemes
 import Memory.Memory
 import Types.Types
 import TypeValue.TypeValue
+import PredefBlocks.Grammar
 
 -- Haskell modules
 
 
 
 
-setExpType :: [MemoryCell] -> Exp -> Exp
+setExpType :: ProgramState -> Exp -> Exp
 
 setExpType _ (CONSExpLit t tok ) = 
     CONSExpLit t tok 
 
-setExpType memory (CONSExpBin _ binOp exp1 exp2) = 
+setExpType state (CONSExpBin _ binOp exp1 exp2) = 
     CONSExpBin t binOp retExp1 retExp2
     where 
-        retExp1 = setExpType memory exp1
-        retExp2 = setExpType memory exp2
+        retExp1 = setExpType state exp1
+        retExp2 = setExpType state exp2
         t1 = getExpType retExp1
         t2 = getExpType retExp1
         t = getReturnTypeOfBinOp binOp t1 t2
 
-setExpType memory (CONSExpUn _ unOp exp1) = 
+setExpType state (CONSExpUn _ unOp exp1) = 
     CONSExpUn t unOp retExp1
     where 
-        retExp1 = setExpType memory exp1 
+        retExp1 = setExpType state exp1 
         t1 = getExpType retExp1
         t = getReturnTypeOfUnOp unOp t1
 
-setExpType memory (CONSExpAssign _ lval exp2) 
+setExpType state (CONSExpAssign _ lval exp2) 
     | checkCompatibleTypes t1 t2 = CONSExpAssign t2 lval newExp2
     | otherwise = error ("ERROR: you cant assign " ++ show(t2) ++ " to "  ++ show(t1))
     
     where
-        t1 = getLValueType memory lval 
-        newExp2 = setExpType memory exp2
+        t1 = getLValueType state lval 
+        newExp2 = setExpType state exp2
         t2 = getExpType newExp2
     
-setExpType memory (CONSExpLValue _ lval) =
-    CONSExpLValue (getLValueType memory lval) lval
+setExpType state (CONSExpLValue _ lval) =
+    CONSExpLValue (getLValueType state lval) lval
 
-setExpType memory (CONSExpStruct _ name exps) 
+setExpType state (CONSExpStruct _ name exps) 
     | elem False resultList = error ("ERROR: type error in the struct fields")
     | otherwise = (CONSExpStruct (NatStruct name) name newExps)
 
     where
-        structure = getStructStructure memory name -- [(Type, String)] 
+        structure = getStructStructure state name -- [(Type, String)] 
         structTypes = map fst structure -- [Type]
-        newExps = map (setExpType memory) exps -- [Exp]
+        newExps = map (setExpType state) exps -- [Exp]
         newExpsTypes = map getExpType exps -- [Type]
         resultList = applyBinFunctionInTwoLists checkCompatibleTypes structTypes newExpsTypes -- [Bool]
 
-setExpType memory (CONSExpSet _ exps) 
+setExpType state (CONSExpSet _ exps) 
     | typeOfList == NatNothing = error ("ERROR: your set is not homogeneous. ")
     | otherwise = CONSExpSet typeOfList newExps 
     where 
-        newExps = map (setExpType memory) exps -- [Exp]
+        newExps = map (setExpType state) exps -- [Exp]
         newExpsTypes = map getExpType exps -- [Type]
         typeOfList = typeListType newExpsTypes 
 
         
-setExpType memory (CONSExpFuncCall _ name exps) 
+setExpType state (CONSExpFuncCall _ name exps) 
     | elem False resultList = error ("ERROR: type error in the parameter passing to " ++ name) 
     | otherwise = CONSExpFuncCall (snd prot) name newExps
     where 
-        newExps = map (setExpType memory) exps -- [Exp]
+        newExps = map (setExpType state) exps -- [Exp]
         newExpsTypes = map getExpType exps -- [Type]
-        prot = getFunctionProtocol memory name -- ([Type], Type)
+        prot = getFunctionProtocol state name -- ([Type], Type)
         protTypes = fst prot -- [Type]
         resultList = applyBinFunctionInTwoLists checkCompatibleTypes protTypes newExpsTypes -- [Bool]
 
-setExpType memory (CONSExpCmdZero _ (Read p)) = 
+setExpType state (CONSExpCmdZero _ (Read p)) = 
     CONSExpCmdZero NatString (Read p)
 
-setExpType memory (CONSExpCmdUn _ (ToString p) exp1) = 
-    CONSExpCmdUn NatString (ToString p) (setExpType memory exp1 )
+setExpType state (CONSExpCmdUn _ (ToString p) exp1) = 
+    CONSExpCmdUn NatString (ToString p) (setExpType state exp1 )
 
-setExpType memory (CONSExpCmdUn _ (ToDouble p) exp1) 
+setExpType state (CONSExpCmdUn _ (ToDouble p) exp1) 
     | (newExpType == NatDouble) || (newExpType == NatString) || (newExpType == NatInt) = CONSExpCmdUn newExpType (ToDouble p) newExp
     | otherwise = error ("ERROR: the toDouble() function expects a " ++ getTypeName(NatDouble) ++ ", a " ++ (getTypeName NatInt) ++ " or a " ++ (getTypeName NatString ) ++ ", but a " ++ (getTypeName newExpType) ++ " was provided.")
 
     where 
-        newExp = setExpType memory exp1 
+        newExp = setExpType state exp1 
         newExpType = getExpType newExp
 
-setExpType memory (CONSExpCmdUn _ (ToInt p) exp1) 
+setExpType state (CONSExpCmdUn _ (ToInt p) exp1) 
     | (newExpType == NatString) || (newExpType == NatInt) = CONSExpCmdUn newExpType (ToInt p) newExp
     | otherwise = error ("ERROR: the toInt() function expects a " ++ (getTypeName NatInt) ++ " or a " ++ (getTypeName NatString ) ++ ", but a " ++ (getTypeName newExpType) ++ " was provided.")
 
     where 
-        newExp = setExpType memory exp1 
+        newExp = setExpType state exp1 
         newExpType = getExpType newExp
 
-setExpType memory (CONSExpCmdUn _ (ToBool p) exp1)     
+setExpType state (CONSExpCmdUn _ (ToBool p) exp1)     
     | (newExpType == NatString) || (newExpType == NatBool) = CONSExpCmdUn newExpType (ToBool p) newExp 
     | otherwise = error ("ERROR: the toBool() function expects a " ++ (getTypeName NatBool) ++ " or a " ++ (getTypeName NatString ) ++ ", but a " ++ (getTypeName newExpType) ++ " was provided.")
     | otherwise = error ("ERROR: this error shouldn't have appeared.")
 
     where 
-        newExp = setExpType memory exp1 
+        newExp = setExpType state exp1 
         newExpType = getExpType newExp
 
 -- alias to getNameOfType
 getTypeName = getNameOfType 
 
 -- | Gets the protocol of a function.
-getFunctionProtocol :: [MemoryCell] -- ^ the memory which contains the protocol of the function
+getFunctionProtocol :: ProgramState -- ^ the memory which contains the protocol of the function
                        -> String -- ^ the name of the function
                        -> ([Type], Type) -- ^ the function protocol (in terms of its parameters and its return type)
-getFunctionProtocol _ _ = ([], NatNothing)
+getFunctionProtocol state name = funcProtocol f
+    where
+        funcProtocol (Subprogram (CONSFunction _ a b _ )) = (fst (unzip a), b)
+        f = getFunctionFromMemory name (getStateGlobalMemory state)
 
 -- | Gets the most generic type t for a list of types such that all types in the list are compatible with t
 typeListType :: [Type] -> Type 
@@ -146,16 +150,16 @@ getExpType (CONSExpFuncCall t _ _) = t
 getExpType (CONSExpCmdZero t _) = t
 getExpType (CONSExpCmdUn t _ _) = t
 
-getStructFieldType :: [MemoryCell] -> String -> [String] -> Type 
-getStructFieldType memory name [] = 
-    NatStruct name
+getStructFieldType :: ProgramState -> String -> [String] -> Type 
+getStructFieldType state name [] = getStructType (getStructFromMemory name globalMem)
+    where globalMem = getStateGlobalMemory state
 
-getStructFieldType memory name (field : fields) 
+getStructFieldType state name (field : fields) 
     | fields == [] = actualFieldType
-    | otherwise = getStructFieldType memory field fields
+    | otherwise = getStructFieldType state field fields
     
     where 
-        structure = getStructStructure memory name
+        structure = getStructStructure state name
         actualFieldType = keyFromVal structure field
 
 keyFromVal :: (Eq v) => [(u, v)] -> v -> u
@@ -165,36 +169,36 @@ keyFromVal (x:xs) val
     | otherwise = keyFromVal xs val
 
 -- | Gets the structure  (list of fields) of a... well... struct...
-getStructStructure :: [MemoryCell] -- ^ the memory which contains the definition of the struct
+getStructStructure :: ProgramState -- ^ the memory which contains the definition of the struct
                    -> String -- ^ the name of the struct
                    -> [(Type, String)] -- ^ the structure (list of fields) of the struct
-getStructStructure memory x = []
+getStructStructure state x = []
 
 
-getLValueType :: [MemoryCell] -> LValue -> Type
-getLValueType memory (CONSLValueId id) = 
-    getVarTypeInMemory memory id 
+getLValueType :: ProgramState -> LValue -> Type
+getLValueType state (CONSLValueId id) = 
+    getVarTypeInMemory state id 
 
-getLValueType memory (CONSLValueStruct name fields ) = 
-    getStructFieldType memory name fields
+getLValueType state (CONSLValueStruct name fields ) = 
+    getStructFieldType state name fields
 
-getLValueType memory (CONSLValueArray name fields) 
+getLValueType state (CONSLValueArray name fields) 
     | not (elem NatInt  (f fields)  ) = error ("the arr index must be int")
     | otherwise = unwrapArrayType (length fields) t
 
     where 
-        t = getVarTypeInMemory memory name 
-        f xs = map (setAndGetExpType memory) xs
+        t = getVarTypeInMemory state name 
+        f xs = map (setAndGetExpType state) xs
 
-getLValueType memory (CONSLValueDerref name x) = 
+getLValueType state (CONSLValueDerref name x) = 
     unwrapPointerType x t
 
     where 
-        t = getVarTypeInMemory memory name 
+        t = getVarTypeInMemory state name 
 
-setAndGetExpType :: [MemoryCell] -> Exp -> Type 
-setAndGetExpType memory exp1 = 
-    getExpType (setExpType memory exp1) 
+setAndGetExpType :: ProgramState -> Exp -> Type 
+setAndGetExpType state exp1 = 
+    getExpType (setExpType state exp1) 
 
 unwrapArrayType :: Int -> Type -> Type 
 unwrapArrayType 0 t = t
