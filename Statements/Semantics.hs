@@ -34,7 +34,7 @@ playStmtsWithoutRet (stmt : stmts ) =
         return ()
 
 playStmtWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
-playStmtWithoutRet stmt = try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
+playStmtWithoutRet stmt = try (playVarInit stmt) <|> try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
 playPrint :: Statement -> ParsecT [Token] ProgramState IO ()
@@ -108,7 +108,7 @@ playVarInit :: Statement -> ParsecT [Token] ProgramState IO ()
 playVarInit stmt = 
     do 
         let maybevarinit = getStatementVarInit stmt 
-        if isNothing maybevarinit then fail ("error")
+        if isNothing maybevarinit then fail ("error in the init of a variable")
         else do 
             let varinit = fromJust maybevarinit -- VarInit
             let t = getVarInitType varinit -- Type 
@@ -127,3 +127,13 @@ playVarInit stmt =
                 return ()
 
             else error ("EXECERROR: you can't assign a " ++ (getNameOfType exprtype) ++ " to a variable of type " ++ (getNameOfType t))
+
+-- playAssignment :: Statement -> ParsecT [Token] ProgramState IO ()
+-- playAssignment stmt =
+--     do 
+--         let maybeassign = getStatementAssignment stmt 
+--         if isNothing maybeassign then fail ("error")
+--         else do
+--             let assign = fromJust maybeassign -- Assignment
+--             let t = 
+

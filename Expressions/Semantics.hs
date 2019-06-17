@@ -243,7 +243,7 @@ playExpUnEval (CONSExpUn t (CONSUnOp unOp) exp) =
 
 playExpUnEval _ =
     do
-        fail ("error")   
+        fail ("error when trying to parse an unary operation")   
 
 -- semantics to assignment
 playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
@@ -257,5 +257,29 @@ playExpAssignEval (CONSExpAssign t (CONSLValueId str) exp) =
 
 playExpAssignEval _ = 
     do
-        fail ("error")
+        fail ("error in the assignment of a variable")
         
+-- -- TODO: sets, structs and stuff
+-- playExpCmdUn (CONSExpCmdUn typ (ToString p) expr) = 
+--     do 
+--         val <- playExp expr -- Value
+--         if isValueString val then do 
+--             return $ val 
+--         else if isValueInteger val then do 
+--             let valint = getValueAsInteger val -- Integer
+--             return $ ConsNatString (show valint)
+--         else if isValueDouble val then do 
+--             let valdou  = getValueAsDouble val -- Double
+--             return $ ConsNatString (show valdou)
+--         else if isValueBool val then do 
+--             let valbool  = getValueAsBool val -- Bool
+--             return $ ConsNatString (show valbool)
+--         else 
+--             error ("EXECERROR: can't convert a " ++ (show (getTypeFromValue val)) ++ " to a string." )
+
+-- playExpCmdUn _ = 
+--     fail ("error")
+
+
+    
+-- _toStringToken <|> try _toIntToken <|> try _toDoubleToken <|> _toBoolToken
