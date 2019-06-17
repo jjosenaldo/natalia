@@ -40,11 +40,10 @@ playPrint stmt =
     do 
         let prnt = getStatementPrint stmt -- Print 
         let expr = getPrintExp prnt -- Exp
+        val <- playMyExp expr
         
-        if (getExpType expr) == NatString then do 
-            val <- playExp expr -- Value
-            let valAsStr = getValueAsString val -- String
-            liftIO (putStrLn valAsStr)
+        if (getTypeFromValue val) == NatString then do 
+            liftIO (putStrLn (getValueAsString val))
             return ()
         else 
             error ("EXECERROR: You can only print " ++ (getNameOfType NatString) ++ "!")

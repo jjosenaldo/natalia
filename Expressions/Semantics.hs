@@ -27,9 +27,18 @@ binaryEval :: Value -- ^ first operand
 binaryEval (ConsNatString x) (Plus _) (ConsNatString y) = ConsNatString (x ++ y)
 binaryEval _ (Plus p) _ = error ("ERROR at " ++ show(p) ++ ": the + operator expects two numbers.")
 
-playExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
-playExp expr = try (playExpBinEval expr) <|> (playExpLit expr) 
 
+playMyExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
+playMyExp expr = 
+    do 
+        
+        mem <- getState -- [MemoryCell]
+        let newExp = setExpType mem expr -- Exp
+        val <- playExp newExp
+        return $ val
+
+playExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
+playExp expr = (try (playExpBinEval expr)) <|> (playExpLit expr) 
 
 playExpLit expr = 
     do 
@@ -40,9 +49,10 @@ playExpLit expr =
 playExpBinEval (CONSExpBin t (CONSBinOp binOp) expr1 expr2) = 
     do 
         res1 <- (playExp expr1)
-        liftIO(print(show(res1)))
         res2 <- (playExp expr2)
         let val = (binaryEval (res1) (binOp) (res2))
-        liftIO(print(show(val)))
         return $ val
-
+        
+playExpBinEval _ = 
+    do 
+        fail ("error")
