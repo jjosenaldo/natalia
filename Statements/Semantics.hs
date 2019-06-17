@@ -34,7 +34,7 @@ playStmtsWithoutRet (stmt : stmts ) =
         return ()
 
 playStmtWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
-playStmtWithoutRet stmt = try (playVarInit stmt) <|> try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
+playStmtWithoutRet stmt = {-try (playWhile stmt) <|>-} try (playVarInit stmt) <|> try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
 playPrint :: Statement -> ParsecT [Token] ProgramState IO ()
@@ -145,3 +145,16 @@ playVarInit stmt =
 --                 cell <- getMemoryCellByName id s -- MemoryCell
 --                 newCell <- setValue cell newVal -- MemoryCell
 
+-- playWhile :: Statement -> ParsecT [Token] ProgramState IO ()
+-- playWhile stmt = 
+--     do 
+--         let maybewhile = getStatementWhile stmt -- Maybe While
+--         if isNothing maybewhile then fail ("error in a while") 
+--         else do 
+--             let while = fromJust maybewhile -- While 
+--             let expr = getWhileExp while -- Exp 
+--             let blk = getWhileBlock while -- Block
+--             ret <- semanticWhile expr blk 
+
+-- semanticWhile expr blk = 
+--     do 
