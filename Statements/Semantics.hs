@@ -34,7 +34,7 @@ playStmtsWithoutRet (stmt : stmts ) =
         return ()
 
 playStmtWithoutRet :: Statement -> ParsecT [Token] ProgramState IO ()
-playStmtWithoutRet stmt = {-try (playWhile stmt) <|>-} try (playVarInit stmt) <|> try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
+playStmtWithoutRet stmt = try (playVarInit stmt) <|> try (playWhile stmt) <|> try (playAssignment stmt) <|> try (playIfElseWithoutRet stmt) <|> try (playIfWithoutRet stmt ) <|> playPrint stmt
 
 
 playPrint :: Statement -> ParsecT [Token] ProgramState IO ()
@@ -49,6 +49,7 @@ playPrint stmt =
             val <- playMyExp expr
             
             if (getTypeFromValue val) == NatString then do 
+                -- don't erase this!
                 liftIO (putStrLn (getValueAsString val))
                 return ()
             else 
@@ -128,33 +129,48 @@ playVarInit stmt =
 
             else error ("EXECERROR: you can't assign a " ++ (getNameOfType exprtype) ++ " to a variable of type " ++ (getNameOfType t))
 
--- playAssignment :: Statement -> ParsecT [Token] ProgramState IO ()
--- playAssignment stmt =
---     do 
---         let maybeassign = getStatementAssignment stmt 
---         if isNothing maybeassign then fail ("error")
---         else do
---             let assign = fromJust maybeassign -- Assignment
---             let asslvalue = getLValueAssign assign -- LValue
---             let expr = getVarAssignExp assign -- Exp 
---             newVal <- playMyExp expr -- Value
+playAssignment :: Statement -> ParsecT [Token] ProgramState IO ()
+playAssignment stmt =
+    do 
+        let maybeassign = getStatementAssignment stmt 
+        if isNothing maybeassign then fail ("error")
+        else do
+            let assign = fromJust maybeassign -- Assignment
+            let asslvalue = getLValueAssign assign -- LValue
+            let expr = getVarAssignExp assign -- Exp 
+            newVal <- playMyExp expr -- Value
 
---             if isLValueLocalVar asslvalue then do 
---                 let id = getLocalVarId asslvalue -- String
---                 s <- getState -- ProgramState
---                 cell <- getMemoryCellByName id s -- MemoryCell
---                 newCell <- setValue cell newVal -- MemoryCell
+            if isLValueLocalVar asslvalue then do 
+                let id = getLocalVarId asslvalue -- String
+                s <- getState -- ProgramState
+                let cell = getMemoryCellByName id s -- MemoryCell
+                let newCell = setValue cell newVal -- MemoryCell
+                modifyState (stateMemoryUpdate newCell) 
+                return ()
+            else error ("error you're trying to assign a value to a thing that ain't a variable")
 
--- playWhile :: Statement -> ParsecT [Token] ProgramState IO ()
--- playWhile stmt = 
---     do 
---         let maybewhile = getStatementWhile stmt -- Maybe While
---         if isNothing maybewhile then fail ("error in a while") 
---         else do 
---             let while = fromJust maybewhile -- While 
---             let expr = getWhileExp while -- Exp 
---             let blk = getWhileBlock while -- Block
---             ret <- semanticWhile expr blk 
+playWhile :: Statement -> ParsecT [Token] ProgramState IO ()
+playWhile stmt = 
+    do 
+        let maybewhile = getStatementWhile stmt -- Maybe While
+        if isNothing maybewhile then fail ("error in a while") 
+        else do 
+            let while = fromJust maybewhile -- While 
+            let expr = getWhileExp while -- Exp 
+            let blk = getWhileBlock while -- Block
+            ret <- semanticWhile expr blk 
+            return ()
 
--- semanticWhile expr blk = 
---     do 
+semanticWhile expr blk = 
+    do 
+        val <- playMyExp expr -- Value 
+        let t = getTypeFromValue val -- Type 
+
+        if not (t == NatBool) then error ("The expression in a while must be " ++ (getNameOfType NatBool))
+        else do 
+            if not (getValueAsBool val) then do 
+                return () 
+            else do 
+                exec <- playBlockWithoutRet blk 
+                res <- semanticWhile expr blk 
+                return ()

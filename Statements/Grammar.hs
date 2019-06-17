@@ -124,7 +124,7 @@ getIfBlock (CONSIf _ blk1 ) = blk1
 getWhileExp :: While -> Exp 
 getWhileExp (CONSWhile ex  _ ) = ex 
 
-getWhileBlock :: If -> Block 
+getWhileBlock :: While -> Block 
 getWhileBlock (CONSWhile _  blk1 ) = blk1
 
 
