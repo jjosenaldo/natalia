@@ -129,6 +129,11 @@ typedefsToken = tokenPrim show updatePos get_token where
     get_token (Typedefs p) = Just (RetToken (Typedefs p))
     get_token _       = Nothing
 
+
+_typedefsToken :: ParsecT [Token] st IO (Token)
+_typedefsToken = tokenPrim show updatePos get_token where
+    get_token (Typedefs p) = Just (Typedefs p)
+    get_token _       = Nothing
 -- Pre-defined block (subprograms)
 _subprogramsToken :: ParsecT [Token] st IO (Token)
 _subprogramsToken = tokenPrim show updatePos get_token where
