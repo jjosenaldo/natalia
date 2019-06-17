@@ -107,9 +107,9 @@ getValue (Variable (ConstructVariable _ val _ _ _)) _ = val
 getValue (Variable (ConstructConstantVariable _ val _)) _ = val
 getValue c p = error ("ERROR "++show(p)++" you can't get value from a " ++ show(c))
 
-getCaller :: MemoryCell -> String
-getCaller (Variable (ConstructVariable _ _ _ f _)) = f
-getCaller _ = error ("Can't get creator of this cell (not a variable)")
+getCreator :: MemoryCell -> String
+getCreator (Variable (ConstructVariable _ _ _ f _)) = f
+getCreator _ = error ("Can't get creator of this cell (not a variable)")
 
 getValueByMemoryCell :: MemoryCell -> Value
 getValueByMemoryCell (Variable (ConstructVariable _ val _ _ _)) = val
@@ -152,12 +152,16 @@ memoryGet name p (cell:m) =
     else memoryGet name p m
 
 getMemoryCellByName :: String -- ^ the name of memory cell to be searched
-                    -> [MemoryCell] -- ^ the memory  
+                    -> ProgramState -- ^ the memory  
                     -> MemoryCell   -- ^ the value of memory cell
-getMemoryCellByName name [] = error ("ERROR when fetching name " ++ name ++ ": it is not in the memory.")
-getMemoryCellByName name (cell:m) = 
-    if (getId cell)  == name then cell
-    else getMemoryCellByName name m
+getMemoryCellByName name (CONSState creator _ m1 m2) = getMemoryCellByNameAndCreator name creator (m1++m2)
+
+getMemoryCellByNameAndCreator name creator (c:mem) = 
+    if (name == (getId c)) && (creator == (getCreator c)) then c
+    else getMemoryCellByNameAndCreator name creator mem
+getMemoryCellByName _ _ [] = error ("ERROR variable not found")
+
+
 
 memoryHasName :: String -- ^ the name of the variable or subprogram to be searched
     -> [MemoryCell] -- ^ the memory
