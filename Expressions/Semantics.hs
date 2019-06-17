@@ -1,8 +1,7 @@
-module Program.Semantics where
+module Expressions.Semantics where 
 
 -- natalia's modules
 import Expressions.Grammar
-import Expressions.Semantics
 import Expressions.Typing
 import Lexical.Lexemes
 import Memory.Memory
@@ -10,7 +9,6 @@ import PredefBlocks.Grammar
 import Program.Grammar
 import Program.Parser
 import Statements.Grammar
-import Statements.Semantics
 import Types.Types
 import TypeValue.TypeValue
 import Value.Value
@@ -21,10 +19,11 @@ import System.Environment
 import System.IO.Unsafe
 import Text.Parsec
 
-playProgram  = 
+playExp :: Exp -> ParsecT [Token] [MemoryCell] IO (Value)
+playExp = playExpLit 
+
+playExpLit expr = 
     do 
-        pg <- _program -- Program
-        let mainBlk = getProgramMainBlock pg -- MainBlock
-        let mainStmts = getMainBlockStatements mainBlk -- [Statements]
-        ret <- playStmtsWithNoReturn mainStmts
-        return ()
+        let tok = getExpLitToken expr -- Token
+        let val = getValueFromToken tok -- Value
+        return $ val 
