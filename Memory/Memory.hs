@@ -1,5 +1,7 @@
 module Memory.Memory where
 
+import Statements.Grammar
+import PredefBlocks.Grammar
 import Lexical.Lexemes
 import Types.Types
 import Types.Typedef
@@ -10,47 +12,47 @@ data Block =
     CONSBlock [Statement]
     deriving (Eq, Show)
 
-data Statement = 
-    CONSStatementVarInit VarInit                            |
-    CONSStatementVarAssign VarAssign                        |
-    CONSStatementPrint Print                                |
-    CONSStatementBlock Block                                |
-    CONSStatementIf Expression Block                        |
-    CONSStatementIfElse Expression Block Block              |
-    CONSStatementWhile Expression Block
-    deriving (Eq, Show)
+-- data Statement = 
+--     CONSStatementVarInit VarInit                            |
+--     CONSStatementVarAssign VarAssign                        |
+--     CONSStatementPrint Print                                |
+--     CONSStatementBlock Block                                |
+--     CONSStatementIf Expression Block                        |
+--     CONSStatementIfElse Expression Block Block              |
+--     CONSStatementWhile Expression Block
+--     deriving (Eq, Show)
 
-data Print = 
-    CONSPrint Expression
-    deriving (Eq, Show)
+-- data Print = 
+--     CONSPrint Expression
+--     deriving (Eq, Show)
 
-data VarInit = 
-    CONSVarInit Type Id Expression
-    deriving (Eq, Show)
+-- data VarInit = 
+--     CONSVarInit Type Id Expression
+--     deriving (Eq, Show)
 
-data VarAssign = 
-    CONSVarAssign Id Expression
-    deriving (Eq, Show)
+-- data VarAssign = 
+--     CONSVarAssign Id Expression
+--     deriving (Eq, Show)
 
-data UnOperator = 
-    CONSTokenUnOperator Token
-    deriving (Eq, Show)
+-- data UnOperator = 
+--     CONSTokenUnOperator Token
+--     deriving (Eq, Show)
 
-data BinOperator =
-    CONSTokenBinOperator Token 
-    deriving (Eq, Show)
+-- data BinOperator =
+--     CONSTokenBinOperator Token 
+--     deriving (Eq, Show)
 
-data Id = 
-    CONSTokenId Token -- Id
-    deriving (Eq, Show)
+-- data Id = 
+--     CONSTokenId Token -- Id
+--     deriving (Eq, Show)
 
-data Expression = 
-    CONSValue Value Type | -- literals
-    CONSId Id Type |
-    CONSUnOperation UnOperator Expression Type |
-    CONSBinOperation BinOperator Expression Expression Type |
-    CONSExprVarAssignment Id Expression Type
-    deriving (Eq, Show)
+-- data Expression = 
+--     CONSValue Value Type | -- literals
+--     CONSId Id Type |
+--     CONSUnOperation UnOperator Expression Type |
+--     CONSBinOperation BinOperator Expression Expression Type |
+--     CONSExprVarAssignment Id Expression Type
+--     deriving (Eq, Show)
 
 
 data Variable = 
@@ -84,8 +86,8 @@ getTypeOfFunctionCall :: String -> Type
 getTypeOfFunctionCall functionId = NatInt
 
 -- TODO: this is not implemented yet
-checkParamsPassed :: String -> [Expression] -> Bool
-checkParamsPassed id exprList = True
+-- checkParamsPassed :: String -> [Expression] -> Bool
+-- checkParamsPassed id exprList = True
 
 setValue::MemoryCell -> Value -> MemoryCell
 setValue (Variable (ConstructVariable name v1 isGlobal)) v2

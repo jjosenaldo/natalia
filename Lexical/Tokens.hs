@@ -14,84 +14,84 @@ import Control.Monad.IO.Class
 import System.IO.Unsafe
 
 data ReturnObject = 
-    RetBinOperator BinOperator |
-    RetBlock Block |
-    RetExpression Expression |
-    RetMemoryCell MemoryCell |
-    RetNothing |
-    RetStatement Statement | 
-    RetStatementList [Statement] | 
-    RetStructStructure [(Type, String)] |
-    RetStructValues [(String, Value)] |
+    -- RetBinOperator BinOperator |
+    -- RetBlock Block |
+    -- RetExpression Expression |
+    -- RetMemoryCell MemoryCell |
+    -- RetNothing |
+    -- RetStatement Statement | 
+    -- RetStatementList [Statement] | 
+    -- RetStructStructure [(Type, String)] |
+    -- RetStructValues [(String, Value)] |
     RetToken Token | 
-    RetType Type | 
-    RetValue Value | 
-    RetVarInit VarInit |
-    RetUnOperator UnOperator |
-    RetParamList [Parameter] |
-    RetExpressionList [Expression]
+    RetType Type -- | 
+    -- RetValue Value | 
+    -- RetVarInit VarInit |
+    -- RetUnOperator UnOperator |
+    -- RetParamList [Parameter] |
+    -- RetExpressionList [Expression]
     deriving (Eq, Show)
 
 
-getRetStatementList :: ReturnObject -> [Statement]
-getRetStatementList (RetStatementList x) = x
-getRetStatementList _ = error "Invalid conversion from ReturnObject to StatementList"
+-- getRetStatementList :: ReturnObject -> [Statement]
+-- getRetStatementList (RetStatementList x) = x
+-- getRetStatementList _ = error "Invalid conversion from ReturnObject to StatementList"
 
-getRetVarInit :: ReturnObject -> VarInit
-getRetVarInit (RetVarInit x) = x
-getRetVarInit _ = error "Invalid conversion from ReturnObject to VarInit"
+-- getRetVarInit :: ReturnObject -> VarInit
+-- getRetVarInit (RetVarInit x) = x
+-- getRetVarInit _ = error "Invalid conversion from ReturnObject to VarInit"
 
-getRetStatement :: ReturnObject -> Statement
-getRetStatement (RetStatement x) = x
-getRetStatement _ = error "Invalid conversion from ReturnObject to Statement"
+-- getRetStatement :: ReturnObject -> Statement
+-- getRetStatement (RetStatement x) = x
+-- getRetStatement _ = error "Invalid conversion from ReturnObject to Statement"
 
-getRetBlock :: ReturnObject -> Block
-getRetBlock (RetBlock x) = x
-getRetBlock _ = error "Invalid conversion from ReturnObject to Block"
+-- getRetBlock :: ReturnObject -> Block
+-- getRetBlock (RetBlock x) = x
+-- getRetBlock _ = error "Invalid conversion from ReturnObject to Block"
 
-getRetUnOperator :: ReturnObject -> UnOperator
-getRetUnOperator (RetUnOperator x) = x
-getRetUnOperator _ = error "Invalid conversion from ReturnObject to RetUnOperator"
+-- getRetUnOperator :: ReturnObject -> UnOperator
+-- getRetUnOperator (RetUnOperator x) = x
+-- getRetUnOperator _ = error "Invalid conversion from ReturnObject to RetUnOperator"
 
-getRetBinOperator :: ReturnObject -> BinOperator
-getRetBinOperator (RetBinOperator x) = x
-getRetBinOperator _ = error "Invalid conversion from ReturnObject to RetBinOperator"
+-- getRetBinOperator :: ReturnObject -> BinOperator
+-- getRetBinOperator (RetBinOperator x) = x
+-- getRetBinOperator _ = error "Invalid conversion from ReturnObject to RetBinOperator"
 
-getRetExpression :: ReturnObject -> Expression
-getRetExpression (RetExpression x) = x
-getRetExpression _ = error "Invalid conversion from ReturnObject to RetExpression"
+-- getRetExpression :: ReturnObject -> Expression
+-- getRetExpression (RetExpression x) = x
+-- getRetExpression _ = error "Invalid conversion from ReturnObject to RetExpression"
 
 getRetToken::ReturnObject -> Token
 getRetToken (RetToken t) = t
 getRetToken _ = error "Invalid conversion from ReturnObject to RetToken"
 
-getRetValue::ReturnObject -> Value
-getRetValue (RetValue v) = v
-getRetValue _ = error "Invalid conversion from ReturnObject to RetValue"
+-- getRetValue::ReturnObject -> Value
+-- getRetValue (RetValue v) = v
+-- getRetValue _ = error "Invalid conversion from ReturnObject to RetValue"
 
 getRetType::ReturnObject -> Type
 getRetType (RetType ttype) = ttype
 getRetType _ = error "Invalid conversion from ReturnObject to RetType"
 
-getRetMemoryCell::ReturnObject -> MemoryCell
-getRetMemoryCell (RetMemoryCell var) = var
-getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetMemoryCell"
+-- getRetMemoryCell::ReturnObject -> MemoryCell
+-- getRetMemoryCell (RetMemoryCell var) = var
+-- getRetMemoryCell _ = error "Invalid conversion from ReturnObject to RetMemoryCell"
 
-getRetStructStructure :: ReturnObject -> [(Type, String)]
-getRetStructStructure (RetStructStructure x) = x
-getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetStructStructure"
+-- getRetStructStructure :: ReturnObject -> [(Type, String)]
+-- getRetStructStructure (RetStructStructure x) = x
+-- getRetStructStructure _ = error "Invalid conversion from ReturnObject to RetStructStructure"
 
-getRetStructValues :: ReturnObject -> [(String, Value)]
-getRetStructValues (RetStructValues x) = x
-getRetStructValues _ = error "Invalid conversion from ReturnObject to RetStructValues"
+-- getRetStructValues :: ReturnObject -> [(String, Value)]
+-- getRetStructValues (RetStructValues x) = x
+-- getRetStructValues _ = error "Invalid conversion from ReturnObject to RetStructValues"
 
-getRetParamList :: ReturnObject -> [Parameter]
-getRetParamList (RetParamList x) = x
-getRetParamList _ = error "Invalid conversion from ReturnObject to RetParamList"
+-- getRetParamList :: ReturnObject -> [Parameter]
+-- getRetParamList (RetParamList x) = x
+-- getRetParamList _ = error "Invalid conversion from ReturnObject to RetParamList"
 
-getRetExpressionList :: ReturnObject -> [Expression]
-getRetExpressionList (RetExpressionList x) = x
-getRetExpressionList _ = error "Invalid conversion from ReturnObject to RetExpressionList"
+-- getRetExpressionList :: ReturnObject -> [Expression]
+-- getRetExpressionList (RetExpressionList x) = x
+-- getRetExpressionList _ = error "Invalid conversion from ReturnObject to RetExpressionList"
 
 _procToken :: ParsecT [Token] st IO (Token)
 _procToken = tokenPrim show updatePos get_token where
@@ -282,32 +282,32 @@ assignToken = tokenPrim show updatePos get_token where
     get_token (Assign p) = Just (RetToken (Assign p))
     get_token _      = Nothing
 
--- terminal: literal of type int
-intToken :: ParsecT [Token] st IO (ReturnObject)
-intToken = tokenPrim show updatePos get_token where
-    get_token (Int x _) = Just (RetValue (ConsNatInt x))
-    get_token _       = Nothing
+-- -- terminal: literal of type int
+-- intToken :: ParsecT [Token] st IO (ReturnObject)
+-- intToken = tokenPrim show updatePos get_token where
+--     get_token (Int x _) = Just (RetValue (ConsNatInt x))
+--     get_token _       = Nothing
 
-nullToken :: ParsecT [Token] st IO (ReturnObject)
-nullToken = tokenPrim show updatePos get_token where
-    get_token (Null _)  = Just (RetValue (ConsNatNull))
-    get_token _         = Nothing
+-- nullToken :: ParsecT [Token] st IO (ReturnObject)
+-- nullToken = tokenPrim show updatePos get_token where
+--     get_token (Null _)  = Just (RetValue (ConsNatNull))
+--     get_token _         = Nothing
 
-stringToken :: ParsecT [Token] st IO (ReturnObject)
-stringToken = tokenPrim show updatePos get_token where
-    get_token (String x _) = Just (RetValue (ConsNatString x))
-    get_token _            = Nothing
+-- stringToken :: ParsecT [Token] st IO (ReturnObject)
+-- stringToken = tokenPrim show updatePos get_token where
+--     get_token (String x _) = Just (RetValue (ConsNatString x))
+--     get_token _            = Nothing
 
--- literal of type double
-doubleToken :: ParsecT [Token] st IO (ReturnObject)
-doubleToken = tokenPrim show updatePos get_token where
-    get_token (Double x p) = Just (RetValue (ConsNatDouble x))
-    get_token _       = Nothing
+-- -- literal of type double
+-- doubleToken :: ParsecT [Token] st IO (ReturnObject)
+-- doubleToken = tokenPrim show updatePos get_token where
+--     get_token (Double x p) = Just (RetValue (ConsNatDouble x))
+--     get_token _       = Nothing
 
-boolToken :: ParsecT [Token] st IO (ReturnObject)
-boolToken = tokenPrim show updatePos get_token where
-    get_token (Bool x p) = Just (RetValue (ConsNatBool x))
-    get_token _ = Nothing     
+-- boolToken :: ParsecT [Token] st IO (ReturnObject)
+-- boolToken = tokenPrim show updatePos get_token where
+--     get_token (Bool x p) = Just (RetValue (ConsNatBool x))
+--     get_token _ = Nothing     
 
 equalsToken :: ParsecT [Token] st IO (ReturnObject)
 equalsToken = tokenPrim show updatePos get_token where
