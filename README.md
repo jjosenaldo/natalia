@@ -1,13 +1,18 @@
-# natalia Language
+# natalia language
 
-## How to compile
+This is an implementation of the natalia language which employs the interpretation approach. It was developed as the main assignment of the DIM0437 - LINGUAGENS DE PROGRAMACAO: CONCEITOS E PARADIGMAS (programming languages: concepts and paradigms) course.
 
+## Compilation
+
+To compile the interpreter, execute the following:
 ~~~~
 $ make
 ~~~~
 
-## How to execute
+## Usage
+
+To run the interpreter, execute the following, where `INPUT_FILE` is the path for a .nat file (a natalia program):
 
 ~~~~
-$ ./natalia.out <.nat file>
+$ ./natalia.out INPUT_FILE
 ~~~~
